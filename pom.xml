@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.jadaptive</groupId>
-  <artifactId>maverick-mcp</artifactId>
+  <artifactId>maverick-ssh-mcp</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <name>Maverick SSH MCP Server</name>
   <description>MCP server for Maverick Synergy SSH workflows</description>

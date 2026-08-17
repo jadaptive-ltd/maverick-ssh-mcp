@@ -1,4 +1,4 @@
-# Maverick MCP
+# Maverick SSH MCP
 
 Maverick Synergy based MCP server with handle-oriented SSH tooling.
 
@@ -36,7 +36,6 @@ Run the MCP server directly with Maven or plain Java without building a native i
 Maven resolves dependencies and starts the process in one step:
 
 ```bash
-cd /home/SOUTHPARK/tanktarta/Workspaces/Maverick-Synergy-Develop-Os/maverick-mcp
 # STDIO mode (e.g. for editor/integration testing)
 mvn -q exec:java -Dexec.args="--mode stdio"
 
@@ -51,7 +50,6 @@ Arguments are passed through to `com.jadaptive.mcp.MaverickMcpApplication`.
 Download dependencies and run with the system classpath plugin:
 
 ```bash
-cd /home/SOUTHPARK/tanktarta/Workspaces/Maverick-Synergy-Develop-Os/maverick-mcp
 
 # Step 1: Copy dependencies to target/dependency/
 mvn -q dependency:copy-dependencies -DoutputDirectory=target/dependency
@@ -69,14 +67,13 @@ Build the application JAR (not native) and run it:
 
 ```bash
 mvn -q package
-java -jar target/maverick-mcp-0.0.1-SNAPSHOT.jar --mode stdio
+java -jar target/maverick-ssh-mcp-0.0.1-SNAPSHOT.jar --mode stdio
 ```
 
 
 ## Build
 
 ```bash
-cd /home/SOUTHPARK/tanktarta/Workspaces/Maverick-Synergy-Develop-Os/maverick-mcp
 mvn -q test
 mvn -q package
 ```
@@ -84,7 +81,6 @@ mvn -q package
 ## Native image profile
 
 ```bash
-cd /home/SOUTHPARK/tanktarta/Workspaces/Maverick-Synergy-Develop-Os/maverick-mcp
 mvn -Pnative-images -DskipTests package
 ```
 
@@ -100,27 +96,13 @@ Environment variables:
 ### Local Build
 
 ```
-docker build -t maverick-mcp:local .
+docker build -t maverick-ssh-mcp:local .
 ```
 
 ### Local Run
 
 ```bash
-docker run --rm -p 7693:7693 maverick-mcp:local
-```
-
-## Endpoint smoke test (native Docker)
-
-Run the smoke script to build the image, boot the container, and verify HTTP endpoint behavior (`/` and `/mcp`).
-
-```bash
-./scripts/smoke-http.sh
-```
-
-Useful overrides:
-
-```bash
-BUILD_IMAGE=0 IMAGE_NAME=maverick-mcp:test HOST_PORT=7694 ./scripts/smoke-http.sh
+docker run --rm -p 7693:7693 maverick-ssh-mcp:local
 ```
 
 ## SSH Team integration
@@ -162,8 +144,3 @@ Additional SSH Team tools:
 - `sshteam_revoke_device` - revoke a remote device by id.
 - `sshteam_register_poll` - poll OAuth device flow with an existing `deviceCode`.
 
-## SSH Team smoke test
-
-```bash
-./scripts/smoke-sshteam.sh
-```
