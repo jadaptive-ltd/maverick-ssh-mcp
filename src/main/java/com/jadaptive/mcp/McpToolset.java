@@ -19,7 +19,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sshtools.client.KeyboardInteractiveAuthenticator;
 import com.sshtools.client.PasswordAuthenticator;
 import com.sshtools.client.PasswordOverKeyboardInteractiveCallback;
-import com.sshtools.client.PrivateKeyFileAuthenticator;
 import com.sshtools.client.SessionChannelNG;
 import com.sshtools.client.SshClient;
 import com.sshtools.client.SshClient.SshClientBuilder;
@@ -28,17 +27,14 @@ import com.sshtools.client.sftp.SftpChannel;
 import com.sshtools.client.sftp.SftpClient;
 import com.sshtools.client.sftp.SftpFile;
 import com.sshtools.client.sftp.SftpHandle;
-import com.sshtools.client.tasks.ShellTask;
 import com.sshtools.common.forwarding.ForwardingHandle;
 import com.sshtools.common.forwarding.ForwardingPolicy.ForwardingPolicyBuilder;
-import com.sshtools.common.forwarding.ForwardingRequest.ForwardingType;
-import com.sshtools.common.forwarding.ForwardingRequest.Protocol;
 import com.sshtools.common.forwarding.ForwardingRequest.ForwardingRequestBuilder;
+import com.sshtools.common.forwarding.ForwardingRequest.Protocol;
 import com.sshtools.common.permissions.UnauthorizedException;
 import com.sshtools.common.sftp.PosixPermissions;
 import com.sshtools.common.sftp.PosixPermissions.PosixPermissionsBuilder;
 import com.sshtools.common.sftp.SftpFileAttributes;
-import com.sshtools.common.sftp.SftpStatusException;
 import com.sshtools.common.ssh.RequestFuture;
 import com.sshtools.common.ssh.SshException;
 
@@ -55,211 +51,212 @@ final class McpToolset {
     private McpToolset() {
     }
 
-    static void register(McpServer.SyncSpecification<?> spec, HandleRegistry registry, DestructivePolicy destructivePolicy,
+    @SuppressWarnings("unused")
+	static void register(McpServer.SyncSpecification<?> spec, HandleRegistry registry, DestructivePolicy destructivePolicy,
             SshTeamService sshTeamService) {
-        spec.tool(tool("sshteam_register", "Register this MCP runtime as an SSH Team device using OAuth device flow.",
+        spec.toolCall(tool("sshteam_register", "Register this MCP runtime as an SSH Team device using OAuth device flow.",
                 """
                 {"type":"object","required":["serverUrl"],"properties":{"serverUrl":{"type":"string"},"clientId":{"type":"string","default":"sshteam-cli"},"scope":{"type":"string","default":"signing"},"deviceName":{"type":"string"},"pollIntervalSeconds":{"type":"integer","default":5},"maxWaitSeconds":{"type":"integer","default":600},"waitForAuthorization":{"type":"boolean","default":false},"ignoreSslTrust":{"type":"boolean","default":false},"setDefault":{"type":"boolean","default":true}}}
                 """),
-                (exchange, args) -> sshteamRegister(args, sshTeamService));
+                (exchange, request) -> sshteamRegister(toolArgs(request), sshTeamService));
 
-        spec.tool(tool("sshteam_status", "List local SSH Team registrations and token state.",
+        spec.toolCall(tool("sshteam_status", "List local SSH Team registrations and token state.",
                 """
                 {"type":"object","properties":{"serverUrl":{"type":"string"}}}
                 """),
-                (exchange, args) -> sshteamStatus(args, sshTeamService));
+                (exchange, request) -> sshteamStatus(toolArgs(request), sshTeamService));
 
-        spec.tool(tool("sshteam_register_poll", "Poll SSH Team OAuth device flow using a previously returned device code.",
+        spec.toolCall(tool("sshteam_register_poll", "Poll SSH Team OAuth device flow using a previously returned device code.",
                 """
                 {"type":"object","required":["serverUrl","deviceCode"],"properties":{"serverUrl":{"type":"string"},"deviceCode":{"type":"string"},"clientId":{"type":"string","default":"sshteam-cli"},"verificationUri":{"type":"string"},"userCode":{"type":"string"},"pollIntervalSeconds":{"type":"integer","default":5},"maxWaitSeconds":{"type":"integer","default":600},"ignoreSslTrust":{"type":"boolean","default":false},"setDefault":{"type":"boolean","default":true}}}
                 """),
-                (exchange, args) -> sshteamRegisterPoll(args, sshTeamService));
+                (exchange, request) -> sshteamRegisterPoll(toolArgs(request), sshTeamService));
 
-        spec.tool(tool("sshteam_revoke_device", "Revoke an SSH Team device by id.",
+        spec.toolCall(tool("sshteam_revoke_device", "Revoke an SSH Team device by id.",
                 """
                 {"type":"object","required":["deviceId"],"properties":{"serverUrl":{"type":"string"},"deviceId":{"type":"string"},"ignoreSslTrust":{"type":"boolean","default":false}}}
                 """),
-                (exchange, args) -> sshteamRevokeDevice(args, sshTeamService));
+                (exchange, request) -> sshteamRevokeDevice(toolArgs(request), sshTeamService));
 
-        spec.tool(tool("ssh_connect", "Open an SSH connection and return a handle.",
+        spec.toolCall(tool("ssh_connect", "Open an SSH connection and return a handle.",
                 """
                 {"type":"object","required":["host","username"],"properties":{"host":{"type":"string"},"port":{"type":"integer","default":22},"username":{"type":"string"},"password":{"type":"string"},"privateKeyPath":{"type":"string"},"privateKeyPassphrase":{"type":"string"},"keyboardInteractivePassword":{"type":"boolean","default":false},"connectTimeoutMs":{"type":"integer","default":30000},"sshTeamEnabled":{"type":"boolean","default":true},"sshTeamServer":{"type":"string"},"sshTeamIgnoreSslTrust":{"type":"boolean","default":false},"sshTeamCertificateType":{"type":"string","default":"ED25519"},"sshTeamTimezone":{"type":"string"}}}
                 """),
-                (exchange, args) -> sshConnect(args, registry, sshTeamService));
+                (exchange, request) -> sshConnect(toolArgs(request), registry, sshTeamService));
 
-        spec.tool(tool("ssh_status", "Get status for one SSH handle.",
+        spec.toolCall(tool("ssh_status", "Get status for one SSH handle.",
                 "{" +
                         "\"type\":\"object\",\"required\":[\"sshHandle\"],\"properties\":{\"sshHandle\":{\"type\":\"string\"}}" +
                         "}"),
-                (exchange, args) -> sshStatus(args, registry));
+                (exchange, request) -> sshStatus(toolArgs(request), registry));
 
-        spec.tool(tool("ssh_close", "Close an SSH handle.",
+        spec.toolCall(tool("ssh_close", "Close an SSH handle.",
                 "{" +
                         "\"type\":\"object\",\"required\":[\"sshHandle\"],\"properties\":{\"sshHandle\":{\"type\":\"string\"}}" +
                         "}"),
-                (exchange, args) -> closeResult("ssh", registry.closeSsh(stringArg(args, "sshHandle", true))));
+                (exchange, request) -> closeResult("ssh", registry.closeSsh(stringArg(toolArgs(request), "sshHandle", true))));
 
-        spec.tool(tool("shell_open", "Open a shell or exec command on an SSH connection.",
+        spec.toolCall(tool("shell_open", "Open a shell or exec command on an SSH connection.",
                 """
                 {"type":"object","required":["sshHandle"],"properties":{"sshHandle":{"type":"string"},"pty":{"type":"boolean","default":true},"term":{"type":"string","default":"xterm"},"cols":{"type":"integer","default":120},"rows":{"type":"integer","default":40},"command":{"type":"string"},"timeoutMs":{"type":"integer","default":30000}}}
                 """),
-                (exchange, args) -> shellOpen(args, registry));
+                (exchange, request) -> shellOpen(toolArgs(request), registry));
 
-        spec.tool(tool("shell_write", "Write data to an open shell handle.",
+        spec.toolCall(tool("shell_write", "Write data to an open shell handle.",
                 """
                 {"type":"object","required":["shellHandle","data"],"properties":{"shellHandle":{"type":"string"},"data":{"type":"string"},"appendNewline":{"type":"boolean","default":true}}}
                 """),
-                (exchange, args) -> shellWrite(args, registry));
+                (exchange, request) -> shellWrite(toolArgs(request), registry));
 
-        spec.tool(tool("shell_read", "Read available stdout/stderr bytes from a shell handle.",
+        spec.toolCall(tool("shell_read", "Read available stdout/stderr bytes from a shell handle.",
                 """
                 {"type":"object","required":["shellHandle"],"properties":{"shellHandle":{"type":"string"},"maxBytes":{"type":"integer","default":8192},"base64":{"type":"boolean","default":false}}}
                 """),
-                (exchange, args) -> shellRead(args, registry));
+                (exchange, request) -> shellRead(toolArgs(request), registry));
 
-        spec.tool(tool("shell_close", "Close a shell handle.",
+        spec.toolCall(tool("shell_close", "Close a shell handle.",
                 "{" +
                         "\"type\":\"object\",\"required\":[\"shellHandle\"],\"properties\":{\"shellHandle\":{\"type\":\"string\"}}" +
                         "}"),
-                (exchange, args) -> closeResult("shell", registry.closeShell(stringArg(args, "shellHandle", true))));
+                (exchange, request) -> closeResult("shell", registry.closeShell(stringArg(toolArgs(request), "shellHandle", true))));
 
-        spec.tool(tool("sftp_open", "Open an SFTP client from an SSH handle.",
+        spec.toolCall(tool("sftp_open", "Open an SFTP client from an SSH handle.",
                 """
                 {"type":"object","required":["sshHandle"],"properties":{"sshHandle":{"type":"string"},"remotePath":{"type":"string","default":"/"}}}
                 """),
-                (exchange, args) -> sftpOpen(args, registry));
+                (exchange, request) -> sftpOpen(toolArgs(request), registry));
 
-        spec.tool(tool("sftp_close", "Close an SFTP handle.",
+        spec.toolCall(tool("sftp_close", "Close an SFTP handle.",
                 "{" +
                         "\"type\":\"object\",\"required\":[\"sftpHandle\"],\"properties\":{\"sftpHandle\":{\"type\":\"string\"}}" +
                         "}"),
-                (exchange, args) -> closeResult("sftp", registry.closeSftp(stringArg(args, "sftpHandle", true))));
+                (exchange, request) -> closeResult("sftp", registry.closeSftp(stringArg(toolArgs(request), "sftpHandle", true))));
 
-        spec.tool(tool("sftp_pwd", "Get the current remote working directory of an SFTP client.",
+        spec.toolCall(tool("sftp_pwd", "Get the current remote working directory of an SFTP client.",
                 """
                 {"type":"object","required":["sftpHandle"],"properties":{"sftpHandle":{"type":"string"}}}
                 """),
-                (exchange, args) -> sftpPwd(args, registry));
+                (exchange, request) -> sftpPwd(toolArgs(request), registry));
 
-        spec.tool(tool("sftp_cd", "Change the current remote working directory of an SFTP client.",
+        spec.toolCall(tool("sftp_cd", "Change the current remote working directory of an SFTP client.",
                 """
                 {"type":"object","required":["sftpHandle","path"],"properties":{"sftpHandle":{"type":"string"},"path":{"type":"string"}}}
                 """),
-                (exchange, args) -> sftpCd(args, registry));
+                (exchange, request) -> sftpCd(toolArgs(request), registry));
 
-        spec.tool(tool("sftp_ls", "List files in a remote directory.",
+        spec.toolCall(tool("sftp_ls", "List files in a remote directory.",
                 """
                 {"type":"object","required":["sftpHandle"],"properties":{"sftpHandle":{"type":"string"},"path":{"type":"string"},"filter":{"type":"string"},"regexFilter":{"type":"boolean","default":false},"maximumFiles":{"type":"integer","default":0}}}
                 """),
-                (exchange, args) -> sftpLs(args, registry));
+                (exchange, request) -> sftpLs(toolArgs(request), registry));
 
-        spec.tool(tool("sftp_stat", "Get attributes of a remote file or directory.",
+        spec.toolCall(tool("sftp_stat", "Get attributes of a remote file or directory.",
                 """
                 {"type":"object","required":["sftpHandle","path"],"properties":{"sftpHandle":{"type":"string"},"path":{"type":"string"},"followLink":{"type":"boolean","default":true}}}
                 """),
-                (exchange, args) -> sftpStat(args, registry));
+                (exchange, request) -> sftpStat(toolArgs(request), registry));
 
-        spec.tool(tool("sftp_mkdir", "Create a remote directory.",
+        spec.toolCall(tool("sftp_mkdir", "Create a remote directory.",
                 """
                 {"type":"object","required":["sftpHandle","path"],"properties":{"sftpHandle":{"type":"string"},"path":{"type":"string"},"parents":{"type":"boolean","default":false}}}
                 """),
-                (exchange, args) -> sftpMkdir(args, registry));
+                (exchange, request) -> sftpMkdir(toolArgs(request), registry));
 
-        spec.tool(tool("sftp_rmdir", "Remove a remote directory.",
+        spec.toolCall(tool("sftp_rmdir", "Remove a remote directory.",
                 """
                 {"type":"object","required":["sftpHandle","path"],"properties":{"sftpHandle":{"type":"string"},"path":{"type":"string"}}}
                 """),
-                (exchange, args) -> sftpRmdir(args, registry));
+                (exchange, request) -> sftpRmdir(toolArgs(request), registry));
 
-        spec.tool(tool("sftp_rm", "Remove a remote file or directory tree.",
+        spec.toolCall(tool("sftp_rm", "Remove a remote file or directory tree.",
                 """
                 {"type":"object","required":["sftpHandle","path"],"properties":{"sftpHandle":{"type":"string"},"path":{"type":"string"},"recursive":{"type":"boolean","default":false},"force":{"type":"boolean","default":false}}}
                 """),
-                (exchange, args) -> sftpRm(args, registry));
+                (exchange, request) -> sftpRm(toolArgs(request), registry));
 
-        spec.tool(tool("sftp_rename", "Rename a remote file or directory.",
+        spec.toolCall(tool("sftp_rename", "Rename a remote file or directory.",
                 """
                 {"type":"object","required":["sftpHandle","oldPath","newPath"],"properties":{"sftpHandle":{"type":"string"},"oldPath":{"type":"string"},"newPath":{"type":"string"},"posix":{"type":"boolean","default":false}}}
                 """),
-                (exchange, args) -> sftpRename(args, registry));
+                (exchange, request) -> sftpRename(toolArgs(request), registry));
 
-        spec.tool(tool("sftp_symlink", "Create a symbolic link on the remote server.",
+        spec.toolCall(tool("sftp_symlink", "Create a symbolic link on the remote server.",
                 """
                 {"type":"object","required":["sftpHandle","target","linkPath"],"properties":{"sftpHandle":{"type":"string"},"target":{"type":"string"},"linkPath":{"type":"string"}}}
                 """),
-                (exchange, args) -> sftpSymlink(args, registry));
+                (exchange, request) -> sftpSymlink(toolArgs(request), registry));
 
-        spec.tool(tool("sftp_chmod", "Change permissions of a remote file or directory.",
+        spec.toolCall(tool("sftp_chmod", "Change permissions of a remote file or directory.",
                 """
                 {"type":"object","required":["sftpHandle","path","permissions"],"properties":{"sftpHandle":{"type":"string"},"path":{"type":"string"},"permissions":{"type":"string"}}}
                 """),
-                (exchange, args) -> sftpChmod(args, registry));
+                (exchange, request) -> sftpChmod(toolArgs(request), registry));
 
-        spec.tool(tool("sftp_chown", "Change owner/group of a remote file or directory.",
+        spec.toolCall(tool("sftp_chown", "Change owner/group of a remote file or directory.",
                 """
                 {"type":"object","required":["sftpHandle","path"],"properties":{"sftpHandle":{"type":"string"},"path":{"type":"string"},"owner":{"type":"string"},"group":{"type":"string"}}}
                 """),
-                (exchange, args) -> sftpChown(args, registry));
+                (exchange, request) -> sftpChown(toolArgs(request), registry));
 
-        spec.tool(tool("sftp_file_open", "Open a remote file for random access and return an SFTP file handle.",
+        spec.toolCall(tool("sftp_file_open", "Open a remote file for random access and return an SFTP file handle.",
                 """
                 {"type":"object","required":["sftpHandle","path"],"properties":{"sftpHandle":{"type":"string"},"path":{"type":"string"},"read":{"type":"boolean","default":true},"write":{"type":"boolean","default":false},"create":{"type":"boolean","default":false},"truncate":{"type":"boolean","default":false},"append":{"type":"boolean","default":false}}}
                 """),
-                (exchange, args) -> sftpFileOpen(args, registry));
+                (exchange, request) -> sftpFileOpen(toolArgs(request), registry));
 
-        spec.tool(tool("sftp_file_read", "Read bytes from an open SFTP file handle at a given offset.",
+        spec.toolCall(tool("sftp_file_read", "Read bytes from an open SFTP file handle at a given offset.",
                 """
                 {"type":"object","required":["sftpFileHandle","offset","length"],"properties":{"sftpFileHandle":{"type":"string"},"offset":{"type":"integer"},"length":{"type":"integer"},"base64":{"type":"boolean","default":false}}}
                 """),
-                (exchange, args) -> sftpFileRead(args, registry));
+                (exchange, request) -> sftpFileRead(toolArgs(request), registry));
 
-        spec.tool(tool("sftp_file_write", "Write bytes to an open SFTP file handle at a given offset.",
+        spec.toolCall(tool("sftp_file_write", "Write bytes to an open SFTP file handle at a given offset.",
                 """
                 {"type":"object","required":["sftpFileHandle","offset","data"],"properties":{"sftpFileHandle":{"type":"string"},"offset":{"type":"integer"},"data":{"type":"string"},"base64":{"type":"boolean","default":true}}}
                 """),
-                (exchange, args) -> sftpFileWrite(args, registry));
+                (exchange, request) -> sftpFileWrite(toolArgs(request), registry));
 
-        spec.tool(tool("sftp_file_close", "Close an SFTP file handle.",
+        spec.toolCall(tool("sftp_file_close", "Close an SFTP file handle.",
                 """
                 {"type":"object","required":["sftpFileHandle"],"properties":{"sftpFileHandle":{"type":"string"}}}
                 """),
-                (exchange, args) -> closeResult("sftpfile", registry.closeSftpFile(stringArg(args, "sftpFileHandle", true))));
+                (exchange, request) -> closeResult("sftpfile", registry.closeSftpFile(stringArg(toolArgs(request), "sftpFileHandle", true))));
 
-        spec.tool(tool("tunnel_open_local", "Open a local tunnel and return a handle.",
+        spec.toolCall(tool("tunnel_open_local", "Open a local tunnel and return a handle.",
                 """
                 {"type":"object","required":["sshHandle","bindAddress","bindPort","destinationAddress","destinationPort"],"properties":{"sshHandle":{"type":"string"},"protocol":{"type":"string","enum":["tcp","unix"],"default":"tcp"},"bindAddress":{"type":"string"},"bindPort":{"type":"integer"},"destinationAddress":{"type":"string"},"destinationPort":{"type":"integer"},"bindPath":{"type":"string"},"destinationPath":{"type":"string"}}}
                 """),
-                (exchange, args) -> tunnelOpenLocal(args, registry));
+                (exchange, request) -> tunnelOpenLocal(toolArgs(request), registry));
 
-        spec.tool(tool("tunnel_open_remote", "Open a remote tunnel and return a handle.",
+        spec.toolCall(tool("tunnel_open_remote", "Open a remote tunnel and return a handle.",
                 """
                 {"type":"object","required":["sshHandle","bindAddress","bindPort","destinationAddress","destinationPort"],"properties":{"sshHandle":{"type":"string"},"protocol":{"type":"string","enum":["tcp","unix"],"default":"tcp"},"bindAddress":{"type":"string"},"bindPort":{"type":"integer"},"destinationAddress":{"type":"string"},"destinationPort":{"type":"integer"},"bindPath":{"type":"string"},"destinationPath":{"type":"string"}}}
                 """),
-                (exchange, args) -> tunnelOpenRemote(args, registry));
+                (exchange, request) -> tunnelOpenRemote(toolArgs(request), registry));
 
-        spec.tool(tool("tunnel_close", "Close a tunnel handle.",
+        spec.toolCall(tool("tunnel_close", "Close a tunnel handle.",
                 "{" +
                         "\"type\":\"object\",\"required\":[\"tunnelHandle\"],\"properties\":{\"tunnelHandle\":{\"type\":\"string\"}}" +
                         "}"),
-                (exchange, args) -> closeResult("tunnel", registry.closeTunnel(stringArg(args, "tunnelHandle", true))));
+                (exchange, request) -> closeResult("tunnel", registry.closeTunnel(stringArg(toolArgs(request), "tunnelHandle", true))));
 
-        spec.tool(tool("scp_copy_to", "Upload files to a remote host using legacy SCP via an SSH handle.",
+        spec.toolCall(tool("scp_copy_to", "Upload files to a remote host using legacy SCP via an SSH handle.",
                 """
                 {"type":"object","required":["sshHandle","localPath","remotePath"],"properties":{"sshHandle":{"type":"string"},"localPath":{"type":"string"},"remotePath":{"type":"string"},"recursive":{"type":"boolean","default":false}}}
                 """),
-                (exchange, args) -> scpCopyTo(args, registry));
+                (exchange, request) -> scpCopyTo(toolArgs(request), registry));
 
-        spec.tool(tool("scp_copy_from", "Download files from a remote host using legacy SCP via an SSH handle.",
+        spec.toolCall(tool("scp_copy_from", "Download files from a remote host using legacy SCP via an SSH handle.",
                 """
                 {"type":"object","required":["sshHandle","remotePath","localPath"],"properties":{"sshHandle":{"type":"string"},"remotePath":{"type":"string"},"localPath":{"type":"string"},"recursive":{"type":"boolean","default":false}}}
                 """),
-                (exchange, args) -> scpCopyFrom(args, registry));
+                (exchange, request) -> scpCopyFrom(toolArgs(request), registry));
 
-        spec.tool(tool("sftp_remove_guard", "Policy-gated helper for destructive file operations.",
+        spec.toolCall(tool("sftp_remove_guard", "Policy-gated helper for destructive file operations.",
                 """
                 {"type":"object","required":["sftpHandle","path"],"properties":{"sftpHandle":{"type":"string"},"path":{"type":"string"},"recursive":{"type":"boolean","default":false},"confirm":{"type":"boolean","default":false}}}
                 """),
-                (exchange, args) -> destructiveGuard(args, destructivePolicy));
+                (exchange, request) -> destructiveGuard(toolArgs(request), destructivePolicy));
 
         spec.resources(
                 new SyncResourceSpecification(
@@ -292,8 +289,9 @@ final class McpToolset {
                                             asJson(policyState))));
                         }));
     }
-
-    private static McpSchema.CallToolResult sshConnect(Map<String, Object> args, HandleRegistry registry,
+    
+    @SuppressWarnings("unused")
+	private static McpSchema.CallToolResult sshConnect(Map<String, Object> args, HandleRegistry registry,
             SshTeamService sshTeamService) {
         try {
             String host = stringArg(args, "host", true);
@@ -334,7 +332,7 @@ final class McpToolset {
             }
             if (privateKeyPath != null) {
                 if (privateKeyPassphrase != null) {
-                    builder.withPrivateKeyFile(Path.of(privateKeyPath), keyInfo -> privateKeyPassphrase);
+                    builder.withPrivateKeyFile(Path.of(privateKeyPath), (keyInfo) -> privateKeyPassphrase);
                 }
                 else {
                     builder.withPrivateKeyFile(Path.of(privateKeyPath));
@@ -1101,6 +1099,11 @@ final class McpToolset {
         payload.put("path", path);
         payload.put("recursive", recursive);
         return ok(payload);
+    }
+
+    private static Map<String, Object> toolArgs(McpSchema.CallToolRequest request) {
+        Map<String, Object> arguments = request.arguments();
+        return arguments == null ? Collections.emptyMap() : arguments;
     }
 
     private static McpSchema.Tool tool(String name, String description, String schemaJson) {

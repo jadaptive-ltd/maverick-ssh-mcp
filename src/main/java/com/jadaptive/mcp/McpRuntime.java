@@ -1,10 +1,21 @@
 package com.jadaptive.mcp;
 
+import java.io.IOException;
 import java.time.Duration;
+import java.util.EnumSet;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.DispatcherType;
+import jakarta.servlet.Filter;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 
@@ -27,16 +38,23 @@ final class McpRuntime implements AutoCloseable {
     private final String bindHost;
     private final int bindPort;
     private final String endpoint;
+    private final String mcpToken;
 
     private McpSyncServer mcpServer;
     private Server httpServer;
 
     McpRuntime(DestructivePolicy destructivePolicy, Mode mode, String bindHost, int bindPort, String endpoint) {
+        this(destructivePolicy, mode, bindHost, bindPort, endpoint, System.getenv("MCP_TOKEN"));
+    }
+
+    McpRuntime(DestructivePolicy destructivePolicy, Mode mode, String bindHost, int bindPort, String endpoint,
+            String mcpToken) {
         this.destructivePolicy = destructivePolicy;
         this.mode = mode;
         this.bindHost = bindHost;
         this.bindPort = bindPort;
         this.endpoint = endpoint;
+        this.mcpToken = emptyToNull(mcpToken);
     }
 
     void start() throws Exception {
@@ -61,6 +79,12 @@ final class McpRuntime implements AutoCloseable {
 
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.NO_SESSIONS);
         context.setContextPath("/");
+        if (mcpToken != null) {
+            context.addFilter(
+                    new FilterHolder(new BearerTokenFilter(mcpToken)),
+                    normalizedEndpoint() + "/*",
+                    EnumSet.of(DispatcherType.REQUEST));
+        }
         context.addServlet(new ServletHolder(transport), normalizedEndpoint() + "/*");
         httpServer.setHandler(context);
         httpServer.start();
@@ -72,6 +96,13 @@ final class McpRuntime implements AutoCloseable {
             return;
         }
         Thread.currentThread().join();
+    }
+
+    int httpPort() {
+        if (httpServer == null || httpServer.getConnectors().length == 0) {
+            return -1;
+        }
+        return ((ServerConnector) httpServer.getConnectors()[0]).getLocalPort();
     }
 
     @Override
@@ -114,5 +145,43 @@ final class McpRuntime implements AutoCloseable {
             return "/mcp";
         }
         return endpoint.startsWith("/") ? endpoint : "/" + endpoint;
+    }
+
+    private static String emptyToNull(String value) {
+        if (value == null) {
+            return null;
+        }
+        String trimmed = value.trim();
+        return trimmed.isEmpty() ? null : trimmed;
+    }
+
+    private static final class BearerTokenFilter implements Filter {
+
+        private final String expectedAuthorization;
+
+        private BearerTokenFilter(String token) {
+            this.expectedAuthorization = "Bearer " + token;
+        }
+
+        @Override
+        public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+                throws IOException, ServletException {
+            if (!(request instanceof HttpServletRequest httpRequest)
+                    || !(response instanceof HttpServletResponse httpResponse)) {
+                chain.doFilter(request, response);
+                return;
+            }
+
+            String authorization = httpRequest.getHeader("Authorization");
+            if (!expectedAuthorization.equals(authorization)) {
+                httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                httpResponse.setHeader("WWW-Authenticate", "Bearer");
+                httpResponse.setContentType("text/plain;charset=UTF-8");
+                httpResponse.getWriter().write("Unauthorized");
+                return;
+            }
+
+            chain.doFilter(request, response);
+        }
     }
 }

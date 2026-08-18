@@ -7,6 +7,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.security.Provider;
+import java.security.Security;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.sshteam.lib.DeviceCredentials;
@@ -20,6 +22,21 @@ final class SshTeamService {
 
     SshTeamService(SshTeamDeviceStore store) {
         this.store = store;
+        ensureBouncyCastleProvider();
+    }
+
+    private static void ensureBouncyCastleProvider() {
+        if (Security.getProvider("BC") != null) {
+            return;
+        }
+        try {
+            Class<?> clazz = Class.forName("org.bouncycastle.jce.provider.BouncyCastleProvider");
+            Provider provider = (Provider) clazz.getDeclaredConstructor().newInstance();
+            Security.addProvider(provider);
+        }
+        catch (Exception e) {
+            throw new IllegalStateException("Failed to load Bouncy Castle provider", e);
+        }
     }
 
     RegistrationResult register(String serverUrl, String clientId, String scope, String deviceName,
@@ -29,13 +46,15 @@ final class SshTeamService {
         store.initServer(normalizedServerUrl);
 
         SshteamHttpClient client = new SshteamHttpClient(normalizedServerUrl, ignoreSslTrust);
+        
+        /* TODO hrm... looks importantion ...  why is this here with unused variable? */
         DpopSigner signer = DpopSigner.generate();
 
         JsonNode authResponse = client.deviceAuthorize(clientId, scope, deviceName);
         String deviceCode = text(authResponse, "device_code");
         String userCode = text(authResponse, "user_code");
-        String verificationUri = text(authResponse, "verification_uri");
-        String verificationUriComplete = authResponse.path("verification_uri_complete").asText(verificationUri + "?user_code=" + userCode);
+//        String verificationUri = text(authResponse, "verification_uri");
+        String verificationUriComplete = authResponse.path("verification_uri_complete").asText();
         long expiresIn = authResponse.path("expires_in").asLong(600L);
 
         if (!waitForAuthorization) {
@@ -74,7 +93,7 @@ final class SshTeamService {
                 break;
             }
 
-            String error = pollResult.path("error").asText("unknown");
+            String error = pollResult.path("error").asText();
             if ("authorization_pending".equals(error) || "slow_down".equals(error)) {
                 continue;
             }
@@ -180,9 +199,9 @@ final class SshTeamService {
                 requestTimezone,
                 certificateType == null || certificateType.isBlank() ? "ED25519" : certificateType);
 
-        String certificate = response.path("certificate").asText("").trim();
+        String certificate = response.path("certificate").asText().trim();
         if (certificate.isEmpty()) {
-            String error = response.path("error").asText("SSH Teams did not return a certificate.");
+            String error = response.path("error").asText();
             throw new IllegalStateException(error);
         }
         return certificate;
@@ -203,7 +222,7 @@ final class SshTeamService {
     }
 
     private static String text(JsonNode node, String key) {
-        String value = node.path(key).asText("");
+        String value = node.path(key).asText();
         if (value.isBlank()) {
             throw new IllegalStateException("Missing expected field: " + key);
         }

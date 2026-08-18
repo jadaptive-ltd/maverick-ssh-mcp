@@ -1,0 +1,2917 @@
+{
+  "reflection": [
+    {
+      "type": "com.ethlo.time.ITU"
+    },
+    {
+      "type": "com.fasterxml.jackson.databind.ext.Java7SupportImpl",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.jadaptive.mcp.MaverickMcpApplication",
+      "fields": [
+        {
+          "name": "destructivePolicy"
+        },
+        {
+          "name": "endpoint"
+        },
+        {
+          "name": "host"
+        },
+        {
+          "name": "mode"
+        },
+        {
+          "name": "port"
+        }
+      ]
+    },
+    {
+      "type": "com.jadaptive.mcp.SshTeamDeviceStore$DefaultsRecord",
+      "fields": [
+        {
+          "name": "defaultServer"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.jadaptive.mcp.SshTeamDeviceStore$StoredCredentials",
+      "fields": [
+        {
+          "name": "accessToken"
+        },
+        {
+          "name": "accessTokenExpiresAt"
+        },
+        {
+          "name": "keyId"
+        },
+        {
+          "name": "refreshToken"
+        },
+        {
+          "name": "serverUrl"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sshtools.client.DefaultRemoteForwardRequestHandler"
+    },
+    {
+      "type": "com.sshtools.client.LocalClientForwardingFactory"
+    },
+    {
+      "type": "com.sshtools.client.UnixDomainSocketClientForwardingFactory"
+    },
+    {
+      "type": "com.sshtools.client.UnixDomainSocketRemoteForwardRequestHandler"
+    },
+    {
+      "type": "com.sshtools.client.components.Curve25519SHA256Client$Curve25519SHA256ClientFactory"
+    },
+    {
+      "type": "com.sshtools.client.components.Curve25519SHA256LibSshClient$Curve25519SHA256LibSshClientFactory"
+    },
+    {
+      "type": "com.sshtools.client.components.DiffieHellmanEcdhNistp256$DiffieHellmanEcdhNistp256Factory"
+    },
+    {
+      "type": "com.sshtools.client.components.DiffieHellmanEcdhNistp384$DiffieHellmanEcdhNistp384Factory"
+    },
+    {
+      "type": "com.sshtools.client.components.DiffieHellmanEcdhNistp521$DiffieHellmanEcdhNistp521Factory"
+    },
+    {
+      "type": "com.sshtools.client.components.DiffieHellmanGroup14Sha1JCE$DiffieHellmanGroup14Sha1JCEFactory"
+    },
+    {
+      "type": "com.sshtools.client.components.DiffieHellmanGroup14Sha256JCE$DiffieHellmanGroup14Sha256JCEFactory"
+    },
+    {
+      "type": "com.sshtools.client.components.DiffieHellmanGroup15Sha512JCE$DiffieHellmanGroup15Sha512JCEFactory"
+    },
+    {
+      "type": "com.sshtools.client.components.DiffieHellmanGroup16Sha512JCE$DiffieHellmanGroup16Sha512JCEFactory"
+    },
+    {
+      "type": "com.sshtools.client.components.DiffieHellmanGroup17Sha512JCE$DiffieHellmanGroup17Sha512JCEFactory"
+    },
+    {
+      "type": "com.sshtools.client.components.DiffieHellmanGroup18Sha512JCE$DiffieHellmanGroup18Sha512JCEFactory"
+    },
+    {
+      "type": "com.sshtools.client.components.DiffieHellmanGroup1Sha1JCE$DiffieHellmanGroup1Sha1JCEFactory"
+    },
+    {
+      "type": "com.sshtools.client.components.DiffieHellmanGroupExchangeSha1JCE$DiffieHellmanGroupExchangeSha1JCEFactory"
+    },
+    {
+      "type": "com.sshtools.client.components.DiffieHellmanGroupExchangeSha256JCE$DiffieHellmanGroupExchangeSha256JCEFactory"
+    },
+    {
+      "type": "com.sshtools.client.components.Rsa1024Sha1$Rsa1024Sha1Factory"
+    },
+    {
+      "type": "com.sshtools.client.components.Rsa2048Sha256$Rsa2048Sha256Factory"
+    },
+    {
+      "type": "com.sshtools.common.events.EventCodes"
+    },
+    {
+      "type": "com.sshtools.common.policy.FileSystemPolicy",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sshtools.common.policy.SignaturePolicy",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sshtools.common.permissions.Permissions",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sshtools.common.permissions.IPPolicy",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sshtools.common.forwarding.ForwardingPolicy",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sshtools.common.shell.ShellPolicy",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sshtools.common.policy.AuthenticationPolicy",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sshtools.common.policy.KeyExchangePolicy",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sshtools.common.policy.ClassLoaderPolicy",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sshtools.common.scp.ScpPolicy",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sshtools.common.ssh.components.NoneCipher$NoneCipherFactory"
+    },
+    {
+      "type": "com.sshtools.common.ssh.components.NoneHmac$NoneHmacFactory"
+    },
+    {
+      "type": "com.sshtools.common.ssh.components.jce.AES128Cbc$AES128CbcFactory"
+    },
+    {
+      "type": "com.sshtools.common.ssh.components.jce.AES128Ctr$AES128CtrFactory"
+    },
+    {
+      "type": "com.sshtools.common.ssh.components.jce.AES128Gcm$AES128GcmFactory"
+    },
+    {
+      "type": "com.sshtools.common.ssh.components.jce.AES192Cbc$AES192CbcFactory"
+    },
+    {
+      "type": "com.sshtools.common.ssh.components.jce.AES192Ctr$AES192CtrFactory"
+    },
+    {
+      "type": "com.sshtools.common.ssh.components.jce.AES256Cbc$AES256CbcFactory"
+    },
+    {
+      "type": "com.sshtools.common.ssh.components.jce.AES256Ctr$AES256CtrFactory"
+    },
+    {
+      "type": "com.sshtools.common.ssh.components.jce.AES256Gcm$AES256GcmFactory"
+    },
+    {
+      "type": "com.sshtools.common.ssh.components.jce.ArcFour$ArcFourFactory"
+    },
+    {
+      "type": "com.sshtools.common.ssh.components.jce.ArcFour128$ArcFour128Factory"
+    },
+    {
+      "type": "com.sshtools.common.ssh.components.jce.ArcFour256$ArcFour256Factory"
+    },
+    {
+      "type": "com.sshtools.common.ssh.components.jce.BlowfishCbc$BlowfishCbcFactory"
+    },
+    {
+      "type": "com.sshtools.common.ssh.components.jce.ChaCha20Poly1305$ChaCha20Poly1305Factory"
+    },
+    {
+      "type": "com.sshtools.common.ssh.components.jce.HmacMD5$HmacMD5Factory"
+    },
+    {
+      "type": "com.sshtools.common.ssh.components.jce.HmacMD596$HmacMD596Factory"
+    },
+    {
+      "type": "com.sshtools.common.ssh.components.jce.HmacMD5ETM$HmacMD5ETMFactory"
+    },
+    {
+      "type": "com.sshtools.common.ssh.components.jce.HmacRipeMd160$HmacRipeMd160Factory"
+    },
+    {
+      "type": "com.sshtools.common.ssh.components.jce.HmacRipeMd160ETM$HmacRipeMd160ETMFactory"
+    },
+    {
+      "type": "com.sshtools.common.ssh.components.jce.HmacSha1$HmacSha1Factory"
+    },
+    {
+      "type": "com.sshtools.common.ssh.components.jce.HmacSha196$HmacSha196Factory"
+    },
+    {
+      "type": "com.sshtools.common.ssh.components.jce.HmacSha1ETM$HmacSha1ETMFactory"
+    },
+    {
+      "type": "com.sshtools.common.ssh.components.jce.HmacSha256$HmacSha256Factory"
+    },
+    {
+      "type": "com.sshtools.common.ssh.components.jce.HmacSha256ETM$HmacSha256ETMFactory"
+    },
+    {
+      "type": "com.sshtools.common.ssh.components.jce.HmacSha256_96$HmacSha256_96Factory"
+    },
+    {
+      "type": "com.sshtools.common.ssh.components.jce.HmacSha256_at_ssh_dot_com$HmacSha256_at_ssh_dot_comFactory"
+    },
+    {
+      "type": "com.sshtools.common.ssh.components.jce.HmacSha512$HmacSha512Factory"
+    },
+    {
+      "type": "com.sshtools.common.ssh.components.jce.HmacSha512ETM$HmacSha512ETMFactory"
+    },
+    {
+      "type": "com.sshtools.common.ssh.components.jce.HmacSha512_96$HmacSha512_96Factory"
+    },
+    {
+      "type": "com.sshtools.common.ssh.components.jce.MD5Digest$MD5DigestFactory"
+    },
+    {
+      "type": "com.sshtools.common.ssh.components.jce.OpenSshEcdsaSha2Nist256Certificate$OpenSshEcdsaSha2Nist256CertificateFactory"
+    },
+    {
+      "type": "com.sshtools.common.ssh.components.jce.OpenSshEcdsaSha2Nist384Certificate$OpenSshEcdsaSha2Nist384CertificateFactory"
+    },
+    {
+      "type": "com.sshtools.common.ssh.components.jce.OpenSshEcdsaSha2Nist521Certificate$OpenSshEcdsaSha2Nist521CertificateFactory"
+    },
+    {
+      "type": "com.sshtools.common.ssh.components.jce.OpenSshEd25519Certificate$OpenSshEd25519CertificateFactory"
+    },
+    {
+      "type": "com.sshtools.common.ssh.components.jce.OpenSshRsaCertificate$OpenSshRsaCertificateFactory"
+    },
+    {
+      "type": "com.sshtools.common.ssh.components.jce.OpenSshRsaSha256Certificate$OpenSshRsaSha256CertificateFactory"
+    },
+    {
+      "type": "com.sshtools.common.ssh.components.jce.OpenSshRsaSha512Certificate$OpenSshRsaSha512CertificateFactory"
+    },
+    {
+      "type": "com.sshtools.common.ssh.components.jce.SHA1Digest$SHA1DigestFactory"
+    },
+    {
+      "type": "com.sshtools.common.ssh.components.jce.SHA256Digest$SHA256DigestFactory"
+    },
+    {
+      "type": "com.sshtools.common.ssh.components.jce.SHA384Digest$SHA384DigestFactory"
+    },
+    {
+      "type": "com.sshtools.common.ssh.components.jce.SHA512Digest$SHA512DigestFactory"
+    },
+    {
+      "type": "com.sshtools.common.ssh.components.jce.Ssh2DsaPublicKey$Ssh2DsaPublicKeyFactory"
+    },
+    {
+      "type": "com.sshtools.common.ssh.components.jce.Ssh2EcdsaSha2Nist256PublicKey$Ssh2EcdsaSha2Nist256PublicKeyFactory"
+    },
+    {
+      "type": "com.sshtools.common.ssh.components.jce.Ssh2EcdsaSha2Nist384PublicKey$Ssh2EcdsaSha2Nist384PublicKeyFactory"
+    },
+    {
+      "type": "com.sshtools.common.ssh.components.jce.Ssh2EcdsaSha2Nist521PublicKey$Ssh2EcdsaSha2Nist521PublicKeyFactory"
+    },
+    {
+      "type": "com.sshtools.common.ssh.components.jce.Ssh2RsaPublicKey$Ssh2RsaPublicKeyFactory"
+    },
+    {
+      "type": "com.sshtools.common.ssh.components.jce.Ssh2RsaPublicKeySHA256$Ssh2RsaPublicKeySHA256Factory"
+    },
+    {
+      "type": "com.sshtools.common.ssh.components.jce.Ssh2RsaPublicKeySHA512$Ssh2RsaPublicKeySHA512Factory"
+    },
+    {
+      "type": "com.sshtools.common.ssh.components.jce.SshEd25519PublicKeyJCE$SshEd25519PublicKeyJCEFactory"
+    },
+    {
+      "type": "com.sshtools.common.ssh.components.jce.SshEd448PublicKeyJCE$SshEd448PublicKeyJCEFactory"
+    },
+    {
+      "type": "com.sshtools.common.ssh.components.jce.TripleDesCbc$TripleDesCbcFactory"
+    },
+    {
+      "type": "com.sshtools.common.ssh.components.jce.TripleDesCtr$TripleDesCtrFactory"
+    },
+    {
+      "type": "com.sshtools.common.ssh.components.jce.Umac128$Umac128Factory"
+    },
+    {
+      "type": "com.sshtools.common.ssh.components.jce.Umac128OpenSsh$Umac128OpenSshFactory"
+    },
+    {
+      "type": "com.sshtools.common.ssh.components.jce.Umac128OpenSshEtm$Umac128OpenSshEtmFactory"
+    },
+    {
+      "type": "com.sshtools.common.ssh.components.jce.Umac32$Umac32Factory"
+    },
+    {
+      "type": "com.sshtools.common.ssh.components.jce.Umac32OpenSsh$Umac32OpenSshFactory"
+    },
+    {
+      "type": "com.sshtools.common.ssh.components.jce.Umac32OpenSshEtm$Umac32OpenSshEtmFactory"
+    },
+    {
+      "type": "com.sshtools.common.ssh.components.jce.Umac64$Umac64Factory"
+    },
+    {
+      "type": "com.sshtools.common.ssh.components.jce.Umac64OpenSsh$Umac64OpenSshFactory"
+    },
+    {
+      "type": "com.sshtools.common.ssh.components.jce.Umac64OpenSshEtm$Umac64OpenSshEtmFactory"
+    },
+    {
+      "type": "com.sshtools.common.ssh.components.jce.Umac96$Umac96Factory"
+    },
+    {
+      "type": "com.sshtools.common.ssh.components.jce.Umac96OpenSsh$Umac96OpenSshFactory"
+    },
+    {
+      "type": "com.sshtools.common.ssh.components.jce.Umac96OpenSshEtm$Umac96OpenSshEtmFactory"
+    },
+    {
+      "type": "com.sshtools.common.ssh.compression.NoneCompression$NoneCompressionFactory"
+    },
+    {
+      "type": "com.sshtools.common.zlib.OpenSSHZLibCompression$OpenSSHZLibCompressionFactory"
+    },
+    {
+      "type": "com.sshtools.common.zlib.ZLibCompression$ZLibCompressionFactory"
+    },
+    {
+      "type": "com.sun.crypto.provider.AESCipher$General",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.crypto.provider.ARCFOURCipher",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.crypto.provider.ChaCha20Cipher$ChaCha20Poly1305",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.crypto.provider.DESCipher",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.crypto.provider.DESedeCipher",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.crypto.provider.DHParameters",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.crypto.provider.GaloisCounterMode$AESGCM",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.crypto.provider.HKDFKeyDerivation$HKDFSHA384",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "javax.crypto.KDFParameters"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "com.sun.crypto.provider.HmacCore$HmacSHA256",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.crypto.provider.HmacCore$HmacSHA384",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.crypto.provider.HmacCore$HmacSHA512",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.crypto.provider.HmacMD5",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.crypto.provider.HmacPKCS12PBECore$HmacPKCS12PBE_SHA256",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.crypto.provider.HmacSHA1",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.crypto.provider.PBEKeyFactory$PBEWithMD5AndDES",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.crypto.provider.PBES2Core$HmacSHA256AndAES_256",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.crypto.provider.PBES2Parameters$General",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.crypto.provider.RSACipher",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.crypto.provider.TlsMasterSecretGenerator",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "groovy.lang.Closure"
+    },
+    {
+      "type": "io.micrometer.context.ContextRegistry"
+    },
+    {
+      "type": "io.modelcontextprotocol.spec.McpSchema$Annotated"
+    },
+    {
+      "type": "io.modelcontextprotocol.spec.McpSchema$Annotations"
+    },
+    {
+      "type": "io.modelcontextprotocol.spec.McpError",
+      "allPublicConstructors": true,
+      "allDeclaredConstructors": true,
+      "allPublicMethods": true,
+      "allDeclaredMethods": true,
+      "allPublicFields": true,
+      "allDeclaredFields": true
+    },
+    {
+      "type": "io.modelcontextprotocol.spec.McpError$ErrorContent",
+      "allPublicConstructors": true,
+      "allDeclaredConstructors": true,
+      "allPublicMethods": true,
+      "allDeclaredMethods": true,
+      "allPublicFields": true,
+      "allDeclaredFields": true
+    },
+    {
+      "type": "io.modelcontextprotocol.spec.McpSchema$BaseMetadata"
+    },
+    {
+      "type": "io.modelcontextprotocol.spec.McpSchema$CallToolRequest",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.String",
+            "java.util.Map",
+            "java.util.Map"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "io.modelcontextprotocol.spec.McpSchema$JSONRPCResponse$JSONRPCError",
+      "allPublicConstructors": true,
+      "allDeclaredConstructors": true,
+      "allPublicMethods": true,
+      "allDeclaredMethods": true,
+      "allPublicFields": true,
+      "allDeclaredFields": true
+    },
+    {
+      "type": "io.modelcontextprotocol.spec.McpSchema$CallToolResult",
+      "methods": [
+        {
+          "name": "content",
+          "parameterTypes": []
+        },
+        {
+          "name": "isError",
+          "parameterTypes": []
+        },
+        {
+          "name": "meta",
+          "parameterTypes": []
+        },
+        {
+          "name": "structuredContent",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "io.modelcontextprotocol.spec.McpSchema$ClientCapabilities",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.util.Map",
+            "io.modelcontextprotocol.spec.McpSchema$ClientCapabilities$RootCapabilities",
+            "io.modelcontextprotocol.spec.McpSchema$ClientCapabilities$Sampling",
+            "io.modelcontextprotocol.spec.McpSchema$ClientCapabilities$Elicitation"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "io.modelcontextprotocol.spec.McpSchema$ClientCapabilities$Elicitation"
+    },
+    {
+      "type": "io.modelcontextprotocol.spec.McpSchema$ClientCapabilities$RootCapabilities",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.Boolean"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "io.modelcontextprotocol.spec.McpSchema$ClientCapabilities$Sampling",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "io.modelcontextprotocol.spec.McpSchema$Content"
+    },
+    {
+      "type": "io.modelcontextprotocol.spec.McpSchema$Implementation",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.String",
+            "java.lang.String",
+            "java.lang.String"
+          ]
+        },
+        {
+          "name": "name",
+          "parameterTypes": []
+        },
+        {
+          "name": "title",
+          "parameterTypes": []
+        },
+        {
+          "name": "version",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "io.modelcontextprotocol.spec.McpSchema$InitializeRequest",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.String",
+            "io.modelcontextprotocol.spec.McpSchema$ClientCapabilities",
+            "io.modelcontextprotocol.spec.McpSchema$Implementation",
+            "java.util.Map"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "io.modelcontextprotocol.spec.McpSchema$InitializeResult",
+      "methods": [
+        {
+          "name": "capabilities",
+          "parameterTypes": []
+        },
+        {
+          "name": "instructions",
+          "parameterTypes": []
+        },
+        {
+          "name": "meta",
+          "parameterTypes": []
+        },
+        {
+          "name": "protocolVersion",
+          "parameterTypes": []
+        },
+        {
+          "name": "serverInfo",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "io.modelcontextprotocol.spec.McpSchema$JSONRPCMessage"
+    },
+    {
+      "type": "io.modelcontextprotocol.spec.McpSchema$JSONRPCNotification",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.String",
+            "java.lang.String",
+            "java.lang.Object"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "io.modelcontextprotocol.spec.McpSchema$JSONRPCRequest",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.String",
+            "java.lang.String",
+            "java.lang.Object",
+            "java.lang.Object"
+          ]
+        },
+        {
+          "name": "id",
+          "parameterTypes": []
+        },
+        {
+          "name": "jsonrpc",
+          "parameterTypes": []
+        },
+        {
+          "name": "method",
+          "parameterTypes": []
+        },
+        {
+          "name": "params",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "io.modelcontextprotocol.spec.McpSchema$JSONRPCResponse",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.String",
+            "java.lang.Object",
+            "java.lang.Object",
+            "io.modelcontextprotocol.spec.McpSchema$JSONRPCResponse$JSONRPCError"
+          ]
+        },
+        {
+          "name": "error",
+          "parameterTypes": []
+        },
+        {
+          "name": "id",
+          "parameterTypes": []
+        },
+        {
+          "name": "jsonrpc",
+          "parameterTypes": []
+        },
+        {
+          "name": "result",
+          "parameterTypes": []
+        }
+      ]
+    },
+
+    {
+      "type": "io.modelcontextprotocol.spec.McpSchema$JsonSchema",
+      "methods": [
+        {
+          "name": "additionalProperties",
+          "parameterTypes": []
+        },
+        {
+          "name": "definitions",
+          "parameterTypes": []
+        },
+        {
+          "name": "defs",
+          "parameterTypes": []
+        },
+        {
+          "name": "properties",
+          "parameterTypes": []
+        },
+        {
+          "name": "required",
+          "parameterTypes": []
+        },
+        {
+          "name": "type",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "io.modelcontextprotocol.spec.McpSchema$ListResourceTemplatesResult",
+      "methods": [
+        {
+          "name": "meta",
+          "parameterTypes": []
+        },
+        {
+          "name": "nextCursor",
+          "parameterTypes": []
+        },
+        {
+          "name": "resourceTemplates",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "io.modelcontextprotocol.spec.McpSchema$ListToolsResult",
+      "methods": [
+        {
+          "name": "meta",
+          "parameterTypes": []
+        },
+        {
+          "name": "nextCursor",
+          "parameterTypes": []
+        },
+        {
+          "name": "tools",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "io.modelcontextprotocol.spec.McpSchema$ReadResourceRequest",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.String",
+            "java.util.Map"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "io.modelcontextprotocol.spec.McpSchema$ReadResourceResult",
+      "methods": [
+        {
+          "name": "contents",
+          "parameterTypes": []
+        },
+        {
+          "name": "meta",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "io.modelcontextprotocol.spec.McpSchema$Request"
+    },
+    {
+      "type": "io.modelcontextprotocol.spec.McpSchema$Resource",
+      "allPublicConstructors": true,
+      "allDeclaredConstructors": true,
+      "allPublicMethods": true,
+      "allDeclaredMethods": true,
+      "allPublicFields": true,
+      "allDeclaredFields": true
+    },
+    {
+      "type": "io.modelcontextprotocol.spec.McpSchema$ResourceContents"
+    },
+    {
+      "type": "io.modelcontextprotocol.spec.McpSchema$ResourceTemplate"
+    },
+    {
+      "type": "io.modelcontextprotocol.spec.McpSchema$Result"
+    },
+    {
+      "type": "io.modelcontextprotocol.spec.McpSchema$ServerCapabilities",
+      "methods": [
+        {
+          "name": "completions",
+          "parameterTypes": []
+        },
+        {
+          "name": "experimental",
+          "parameterTypes": []
+        },
+        {
+          "name": "logging",
+          "parameterTypes": []
+        },
+        {
+          "name": "prompts",
+          "parameterTypes": []
+        },
+        {
+          "name": "resources",
+          "parameterTypes": []
+        },
+        {
+          "name": "tools",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "io.modelcontextprotocol.spec.McpSchema$ServerCapabilities$CompletionCapabilities"
+    },
+    {
+      "type": "io.modelcontextprotocol.spec.McpSchema$ServerCapabilities$LoggingCapabilities"
+    },
+    {
+      "type": "io.modelcontextprotocol.spec.McpSchema$ServerCapabilities$PromptCapabilities"
+    },
+    {
+      "type": "io.modelcontextprotocol.spec.McpSchema$ServerCapabilities$ResourceCapabilities",
+      "methods": [
+        {
+          "name": "listChanged",
+          "parameterTypes": []
+        },
+        {
+          "name": "subscribe",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "io.modelcontextprotocol.spec.McpSchema$ServerCapabilities$ToolCapabilities",
+      "methods": [
+        {
+          "name": "listChanged",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "io.modelcontextprotocol.spec.McpSchema$TextContent",
+      "methods": [
+        {
+          "name": "annotations",
+          "parameterTypes": []
+        },
+        {
+          "name": "meta",
+          "parameterTypes": []
+        },
+        {
+          "name": "text",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "io.modelcontextprotocol.spec.McpSchema$TextResourceContents",
+      "methods": [
+        {
+          "name": "meta",
+          "parameterTypes": []
+        },
+        {
+          "name": "mimeType",
+          "parameterTypes": []
+        },
+        {
+          "name": "text",
+          "parameterTypes": []
+        },
+        {
+          "name": "uri",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "io.modelcontextprotocol.spec.McpSchema$Tool",
+      "methods": [
+        {
+          "name": "annotations",
+          "parameterTypes": []
+        },
+        {
+          "name": "description",
+          "parameterTypes": []
+        },
+        {
+          "name": "inputSchema",
+          "parameterTypes": []
+        },
+        {
+          "name": "meta",
+          "parameterTypes": []
+        },
+        {
+          "name": "name",
+          "parameterTypes": []
+        },
+        {
+          "name": "outputSchema",
+          "parameterTypes": []
+        },
+        {
+          "name": "title",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "io.modelcontextprotocol.spec.McpSchema$ToolAnnotations"
+    },
+    {
+      "type": "java.io.Serializable"
+    },
+    {
+      "type": "java.lang.Boolean",
+      "jniAccessible": true,
+      "methods": [
+        {
+          "name": "getBoolean",
+          "parameterTypes": [
+            "java.lang.String"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "java.lang.Byte"
+    },
+    {
+      "type": "java.lang.Class",
+      "methods": [
+        {
+          "name": "getRecordComponents",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "java.lang.Comparable"
+    },
+    {
+      "type": "java.lang.Double"
+    },
+    {
+      "type": "java.lang.Float"
+    },
+    {
+      "type": "java.lang.Integer"
+    },
+    {
+      "type": "java.lang.Long"
+    },
+    {
+      "type": "java.lang.Number"
+    },
+    {
+      "type": "java.lang.Object"
+    },
+    {
+      "type": "java.lang.Record"
+    },
+    {
+      "type": "java.lang.Short"
+    },
+    {
+      "type": "java.lang.String[]"
+    },
+    {
+      "type": "java.lang.StackTraceElement",
+      "allPublicConstructors": true,
+      "allDeclaredConstructors": true,
+      "allPublicMethods": true,
+      "allDeclaredMethods": true,
+      "allPublicFields": true,
+      "allDeclaredFields": true
+    },
+    {
+      "type": "java.lang.System",
+      "methods": [
+        {
+          "name": "getSecurityManager",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "java.lang.Thread"
+    },
+    {
+      "type": "java.lang.constant.Constable"
+    },
+    {
+      "type": "java.lang.constant.ConstantDesc"
+    },
+    {
+      "type": "java.lang.management.ManagementFactory",
+      "methods": [
+        {
+          "name": "getRuntimeMXBean",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "java.lang.management.RuntimeMXBean",
+      "methods": [
+        {
+          "name": "getUptime",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "java.lang.reflect.RecordComponent",
+      "methods": [
+        {
+          "name": "getName",
+          "parameterTypes": []
+        },
+        {
+          "name": "getType",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "java.nio.file.Path"
+    },
+    {
+      "type": "java.nio.file.Paths"
+    },
+    {
+      "type": "java.security.AccessController",
+      "methods": [
+        {
+          "name": "doPrivileged",
+          "parameterTypes": [
+            "java.security.PrivilegedAction"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "java.security.AlgorithmParametersSpi"
+    },
+    {
+      "type": "java.security.KeyStoreSpi"
+    },
+    {
+      "type": "java.security.MessageDigestSpi"
+    },
+    {
+      "type": "java.security.cert.PKIXRevocationChecker"
+    },
+    {
+      "type": "java.security.interfaces.DSAPrivateKey"
+    },
+    {
+      "type": "java.security.interfaces.DSAPublicKey"
+    },
+    {
+      "type": "java.security.interfaces.ECPrivateKey"
+    },
+    {
+      "type": "java.security.interfaces.ECPublicKey"
+    },
+    {
+      "type": "java.security.interfaces.RSAPrivateKey"
+    },
+    {
+      "type": "java.security.interfaces.RSAPublicKey"
+    },
+    {
+      "type": "java.security.spec.DSAParameterSpec"
+    },
+    {
+      "type": "java.sql.Connection"
+    },
+    {
+      "type": "java.sql.Date"
+    },
+    {
+      "type": "java.sql.Driver"
+    },
+    {
+      "type": "java.sql.DriverManager"
+    },
+    {
+      "type": "java.sql.Time"
+    },
+    {
+      "type": "java.sql.Timestamp"
+    },
+    {
+      "type": "java.time.Duration"
+    },
+    {
+      "type": "java.time.Instant"
+    },
+    {
+      "type": "java.time.LocalDate"
+    },
+    {
+      "type": "java.time.LocalDateTime"
+    },
+    {
+      "type": "java.time.LocalTime"
+    },
+    {
+      "type": "java.time.MonthDay"
+    },
+    {
+      "type": "java.time.OffsetDateTime"
+    },
+    {
+      "type": "java.time.OffsetTime"
+    },
+    {
+      "type": "java.time.Period"
+    },
+    {
+      "type": "java.time.Year"
+    },
+    {
+      "type": "java.time.YearMonth"
+    },
+    {
+      "type": "java.time.ZoneId"
+    },
+    {
+      "type": "java.time.ZoneOffset"
+    },
+    {
+      "type": "java.time.ZonedDateTime"
+    },
+    {
+      "type": "java.util.HashMap"
+    },
+    {
+      "type": "java.util.concurrent.Executors",
+      "methods": [
+        {
+          "name": "newVirtualThreadPerTaskExecutor",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "javax.crypto.spec.GCMParameterSpec"
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider"
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.asymmetric.COMPOSITE$Mappings",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.asymmetric.DH$Mappings",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.asymmetric.DSA$Mappings",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.asymmetric.DSTU4145$Mappings",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.asymmetric.EC$Mappings",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.asymmetric.ECGOST$Mappings",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.asymmetric.EdEC$Mappings",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.asymmetric.ElGamal$Mappings",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.asymmetric.GM$Mappings",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.asymmetric.GOST$Mappings",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.asymmetric.IES$Mappings",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.asymmetric.RSA$Mappings",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.asymmetric.X509$Mappings",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.asymmetric.x509.CertificateFactory",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.asymmetric.edec.SignatureSpi$Ed25519",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.asymmetric.edec.SignatureSpi$Ed448",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.asymmetric.rsa.DigestSignatureSpi$SHA256",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.asymmetric.rsa.DigestSignatureSpi$SHA384",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.asymmetric.rsa.DigestSignatureSpi$SHA512",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.asymmetric.ec.SignatureSpi$ecDSA",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.asymmetric.ec.SignatureSpi$ecCVCDSA256",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.asymmetric.ec.SignatureSpi$ecCVCDSA384",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.asymmetric.ec.SignatureSpi$ecCVCDSA512",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.asymmetric.dh.KeyAgreementSpi",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.asymmetric.dh.KeyFactorySpi",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.asymmetric.dh.KeyPairGeneratorSpi",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.asymmetric.ec.KeyAgreementSpi$DH",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.asymmetric.ec.KeyFactorySpi$ECDSA",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.asymmetric.ec.KeyPairGeneratorSpi$ECDSA",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.asymmetric.rsa.CipherSpi$NoPadding",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.digest.Blake2b$Mappings",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.digest.Blake2s$Mappings",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.digest.DSTU7564$Mappings",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.digest.GOST3411$Mappings",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.digest.Haraka$Mappings",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.digest.Keccak$Mappings",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.digest.MD2$Mappings",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.digest.MD4$Mappings",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.digest.MD5$Mappings",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.digest.RIPEMD128$Mappings",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.digest.RIPEMD160$HashMac",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.digest.RIPEMD160$Mappings",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.digest.RIPEMD256$Mappings",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.digest.RIPEMD320$Mappings",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.digest.SHA1$Mappings",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.digest.SHA224$Mappings",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.digest.SHA256$Mappings",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.digest.SHA3$Mappings",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.digest.SHA384$Mappings",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.digest.SHA512$Mappings",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.digest.SM3$Mappings",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.digest.Skein$Mappings",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.digest.Tiger$Mappings",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.digest.Whirlpool$Mappings",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.drbg.DRBG$Mappings",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.keystore.BC$Mappings",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.keystore.BCFKS$Mappings",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.keystore.PKCS12$Mappings",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.symmetric.AES$Mappings",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.symmetric.ARC4$Mappings",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.symmetric.ARIA$Mappings",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.symmetric.Blowfish$Mappings",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.symmetric.CAST5$Mappings",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.symmetric.CAST6$Mappings",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.symmetric.Camellia$Mappings",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.symmetric.ChaCha$Mappings",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.symmetric.DES$Mappings",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.symmetric.DESede$Mappings",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.symmetric.DSTU7624$Mappings",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.symmetric.GOST28147$Mappings",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.symmetric.GOST3412_2015$Mappings",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.symmetric.Grain128$Mappings",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.symmetric.Grainv1$Mappings",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.symmetric.HC128$Mappings",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.symmetric.HC256$Mappings",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.symmetric.IDEA$Mappings",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.symmetric.Noekeon$Mappings",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.symmetric.OpenSSLPBKDF$Mappings",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.symmetric.PBEPBKDF1$Mappings",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.symmetric.PBEPBKDF2$Mappings",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.symmetric.PBEPKCS12$Mappings",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.symmetric.Poly1305$Mappings",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.symmetric.RC2$Mappings",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.symmetric.RC5$Mappings",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.symmetric.RC6$Mappings",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.symmetric.Rijndael$Mappings",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.symmetric.SCRYPT$Mappings",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.symmetric.SEED$Mappings",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.symmetric.SM4$Mappings",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.symmetric.Salsa20$Mappings",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.symmetric.Serpent$Mappings",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.symmetric.Shacal2$Mappings",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.symmetric.SipHash$Mappings",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.symmetric.SipHash128$Mappings",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.symmetric.Skipjack$Mappings",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.symmetric.TEA$Mappings",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.symmetric.TLSKDF$Mappings",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.symmetric.Threefish$Mappings",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.symmetric.Twofish$Mappings",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.symmetric.VMPC$Mappings",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.symmetric.VMPCKSA3$Mappings",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.symmetric.XSalsa20$Mappings",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.symmetric.XTEA$Mappings",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.symmetric.Zuc$Mappings",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.bouncycastle.jce.provider.BouncyCastleProvider",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.eclipse.jetty.http.Http1FieldPreEncoder"
+    },
+    {
+      "type": "org.eclipse.jetty.util.TypeUtil",
+      "methods": [
+        {
+          "name": "getClassLoaderLocation",
+          "parameterTypes": [
+            "java.lang.Class"
+          ]
+        },
+        {
+          "name": "getCodeSourceLocation",
+          "parameterTypes": [
+            "java.lang.Class"
+          ]
+        },
+        {
+          "name": "getModuleLocation",
+          "parameterTypes": [
+            "java.lang.Class"
+          ]
+        },
+        {
+          "name": "getSystemClassLoaderLocation",
+          "parameterTypes": [
+            "java.lang.Class"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "org.slf4j.simple.SimpleServiceProvider"
+    },
+    {
+      "type": "picocli.CommandLine$AutoHelpMixin",
+      "fields": [
+        {
+          "name": "helpRequested"
+        },
+        {
+          "name": "versionRequested"
+        }
+      ]
+    },
+    {
+      "type": "reactor.core.publisher.FlatMapTracker"
+    },
+    {
+      "type": "reactor.core.publisher.FluxFlatMap$FlatMapInner"
+    },
+    {
+      "type": "reactor.core.publisher.FluxFlatMap$FlatMapMain"
+    },
+    {
+      "type": "reactor.core.publisher.FluxInterval$IntervalRunnable"
+    },
+    {
+      "type": "reactor.core.publisher.FluxIterable$IterableSubscription"
+    },
+    {
+      "type": "reactor.core.publisher.FluxOnErrorReturn$ReturnSubscriber"
+    },
+    {
+      "type": "reactor.core.publisher.FluxTimeout$TimeoutMainSubscriber"
+    },
+    {
+      "type": "reactor.core.publisher.FluxTimeout$TimeoutTimeoutSubscriber"
+    },
+    {
+      "type": "reactor.core.publisher.LambdaMonoSubscriber"
+    },
+    {
+      "type": "reactor.core.publisher.LambdaSubscriber"
+    },
+    {
+      "type": "reactor.core.publisher.MonoCallable$MonoCallableSubscription"
+    },
+    {
+      "type": "reactor.core.publisher.MonoCreate$DefaultMonoSink"
+    },
+    {
+      "type": "reactor.core.publisher.MonoDelay$MonoDelayRunnable"
+    },
+    {
+      "type": "reactor.core.publisher.MonoFlatMap$FlatMapMain"
+    },
+    {
+      "type": "reactor.core.publisher.MonoIgnoreThen$ThenIgnoreMain"
+    },
+    {
+      "type": "reactor.core.publisher.Operators$MultiSubscriptionSubscriber"
+    },
+    {
+      "type": "reactor.core.publisher.Operators$ScalarSubscription"
+    },
+    {
+      "type": "reactor.core.scheduler.BoundedElasticScheduler"
+    },
+    {
+      "type": "reactor.core.scheduler.BoundedElasticScheduler$BoundedServices"
+    },
+    {
+      "type": "reactor.core.scheduler.BoundedElasticScheduler$BoundedState"
+    },
+    {
+      "type": "reactor.core.scheduler.ParallelScheduler"
+    },
+    {
+      "type": "reactor.core.scheduler.PeriodicWorkerTask"
+    },
+    {
+      "type": "reactor.core.scheduler.SchedulerTask"
+    },
+    {
+      "type": "sun.management.VMManagementImpl",
+      "jniAccessible": true,
+      "fields": [
+        {
+          "name": "compTimeMonitoringSupport"
+        },
+        {
+          "name": "currentThreadCpuTimeSupport"
+        },
+        {
+          "name": "objectMonitorUsageSupport"
+        },
+        {
+          "name": "otherThreadCpuTimeSupport"
+        },
+        {
+          "name": "remoteDiagnosticCommandsSupport"
+        },
+        {
+          "name": "synchronizerUsageSupport"
+        },
+        {
+          "name": "threadAllocatedMemorySupport"
+        },
+        {
+          "name": "threadContentionMonitoringSupport"
+        }
+      ]
+    },
+    {
+      "type": "sun.security.pkcs12.PKCS12KeyStore",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.pkcs12.PKCS12KeyStore$DualFormatPKCS12",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.provider.DSA$SHA1withDSA",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.provider.DSA$SHA224withDSA",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.provider.DSA$SHA256withDSA",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.provider.DSAKeyFactory",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.provider.DSAParameters",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.provider.JavaKeyStore$DualFormatJKS",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.provider.JavaKeyStore$JKS",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.provider.MD5",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.provider.NativePRNG",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.security.SecureRandomParameters"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.security.provider.SHA",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.provider.SHA2$SHA224",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.provider.SHA2$SHA256",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.provider.SHA5$SHA384",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.provider.SHA5$SHA512",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.provider.X509Factory",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.provider.certpath.PKIXCertPathValidator",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.rsa.PSSParameters",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.rsa.RSAKeyFactory$Legacy",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.rsa.RSAPSSSignature",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.rsa.RSASignature$SHA224withRSA",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.rsa.RSASignature$SHA256withRSA",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.ssl.KeyManagerFactoryImpl$SunX509",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.ssl.SSLContextImpl$DefaultSSLContext",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.ssl.TrustManagerFactoryImpl$PKIXFactory",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.x509.AuthorityInfoAccessExtension",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.Boolean",
+            "java.lang.Object"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.security.x509.AuthorityKeyIdentifierExtension",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.Boolean",
+            "java.lang.Object"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.security.x509.BasicConstraintsExtension",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.Boolean",
+            "java.lang.Object"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.security.x509.CRLDistributionPointsExtension",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.Boolean",
+            "java.lang.Object"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.security.x509.CertificatePoliciesExtension",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.Boolean",
+            "java.lang.Object"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.security.x509.ExtendedKeyUsageExtension",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.Boolean",
+            "java.lang.Object"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.security.x509.KeyUsageExtension",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.Boolean",
+            "java.lang.Object"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.security.x509.NetscapeCertTypeExtension",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.Boolean",
+            "java.lang.Object"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.security.x509.PrivateKeyUsageExtension",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.Boolean",
+            "java.lang.Object"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.security.x509.SubjectAlternativeNameExtension",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.Boolean",
+            "java.lang.Object"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.security.x509.SubjectKeyIdentifierExtension",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.Boolean",
+            "java.lang.Object"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.text.resources.cldr.FormatData"
+    },
+    {
+      "type": "sun.text.resources.cldr.FormatData_en"
+    },
+    {
+      "type": "sun.text.resources.cldr.FormatData_en_US"
+    },
+    {
+      "type": "sun.util.resources.cldr.CalendarData"
+    }
+  ],
+  "resources": [
+    {
+      "glob": "META-INF/maven/com.sshtools/maverick-synergy-common/pom.properties"
+    },
+    {
+      "glob": "META-INF/services/com.sshtools.client.ClientForwardingFactory"
+    },
+    {
+      "glob": "META-INF/services/com.sshtools.client.SshKeyExchangeClientFactory"
+    },
+    {
+      "glob": "META-INF/services/com.sshtools.common.ssh.components.DigestFactory"
+    },
+    {
+      "glob": "META-INF/services/com.sshtools.common.ssh.components.SshCipherFactory"
+    },
+    {
+      "glob": "META-INF/services/com.sshtools.common.ssh.components.SshHmacFactory"
+    },
+    {
+      "glob": "META-INF/services/com.sshtools.common.ssh.components.SshPublicKeyFactory"
+    },
+    {
+      "glob": "META-INF/services/com.sshtools.common.ssh.compression.SshCompressionFactory"
+    },
+    {
+      "glob": "META-INF/services/com.sshtools.synergy.ssh.RemoteForwardRequestHandler"
+    },
+    {
+      "glob": "META-INF/services/java.net.spi.InetAddressResolverProvider"
+    },
+    {
+      "glob": "META-INF/services/java.net.spi.URLStreamHandlerProvider"
+    },
+    {
+      "glob": "META-INF/services/java.nio.channels.spi.SelectorProvider"
+    },
+    {
+      "glob": "META-INF/services/java.time.zone.ZoneRulesProvider"
+    },
+    {
+      "glob": "META-INF/services/java.util.spi.ResourceBundleControlProvider"
+    },
+    {
+      "glob": "META-INF/services/org.eclipse.jetty.http.HttpFieldPreEncoder"
+    },
+    {
+      "glob": "META-INF/services/org.slf4j.spi.SLF4JServiceProvider"
+    },
+    {
+      "glob": "jakarta/servlet/LocalStrings.properties"
+    },
+    {
+      "glob": "jakarta/servlet/LocalStrings_en.properties"
+    },
+    {
+      "glob": "jakarta/servlet/LocalStrings_en_GB.properties"
+    },
+    {
+      "glob": "jakarta/servlet/http/LocalStrings.properties"
+    },
+    {
+      "glob": "jakarta/servlet/http/LocalStrings_en.properties"
+    },
+    {
+      "glob": "jakarta/servlet/http/LocalStrings_en_GB.properties"
+    },
+    {
+      "glob": "org/eclipse/jetty/http/encoding.properties"
+    },
+    {
+      "glob": "org/eclipse/jetty/http/mime.properties"
+    },
+    {
+      "glob": "org/eclipse/jetty/version/build.properties"
+    },
+    {
+      "glob": "simplelogger.properties"
+    },
+    {
+      "module": "java.base",
+      "glob": "jdk/internal/icu/impl/data/icudt76b/nfkc.nrm"
+    },
+    {
+      "module": "java.base",
+      "glob": "jdk/internal/icu/impl/data/icudt76b/uprops.icu"
+    },
+    {
+      "module": "java.base",
+      "glob": "sun/net/idn/uidna.spp"
+    },
+    {
+      "bundle": "jakarta.servlet.LocalStrings"
+    },
+    {
+      "bundle": "jakarta.servlet.http.LocalStrings"
+    }
+  ]
+}
