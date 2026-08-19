@@ -1,0 +1,19 @@
+#!/usr/bin/env sh
+set -eu
+
+DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+OS=$(uname -s)
+ARCH=$(uname -m)
+
+case "$OS/$ARCH" in
+  Linux/x86_64) BIN="maverick-ssh-mcp-linux-amd64" ;;
+  Linux/aarch64|Linux/arm64) BIN="maverick-ssh-mcp-linux-arm64" ;;
+  Darwin/x86_64) BIN="maverick-ssh-mcp-macos-amd64" ;;
+  Darwin/arm64|Darwin/aarch64) BIN="maverick-ssh-mcp-macos-arm64" ;;
+  *)
+    echo "Unsupported platform: $OS/$ARCH" >&2
+    exit 1
+    ;;
+esac
+
+exec "$DIR/$BIN" "$@"

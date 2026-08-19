@@ -129,6 +129,12 @@ pipeline {
                                         -Dbuild.number="${BUILD_NUMBER}" \
                                         clean deploy
                                     '''
+
+                                    sh '''
+                                    mkdir -p mcpb/server
+                                    cp target/maverick-ssh-mcp mcpb/server/maverick-ssh-mcp-macos-amd64
+                                    '''
+                                    stash name: 'maverick-ssh-mcp-native-macos-amd64', includes: 'mcpb/server/maverick-ssh-mcp-macos-amd64'
                                 }
                             }
                         }
@@ -168,6 +174,12 @@ pipeline {
                                         -Dbuild.number="${BUILD_NUMBER}" \
                                         clean deploy
                                     '''
+
+                                    sh '''
+                                    mkdir -p mcpb/server
+                                    cp target/maverick-ssh-mcp mcpb/server/maverick-ssh-mcp-macos-arm64
+                                    '''
+                                    stash name: 'maverick-ssh-mcp-native-macos-arm64', includes: 'mcpb/server/maverick-ssh-mcp-macos-arm64'
                                 }
                             }
                         }
@@ -199,12 +211,99 @@ pipeline {
                                 
                                 withCredentials([string(credentialsId: 'windows-signing-etoken-pin', variable: 'SIGNING_PIN')]) {
                                     bat 'mvn -U -P native-image,windows-signing clean deploy -Dbuild.projectProperties="%BUILD_PROPERTIES%" -Dathene.serverId=athene -Dathene.api=https://athene.jadaptive.com -Dathene.repo=jadaptive -Dathene.windows.sign.key="safenet/b69c9c2e8b5e40d3b5d0d3b97afb2baf" -Dathene.windows.sign.passphrase="%SIGNING_PIN%"'
+                                    bat 'if not exist mcpb\\server mkdir mcpb\\server'
+                                    bat 'copy /Y target\\maverick-ssh-mcp.exe mcpb\\server\\maverick-ssh-mcp.exe'
+                                    stash name: 'maverick-ssh-mcp-native-windows-amd64', includes: 'mcpb/server/maverick-ssh-mcp.exe'
                                 }
                             }
                         }
 
                     }
                 }
+            }
+        }
+
+        stage('MCPB') {
+            agent {
+                label 'linux && x86_64'
+            }
+            steps {
+                unstash 'maverick-ssh-mcp-native-linux-amd64'
+                unstash 'maverick-ssh-mcp-native-linux-arm64'
+                unstash 'maverick-ssh-mcp-native-macos-amd64'
+                unstash 'maverick-ssh-mcp-native-macos-arm64'
+                unstash 'maverick-ssh-mcp-native-windows-amd64'
+
+                script {
+                    env.FULL_VERSION = getFullVersion()
+                    echo "Full Version : ${env.FULL_VERSION}"
+
+                    def pom = readMavenPom file: 'pom.xml'
+                    def manifest = [
+                        manifest_version: '0.3',
+                        name: pom.artifactId,
+                        display_name: pom.name,
+                        version: env.FULL_VERSION,
+                        description: pom.description,
+                        author: [name: 'Jadaptive'],
+                        icon: 'icon.png',
+                        server: [
+                            type: 'binary',
+                            entry_point: 'server/maverick-ssh-mcp',
+                            mcp_config: [
+                                command: '${__dirname}/server/maverick-ssh-mcp',
+                                args: ['--mode', 'stdio'],
+                                env: [:],
+                                platform_overrides: [
+                                    win32: [
+                                        command: '${__dirname}/server/maverick-ssh-mcp.exe'
+                                    ]
+                                ]
+                            ]
+                        ],
+                        compatibility: [
+                            platforms: ['linux', 'darwin', 'win32']
+                        ]
+                    ]
+
+                    writeFile(
+                        file: 'target/mcpb-bundle/manifest.json',
+                        text: groovy.json.JsonOutput.prettyPrint(groovy.json.JsonOutput.toJson(manifest)) + '\n'
+                    )
+                }
+
+                sh '''
+                set -euo pipefail
+
+                mkdir -p target/mcpb-bundle/server
+
+                cp docker/native/maverick-ssh-mcp-linux-amd64 target/mcpb-bundle/server/maverick-ssh-mcp-linux-amd64
+                cp docker/native/maverick-ssh-mcp-linux-arm64 target/mcpb-bundle/server/maverick-ssh-mcp-linux-arm64
+                cp mcpb/server/maverick-ssh-mcp-macos-amd64 target/mcpb-bundle/server/maverick-ssh-mcp-macos-amd64
+                cp mcpb/server/maverick-ssh-mcp-macos-arm64 target/mcpb-bundle/server/maverick-ssh-mcp-macos-arm64
+                cp mcpb/server/maverick-ssh-mcp.exe target/mcpb-bundle/server/maverick-ssh-mcp.exe
+
+                cp src/main/mcpb/maverick-ssh-mcp target/mcpb-bundle/server/maverick-ssh-mcp
+
+                chmod +x target/mcpb-bundle/server/maverick-ssh-mcp
+                chmod +x target/mcpb-bundle/server/maverick-ssh-mcp-linux-amd64
+                chmod +x target/mcpb-bundle/server/maverick-ssh-mcp-linux-arm64
+                chmod +x target/mcpb-bundle/server/maverick-ssh-mcp-macos-amd64
+                chmod +x target/mcpb-bundle/server/maverick-ssh-mcp-macos-arm64
+
+                cp src/main/icons/icon.png target/mcpb-bundle/icon.png
+
+                npx -y @anthropic-ai/mcpb validate target/mcpb-bundle/manifest.json
+                npx -y @anthropic-ai/mcpb pack target/mcpb-bundle target/maverick-ssh-mcp-${FULL_VERSION}.mcpb
+                npx -y @anthropic-ai/mcpb info target/maverick-ssh-mcp-${FULL_VERSION}.mcpb
+                '''
+
+                withCredentials([usernamePassword(credentialsId: 'athene', usernameVariable: 'ATHENE_USERNAME', passwordVariable: 'ATHENE_PASSWORD')]) {
+                    sh '''
+                    /usr/local/bin/athene --api=https://athene.jadaptive.com files import jadaptive target/*.mcpb --os=ALL --architecture=ALL --package=maverick-ssh-mcp --version="${FULL_VERSION}" --extension=.mcpb
+                    '''
+                }
+
             }
         }
 
