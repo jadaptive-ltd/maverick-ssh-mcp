@@ -300,7 +300,7 @@ pipeline {
 
                 withCredentials([usernamePassword(credentialsId: 'athene', usernameVariable: 'ATHENE_USERNAME', passwordVariable: 'ATHENE_PASSWORD')]) {
                     sh '''
-                    /usr/local/bin/athene --api=https://athene.jadaptive.com files import jadaptive target/*.mcpb --os=ALL --architecture=ALL --package=maverick-ssh-mcp --version="${FULL_VERSION}" --extension=.mcpb
+                    athene --api=https://athene.jadaptive.com files import jadaptive target/*.mcpb --os=ALL --architecture=ALL --package=maverick-ssh-mcp --version="${FULL_VERSION}" --extension=.mcpb
                     '''
                 }
 
