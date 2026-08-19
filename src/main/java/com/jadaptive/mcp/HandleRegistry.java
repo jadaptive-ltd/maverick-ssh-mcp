@@ -2,6 +2,8 @@ package com.jadaptive.mcp;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -26,6 +28,8 @@ final class HandleRegistry implements Closeable {
     private final ConcurrentMap<String, SftpClient> sftpClients = new ConcurrentHashMap<>();
     private final ConcurrentMap<String, SftpHandle> sftpFiles = new ConcurrentHashMap<>();
     private final ConcurrentMap<String, ForwardingHandle> tunnels = new ConcurrentHashMap<>();
+    private final ConcurrentMap<String, Socket> sockets = new ConcurrentHashMap<>();
+    private final ConcurrentMap<String, ServerSocket> socketListeners = new ConcurrentHashMap<>();
     private final ConcurrentMap<String, Instant> created = new ConcurrentHashMap<>();
 
     String registerSsh(SshClient client) {
@@ -48,6 +52,14 @@ final class HandleRegistry implements Closeable {
         return put(tunnels, tunnel, "tunnel");
     }
 
+    String registerSocket(Socket socket) {
+        return put(sockets, socket, "socket");
+    }
+
+    String registerSocketListener(ServerSocket socket) {
+        return put(socketListeners, socket, "socketlistener");
+    }
+
     Optional<SshClient> ssh(String id) {
         return Optional.ofNullable(sshClients.get(id));
     }
@@ -66,6 +78,14 @@ final class HandleRegistry implements Closeable {
 
     Optional<ForwardingHandle> tunnel(String id) {
         return Optional.ofNullable(tunnels.get(id));
+    }
+
+    Optional<Socket> socket(String id) {
+        return Optional.ofNullable(sockets.get(id));
+    }
+
+    Optional<ServerSocket> socketListener(String id) {
+        return Optional.ofNullable(socketListeners.get(id));
     }
 
     boolean closeSsh(String id) {
@@ -88,6 +108,14 @@ final class HandleRegistry implements Closeable {
         return closeAndRemove(tunnels, id);
     }
 
+    boolean closeSocket(String id) {
+        return closeAndRemove(sockets, id);
+    }
+
+    boolean closeSocketListener(String id) {
+        return closeAndRemove(socketListeners, id);
+    }
+
     Map<String, Object> snapshot() {
         Map<String, Object> map = new LinkedHashMap<>();
         map.put("ssh", summarizeSsh());
@@ -95,6 +123,8 @@ final class HandleRegistry implements Closeable {
         map.put("sftp", summarize(sftpClients));
         map.put("sftpfile", summarize(sftpFiles));
         map.put("tunnel", summarize(tunnels));
+        map.put("socket", summarize(sockets));
+        map.put("socketlistener", summarize(socketListeners));
         return map;
     }
 
@@ -115,6 +145,12 @@ final class HandleRegistry implements Closeable {
         all.clear();
         all.addAll(tunnels.keySet());
         all.forEach(this::closeTunnel);
+        all.clear();
+        all.addAll(sockets.keySet());
+        all.forEach(this::closeSocket);
+        all.clear();
+        all.addAll(socketListeners.keySet());
+        all.forEach(this::closeSocketListener);
     }
 
     private List<Map<String, Object>> summarizeSsh() {

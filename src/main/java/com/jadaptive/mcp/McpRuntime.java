@@ -138,7 +138,7 @@ final class McpRuntime implements AutoCloseable {
         McpToolset.register(specification, registry, destructivePolicy, sshTeamService);
         return specification
                 .serverInfo("maverick-mcp", "0.0.1-SNAPSHOT")
-                .instructions("Maverick Synergy MCP server. Use handle-based tools for SSH, shell, SFTP, tunnels, and SCP workflows.")
+                .instructions("Maverick Synergy MCP server. Use handle-based tools for SSH, local sockets, shell, SFTP, tunnels, and SCP workflows.")
                 .requestTimeout(Duration.ofSeconds(60))
                 .immediateExecution(true)
                 .build();

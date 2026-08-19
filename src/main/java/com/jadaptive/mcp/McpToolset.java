@@ -2,6 +2,12 @@ package com.jadaptive.mcp;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.InetSocketAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.time.Duration;
@@ -95,6 +101,60 @@ final class McpToolset {
                         "\"type\":\"object\",\"required\":[\"sshHandle\"],\"properties\":{\"sshHandle\":{\"type\":\"string\"}}" +
                         "}"),
                 (exchange, request) -> closeResult("ssh", registry.closeSsh(stringArg(toolArgs(request), "sshHandle", true))));
+
+        spec.toolCall(tool("socket_open", "Open a local raw TCP socket and return a handle.",
+                """
+                {"type":"object","required":["host","port"],"properties":{"host":{"type":"string"},"port":{"type":"integer"},"connectTimeoutMs":{"type":"integer","default":30000},"options":{"type":"object","properties":{"tcpNoDelay":{"type":"boolean"},"keepAlive":{"type":"boolean"},"reuseAddress":{"type":"boolean"},"oobInline":{"type":"boolean"},"sendBufferSize":{"type":"integer"},"receiveBufferSize":{"type":"integer"},"soTimeoutMs":{"type":"integer"},"lingerSeconds":{"type":"integer"},"trafficClass":{"type":"integer"}}}}}
+                """),
+                (exchange, request) -> socketOpen(toolArgs(request), registry));
+
+        spec.toolCall(tool("socket_status", "Get status and metadata for one socket handle.",
+                """
+                {"type":"object","required":["socketHandle"],"properties":{"socketHandle":{"type":"string"}}}
+                """),
+                (exchange, request) -> socketStatus(toolArgs(request), registry));
+
+        spec.toolCall(tool("socket_set_options", "Update options on an open socket handle.",
+                """
+                {"type":"object","required":["socketHandle"],"properties":{"socketHandle":{"type":"string"},"options":{"type":"object","properties":{"tcpNoDelay":{"type":"boolean"},"keepAlive":{"type":"boolean"},"reuseAddress":{"type":"boolean"},"oobInline":{"type":"boolean"},"sendBufferSize":{"type":"integer"},"receiveBufferSize":{"type":"integer"},"soTimeoutMs":{"type":"integer"},"lingerSeconds":{"type":"integer"},"trafficClass":{"type":"integer"}}}}}
+                """),
+                (exchange, request) -> socketSetOptions(toolArgs(request), registry));
+
+        spec.toolCall(tool("socket_write", "Write bytes to an open socket handle.",
+                """
+                {"type":"object","required":["socketHandle","data"],"properties":{"socketHandle":{"type":"string"},"data":{"type":"string"},"base64":{"type":"boolean","default":false},"flush":{"type":"boolean","default":true}}}
+                """),
+                (exchange, request) -> socketWrite(toolArgs(request), registry));
+
+        spec.toolCall(tool("socket_read", "Read bytes from an open socket handle.",
+                """
+                {"type":"object","required":["socketHandle"],"properties":{"socketHandle":{"type":"string"},"maxBytes":{"type":"integer","default":8192},"waitMs":{"type":"integer","default":250},"base64":{"type":"boolean","default":false}}}
+                """),
+                (exchange, request) -> socketRead(toolArgs(request), registry));
+
+        spec.toolCall(tool("socket_close", "Close a socket handle.",
+                """
+                {"type":"object","required":["socketHandle"],"properties":{"socketHandle":{"type":"string"}}}
+                """),
+                (exchange, request) -> closeResult("socket", registry.closeSocket(stringArg(toolArgs(request), "socketHandle", true))));
+
+        spec.toolCall(tool("socket_listen_open", "Open a local listening socket and return a listener handle.",
+                """
+                {"type":"object","required":["bindPort"],"properties":{"bindAddress":{"type":"string","default":"127.0.0.1"},"bindPort":{"type":"integer"},"backlog":{"type":"integer","default":50},"options":{"type":"object","properties":{"reuseAddress":{"type":"boolean"},"receiveBufferSize":{"type":"integer"},"soTimeoutMs":{"type":"integer"}}}}}
+                """),
+                (exchange, request) -> socketListenOpen(toolArgs(request), registry));
+
+        spec.toolCall(tool("socket_listen_accept", "Accept a connection from a listener handle and return a socket handle.",
+                """
+                {"type":"object","required":["socketListenerHandle"],"properties":{"socketListenerHandle":{"type":"string"},"timeoutMs":{"type":"integer","default":30000},"options":{"type":"object","properties":{"tcpNoDelay":{"type":"boolean"},"keepAlive":{"type":"boolean"},"reuseAddress":{"type":"boolean"},"oobInline":{"type":"boolean"},"sendBufferSize":{"type":"integer"},"receiveBufferSize":{"type":"integer"},"soTimeoutMs":{"type":"integer"},"lingerSeconds":{"type":"integer"},"trafficClass":{"type":"integer"}}}}}
+                """),
+                (exchange, request) -> socketListenAccept(toolArgs(request), registry));
+
+        spec.toolCall(tool("socket_listen_close", "Close a listener socket handle.",
+                """
+                {"type":"object","required":["socketListenerHandle"],"properties":{"socketListenerHandle":{"type":"string"}}}
+                """),
+                (exchange, request) -> closeResult("socketlistener", registry.closeSocketListener(stringArg(toolArgs(request), "socketListenerHandle", true))));
 
         spec.toolCall(tool("shell_open", "Open a shell or exec command on an SSH connection.",
                 """
@@ -503,6 +563,232 @@ final class McpToolset {
         payload.put("port", client.getPort());
         payload.put("remoteIdentification", client.getRemoteIdentification());
         return ok(payload);
+    }
+
+    private static McpSchema.CallToolResult socketOpen(Map<String, Object> args, HandleRegistry registry) {
+        try {
+            String host = stringArg(args, "host", true);
+            int port = intArg(args, "port", -1);
+            if (port < 0 || port > 65535) {
+                return error("socket_open requires port in range 0..65535");
+            }
+            int connectTimeoutMs = intArg(args, "connectTimeoutMs", 30000);
+
+            Map<String, Object> options = mapArg(args, "options");
+
+            Socket socket = new Socket();
+            applySocketOptions(socket, options);
+            socket.connect(new InetSocketAddress(host, port), connectTimeoutMs);
+            applySocketOptions(socket, options);
+
+            String socketHandle = registry.registerSocket(socket);
+            Map<String, Object> payload = new LinkedHashMap<>();
+            payload.put("socketHandle", socketHandle);
+            payload.put("host", host);
+            payload.put("port", port);
+            payload.put("connected", socket.isConnected());
+            payload.put("localAddress", socket.getLocalAddress().getHostAddress());
+            payload.put("localPort", socket.getLocalPort());
+            return ok(payload);
+        }
+        catch (Exception e) {
+            return error("socket_open failed: " + e.getMessage());
+        }
+    }
+
+    private static McpSchema.CallToolResult socketStatus(Map<String, Object> args, HandleRegistry registry) {
+        String socketHandle = stringArg(args, "socketHandle", true);
+        Optional<Socket> socket = registry.socket(socketHandle);
+        if (socket.isEmpty()) {
+            return error("Unknown socketHandle: " + socketHandle);
+        }
+
+        Socket value = socket.get();
+        Map<String, Object> payload = new LinkedHashMap<>();
+        payload.put("socketHandle", socketHandle);
+        payload.put("connected", value.isConnected());
+        payload.put("closed", value.isClosed());
+        payload.put("inputShutdown", value.isInputShutdown());
+        payload.put("outputShutdown", value.isOutputShutdown());
+        payload.put("localAddress", value.getLocalAddress().getHostAddress());
+        payload.put("localPort", value.getLocalPort());
+        if (value.getInetAddress() != null) {
+            payload.put("remoteAddress", value.getInetAddress().getHostAddress());
+            payload.put("remotePort", value.getPort());
+        }
+        return ok(payload);
+    }
+
+    private static McpSchema.CallToolResult socketSetOptions(Map<String, Object> args, HandleRegistry registry) {
+        String socketHandle = stringArg(args, "socketHandle", true);
+        Optional<Socket> socket = registry.socket(socketHandle);
+        if (socket.isEmpty()) {
+            return error("Unknown socketHandle: " + socketHandle);
+        }
+
+        try {
+            Map<String, Object> options = mapArg(args, "options");
+            applySocketOptions(socket.get(), options);
+            return ok(Map.of("socketHandle", socketHandle, "updated", true));
+        }
+        catch (Exception e) {
+            return error("socket_set_options failed: " + e.getMessage());
+        }
+    }
+
+    private static McpSchema.CallToolResult socketWrite(Map<String, Object> args, HandleRegistry registry) {
+        String socketHandle = stringArg(args, "socketHandle", true);
+        String data = stringArg(args, "data", true);
+        boolean base64 = boolArg(args, "base64", false);
+        boolean flush = boolArg(args, "flush", true);
+
+        Optional<Socket> socket = registry.socket(socketHandle);
+        if (socket.isEmpty()) {
+            return error("Unknown socketHandle: " + socketHandle);
+        }
+
+        try {
+            byte[] bytes = base64 ? Base64.getDecoder().decode(data) : data.getBytes(StandardCharsets.UTF_8);
+            OutputStream output = socket.get().getOutputStream();
+            output.write(bytes);
+            if (flush) {
+                output.flush();
+            }
+            return ok(Map.of("socketHandle", socketHandle, "bytesWritten", bytes.length));
+        }
+        catch (Exception e) {
+            return error("socket_write failed: " + e.getMessage());
+        }
+    }
+
+    private static McpSchema.CallToolResult socketRead(Map<String, Object> args, HandleRegistry registry) {
+        String socketHandle = stringArg(args, "socketHandle", true);
+        int maxBytes = intArg(args, "maxBytes", 8192);
+        int waitMs = intArg(args, "waitMs", 250);
+        boolean base64 = boolArg(args, "base64", false);
+
+        Optional<Socket> socket = registry.socket(socketHandle);
+        if (socket.isEmpty()) {
+            return error("Unknown socketHandle: " + socketHandle);
+        }
+        if (maxBytes <= 0) {
+            return error("socket_read requires maxBytes > 0");
+        }
+
+        try {
+            Socket value = socket.get();
+            byte[] buffer = new byte[maxBytes];
+            int previousTimeout = value.getSoTimeout();
+            int read = 0;
+            boolean eof = false;
+            boolean timedOut = false;
+
+            try {
+                value.setSoTimeout(Math.max(0, waitMs));
+                read = value.getInputStream().read(buffer, 0, maxBytes);
+                if (read < 0) {
+                    read = 0;
+                    eof = true;
+                }
+            }
+            catch (SocketTimeoutException e) {
+                timedOut = true;
+            }
+            finally {
+                value.setSoTimeout(previousTimeout);
+            }
+
+            byte[] data = read == 0 ? new byte[0] : java.util.Arrays.copyOf(buffer, read);
+            Map<String, Object> payload = new LinkedHashMap<>();
+            payload.put("socketHandle", socketHandle);
+            payload.put("bytesRead", read);
+            payload.put("timedOut", timedOut);
+            payload.put("eof", eof);
+            if (base64) {
+                payload.put("data", Base64.getEncoder().encodeToString(data));
+                payload.put("encoding", "base64");
+            }
+            else {
+                payload.put("data", new String(data, StandardCharsets.UTF_8));
+                payload.put("encoding", "utf-8");
+            }
+            return ok(payload);
+        }
+        catch (Exception e) {
+            return error("socket_read failed: " + e.getMessage());
+        }
+    }
+
+    private static McpSchema.CallToolResult socketListenOpen(Map<String, Object> args, HandleRegistry registry) {
+        try {
+            String bindAddress = defaultString(stringArg(args, "bindAddress", false), "127.0.0.1");
+            int bindPort = intArg(args, "bindPort", -1);
+            if (bindPort < 0 || bindPort > 65535) {
+                return error("socket_listen_open requires bindPort in range 0..65535");
+            }
+            int backlog = intArg(args, "backlog", 50);
+
+            Map<String, Object> options = mapArg(args, "options");
+
+            ServerSocket listener = new ServerSocket();
+            applyServerSocketOptions(listener, options);
+            listener.bind(new InetSocketAddress(bindAddress, bindPort), backlog);
+
+            String socketListenerHandle = registry.registerSocketListener(listener);
+            Map<String, Object> payload = new LinkedHashMap<>();
+            payload.put("socketListenerHandle", socketListenerHandle);
+            payload.put("bindAddress", listener.getInetAddress().getHostAddress());
+            payload.put("bindPort", listener.getLocalPort());
+            payload.put("backlog", backlog);
+            return ok(payload);
+        }
+        catch (Exception e) {
+            return error("socket_listen_open failed: " + e.getMessage());
+        }
+    }
+
+    private static McpSchema.CallToolResult socketListenAccept(Map<String, Object> args, HandleRegistry registry) {
+        String socketListenerHandle = stringArg(args, "socketListenerHandle", true);
+        int timeoutMs = intArg(args, "timeoutMs", 30000);
+
+        Optional<ServerSocket> listener = registry.socketListener(socketListenerHandle);
+        if (listener.isEmpty()) {
+            return error("Unknown socketListenerHandle: " + socketListenerHandle);
+        }
+
+        try {
+            ServerSocket server = listener.get();
+            int previousTimeout = server.getSoTimeout();
+            try {
+                server.setSoTimeout(Math.max(0, timeoutMs));
+                Socket socket = server.accept();
+                applySocketOptions(socket, mapArg(args, "options"));
+
+                String socketHandle = registry.registerSocket(socket);
+                Map<String, Object> payload = new LinkedHashMap<>();
+                payload.put("socketListenerHandle", socketListenerHandle);
+                payload.put("accepted", true);
+                payload.put("socketHandle", socketHandle);
+                payload.put("remoteAddress", socket.getInetAddress().getHostAddress());
+                payload.put("remotePort", socket.getPort());
+                payload.put("localAddress", socket.getLocalAddress().getHostAddress());
+                payload.put("localPort", socket.getLocalPort());
+                return ok(payload);
+            }
+            catch (SocketTimeoutException e) {
+                Map<String, Object> payload = new LinkedHashMap<>();
+                payload.put("socketListenerHandle", socketListenerHandle);
+                payload.put("accepted", false);
+                payload.put("message", "Accept timed out.");
+                return ok(payload);
+            }
+            finally {
+                server.setSoTimeout(previousTimeout);
+            }
+        }
+        catch (Exception e) {
+            return error("socket_listen_accept failed: " + e.getMessage());
+        }
     }
 
     private static McpSchema.CallToolResult shellOpen(Map<String, Object> args, HandleRegistry registry) {
@@ -1055,6 +1341,54 @@ final class McpToolset {
         }
     }
 
+    private static void applySocketOptions(Socket socket, Map<String, Object> options) throws SocketException {
+        if (options.containsKey("tcpNoDelay")) {
+            socket.setTcpNoDelay(boolArg(options, "tcpNoDelay", false));
+        }
+        if (options.containsKey("keepAlive")) {
+            socket.setKeepAlive(boolArg(options, "keepAlive", false));
+        }
+        if (options.containsKey("reuseAddress")) {
+            socket.setReuseAddress(boolArg(options, "reuseAddress", false));
+        }
+        if (options.containsKey("oobInline")) {
+            socket.setOOBInline(boolArg(options, "oobInline", false));
+        }
+        if (options.containsKey("sendBufferSize")) {
+            socket.setSendBufferSize(intArg(options, "sendBufferSize", 0));
+        }
+        if (options.containsKey("receiveBufferSize")) {
+            socket.setReceiveBufferSize(intArg(options, "receiveBufferSize", 0));
+        }
+        if (options.containsKey("soTimeoutMs")) {
+            socket.setSoTimeout(intArg(options, "soTimeoutMs", 0));
+        }
+        if (options.containsKey("lingerSeconds")) {
+            int lingerSeconds = intArg(options, "lingerSeconds", -1);
+            if (lingerSeconds < 0) {
+                socket.setSoLinger(false, 0);
+            }
+            else {
+                socket.setSoLinger(true, lingerSeconds);
+            }
+        }
+        if (options.containsKey("trafficClass")) {
+            socket.setTrafficClass(intArg(options, "trafficClass", 0));
+        }
+    }
+
+    private static void applyServerSocketOptions(ServerSocket listener, Map<String, Object> options) throws SocketException {
+        if (options.containsKey("reuseAddress")) {
+            listener.setReuseAddress(boolArg(options, "reuseAddress", false));
+        }
+        if (options.containsKey("receiveBufferSize")) {
+            listener.setReceiveBufferSize(intArg(options, "receiveBufferSize", 0));
+        }
+        if (options.containsKey("soTimeoutMs")) {
+            listener.setSoTimeout(intArg(options, "soTimeoutMs", 0));
+        }
+    }
+
     private static McpSchema.CallToolResult scpCopyFrom(Map<String, Object> args, HandleRegistry registry) {
         String sshHandle = stringArg(args, "sshHandle", true);
         Optional<SshClient> ssh = registry.ssh(sshHandle);
@@ -1263,6 +1597,18 @@ final class McpToolset {
 
     private static String defaultString(String value, String fallback) {
         return value == null || value.isBlank() ? fallback : value;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static Map<String, Object> mapArg(Map<String, Object> args, String key) {
+        Object value = args.get(key);
+        if (value == null) {
+            return Collections.emptyMap();
+        }
+        if (!(value instanceof Map<?, ?> map)) {
+            throw new IllegalArgumentException("Argument must be an object: " + key);
+        }
+        return (Map<String, Object>) map;
     }
 
     private static String stringArg(Map<String, Object> args, String key, boolean required) {
