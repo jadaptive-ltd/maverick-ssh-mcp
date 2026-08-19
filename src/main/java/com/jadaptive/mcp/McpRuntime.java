@@ -3,8 +3,8 @@ package com.jadaptive.mcp;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.EnumSet;
+import java.util.ServiceLoader;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.DispatcherType;
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
@@ -19,6 +19,8 @@ import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 
+import io.modelcontextprotocol.json.McpJsonMapper;
+import io.modelcontextprotocol.json.McpJsonMapperSupplier;
 import io.modelcontextprotocol.server.McpServer;
 import io.modelcontextprotocol.server.McpSyncServer;
 import io.modelcontextprotocol.server.transport.HttpServletStreamableServerTransportProvider;
@@ -39,6 +41,7 @@ final class McpRuntime implements AutoCloseable {
     private final int bindPort;
     private final String endpoint;
     private final String mcpToken;
+    private final McpJsonMapper mcpJsonMapper;
 
     private McpSyncServer mcpServer;
     private Server httpServer;
@@ -55,17 +58,18 @@ final class McpRuntime implements AutoCloseable {
         this.bindPort = bindPort;
         this.endpoint = endpoint;
         this.mcpToken = emptyToNull(mcpToken);
+        this.mcpJsonMapper = createJsonMapper();
     }
 
     void start() throws Exception {
         if (mode == Mode.STDIO) {
-            StdioServerTransportProvider transport = new StdioServerTransportProvider();
+            StdioServerTransportProvider transport = new StdioServerTransportProvider(mcpJsonMapper);
             mcpServer = buildServer(McpServer.sync(transport));
             return;
         }
 
         HttpServletStreamableServerTransportProvider transport = HttpServletStreamableServerTransportProvider.builder()
-                .objectMapper(new ObjectMapper())
+                .jsonMapper(mcpJsonMapper)
                 .mcpEndpoint(normalizedEndpoint())
                 .keepAliveInterval(Duration.ofSeconds(15))
                 .build();
@@ -153,6 +157,13 @@ final class McpRuntime implements AutoCloseable {
         }
         String trimmed = value.trim();
         return trimmed.isEmpty() ? null : trimmed;
+    }
+
+    private static McpJsonMapper createJsonMapper() {
+        return ServiceLoader.load(McpJsonMapperSupplier.class)
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("No McpJsonMapperSupplier found on classpath."))
+                .get();
     }
 
     private static final class BearerTokenFilter implements Filter {

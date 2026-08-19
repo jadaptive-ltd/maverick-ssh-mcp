@@ -12,7 +12,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>25</maven.compiler.release>
-        <mcp.version>0.11.3</mcp.version>
+        <mcp.version>2.0.0</mcp.version>
         <picocli.version>4.7.6</picocli.version>
         <maverick.version>3.2.0-SNAPSHOT</maverick.version>
         <jetty.version>11.0.26</jetty.version>
