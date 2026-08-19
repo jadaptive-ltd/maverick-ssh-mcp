@@ -509,7 +509,7 @@
                                         <os>LINUX</os>
                                         <architecture>${build.arch.deb}</architecture>
                                         <package>maverick-ssh-mcp</package>
-                                        <version>${product.version}.${build.number}</version>
+                                        <version>${product.version}-${build.number}</version>
                                         <extension></extension>
                                     </options>
                                 </configuration>
@@ -699,7 +699,7 @@
                                         <argument>--identifier</argument>
                                         <argument>com.jadaptive.maverick.sshmcp</argument>
                                         <argument>--version</argument>
-                                        <argument>${product.version}.${build.number}</argument>
+                                        <argument>${product.version}-${build.number}</argument>
                                         <argument>--install-location</argument>
                                         <argument>/Applications/MaverickSSHMCP.app/</argument>
                                         <argument>${project.build.directory}/media/maverick-ssh-mcp-${build.os}_${product.version}-${build.number}.pkg</argument>
@@ -733,7 +733,7 @@
                                         <os>MACOS</os>
                                         <architecture>${build.arch.pkg}</architecture>
                                         <package>maverick-ssh-mcp</package>
-                                        <version>${product.version}.${build.number}</version>
+                                        <version>${product.version}-${build.number}</version>
                                         <extension>pkg</extension>
                                         <key>${athene.macos.sign.key}</key>
                                         <passphrase>${athene.macos.sign.passphrase}</passphrase>
