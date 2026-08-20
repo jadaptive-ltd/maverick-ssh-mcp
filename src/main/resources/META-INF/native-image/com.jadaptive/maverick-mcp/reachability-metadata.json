@@ -1151,7 +1151,13 @@
       "type": "io.modelcontextprotocol.spec.McpSchema$ListResourcesResult"
     },
     {
+      "type": "io.modelcontextprotocol.spec.McpSchema$Meta"
+    },
+    {
       "type": "io.modelcontextprotocol.spec.McpSchema$ResourceContent"
+    },
+    {
+      "type": "io.modelcontextprotocol.spec.McpSchema$Resource[]"
     },
     {
       "type": "io.modelcontextprotocol.spec.McpSchema$ResourceTemplate[]"
@@ -2454,6 +2460,9 @@
       "type": "reactor.core.publisher.FluxInterval$IntervalRunnable"
     },
     {
+      "type": "reactor.core.publisher.FluxPublishOn$PublishOnConditionalSubscriber"
+    },
+    {
       "type": "reactor.core.publisher.FluxIterable$IterableSubscription"
     },
     {
@@ -2481,6 +2490,12 @@
       "type": "reactor.core.publisher.MonoDelay$MonoDelayRunnable"
     },
     {
+      "type": "reactor.core.publisher.MonoZip$ZipCoordinator"
+    },
+    {
+      "type": "reactor.core.publisher.MonoZip$ZipInner"
+    },
+    {
       "type": "reactor.core.publisher.MonoFlatMap$FlatMapMain"
     },
     {
@@ -2490,7 +2505,19 @@
       "type": "reactor.core.publisher.Operators$MultiSubscriptionSubscriber"
     },
     {
+      "type": "reactor.core.publisher.Operators$MonoInnerProducerBase"
+    },
+    {
       "type": "reactor.core.publisher.Operators$ScalarSubscription"
+    },
+    {
+      "type": "reactor.core.publisher.SinkEmptyMulticast"
+    },
+    {
+      "type": "reactor.core.publisher.SinkManyUnicast"
+    },
+    {
+      "type": "reactor.core.publisher.SinksSpecs$AbstractSerializedSink"
     },
     {
       "type": "reactor.core.scheduler.BoundedElasticScheduler"
@@ -2505,10 +2532,25 @@
       "type": "reactor.core.scheduler.ParallelScheduler"
     },
     {
+      "type": "reactor.core.scheduler.DelegateServiceScheduler"
+    },
+    {
       "type": "reactor.core.scheduler.PeriodicWorkerTask"
     },
     {
       "type": "reactor.core.scheduler.SchedulerTask"
+    },
+    {
+      "type": "reactor.core.scheduler.WorkerTask"
+    },
+    {
+      "type": "reactor.util.concurrent.SpscArrayQueueConsumer"
+    },
+    {
+      "type": "reactor.util.concurrent.SpscArrayQueueProducer"
+    },
+    {
+      "type": "reactor.util.concurrent.SpscLinkedArrayQueue"
     },
     {
       "type": "sun.management.VMManagementImpl",
