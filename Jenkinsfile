@@ -210,7 +210,7 @@ pipeline {
                             ) {
                                 
                                 withCredentials([string(credentialsId: 'windows-signing-etoken-pin', variable: 'SIGNING_PIN')]) {
-                                    bat 'mvn -U -P native-image,windows-signing clean deploy -Dbuild.projectProperties="%BUILD_PROPERTIES%" -Dathene.serverId=athene -Dathene.api=https://athene.jadaptive.com -Dathene.repo=jadaptive -Dathene.windows.sign.key="safenet/b69c9c2e8b5e40d3b5d0d3b97afb2baf" -Dathene.windows.sign.passphrase="%SIGNING_PIN%"'
+                                    bat 'mvn -U -P native-image,windows-signing clean deploy -Dbuild.projectProperties="%BUILD_PROPERTIES%"  -Dbuild.number="%BUILD_NUMBER%" -Dathene.serverId=athene -Dathene.api=https://athene.jadaptive.com -Dathene.repo=jadaptive -Dathene.windows.sign.key="safenet/b69c9c2e8b5e40d3b5d0d3b97afb2baf" -Dathene.windows.sign.passphrase="%SIGNING_PIN%"'
                                     bat 'if not exist mcpb\\server mkdir mcpb\\server'
                                     bat 'copy /Y target\\maverick-ssh-mcp.exe mcpb\\server\\maverick-ssh-mcp.exe'
                                     stash name: 'maverick-ssh-mcp-native-windows-amd64', includes: 'mcpb/server/maverick-ssh-mcp.exe'
