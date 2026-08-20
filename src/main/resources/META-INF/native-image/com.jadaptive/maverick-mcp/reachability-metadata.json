@@ -740,6 +740,29 @@
         {
           "name": "version",
           "parameterTypes": []
+        },
+        {
+          "name": "description",
+          "parameterTypes": []
+        },
+        {
+          "name": "fromJson",
+          "parameterTypes": [
+            "java.lang.String",
+            "java.lang.String",
+            "java.lang.String",
+            "java.lang.String",
+            "java.util.List",
+            "java.lang.String"
+          ]
+        },
+        {
+          "name": "icons",
+          "parameterTypes": []
+        },
+        {
+          "name": "websiteUrl",
+          "parameterTypes": []
         }
       ]
     },
@@ -1094,6 +1117,10 @@
           "parameterTypes": []
         },
         {
+          "name": "icons",
+          "parameterTypes": []
+        },
+        {
           "name": "title",
           "parameterTypes": []
         }
@@ -1101,6 +1128,84 @@
     },
     {
       "type": "io.modelcontextprotocol.spec.McpSchema$ToolAnnotations"
+    },
+    {
+      "type": "io.modelcontextprotocol.json.jackson3.JacksonMcpJsonMapperSupplier"
+    },
+    {
+      "type": "io.modelcontextprotocol.json.schema.jackson3.JacksonJsonSchemaValidatorSupplier"
+    },
+    {
+      "type": "io.modelcontextprotocol.spec.McpSchema$ClientCapabilities$Elicitation$Form"
+    },
+    {
+      "type": "io.modelcontextprotocol.spec.McpSchema$ClientCapabilities$Elicitation$Url"
+    },
+    {
+      "type": "io.modelcontextprotocol.spec.McpSchema$Icon"
+    },
+    {
+      "type": "io.modelcontextprotocol.spec.McpSchema$Identifier"
+    },
+    {
+      "type": "io.modelcontextprotocol.spec.McpSchema$ListResourcesResult"
+    },
+    {
+      "type": "io.modelcontextprotocol.spec.McpSchema$ResourceContent"
+    },
+    {
+      "type": "io.modelcontextprotocol.spec.McpSchema$ResourceTemplate[]"
+    },
+    {
+      "type": "io.modelcontextprotocol.spec.McpSchema$Tool[]"
+    },
+    {
+      "type": "java.lang.Iterable"
+    },
+    {
+      "type": "java.lang.Object[]"
+    },
+    {
+      "type": "java.util.AbstractCollection"
+    },
+    {
+      "type": "java.util.AbstractMap"
+    },
+    {
+      "type": "java.util.Collection"
+    },
+    {
+      "type": "java.util.Collections$EmptyMap"
+    },
+    {
+      "type": "java.util.ImmutableCollections$AbstractImmutableCollection"
+    },
+    {
+      "type": "java.util.ImmutableCollections$AbstractImmutableList"
+    },
+    {
+      "type": "java.util.ImmutableCollections$ListN"
+    },
+    {
+      "type": "java.util.List"
+    },
+    {
+      "type": "java.util.Map"
+    },
+    {
+      "type": "java.util.RandomAccess"
+    },
+    {
+      "type": "tools.jackson.databind.deser.Deserializers[]"
+    },
+    {
+      "type": "tools.jackson.databind.deser.KeyDeserializers[]"
+    },
+    {
+      "type": "tools.jackson.databind.deser.ValueInstantiators[]"
+    },
+    {
+      "type": "tools.jackson.databind.ser.Serializers[]"
     },
     {
       "type": "java.io.Serializable"
@@ -2864,6 +2969,36 @@
     },
     {
       "glob": "META-INF/services/org.slf4j.spi.SLF4JServiceProvider"
+    },
+    {
+      "glob": "META-INF/services/io.modelcontextprotocol.json.McpJsonMapperSupplier"
+    },
+    {
+      "glob": "META-INF/services/io.modelcontextprotocol.json.schema.JsonSchemaValidatorSupplier"
+    },
+    {
+      "glob": "draft/2020-12/meta/applicator"
+    },
+    {
+      "glob": "draft/2020-12/meta/content"
+    },
+    {
+      "glob": "draft/2020-12/meta/core"
+    },
+    {
+      "glob": "draft/2020-12/meta/format-annotation"
+    },
+    {
+      "glob": "draft/2020-12/meta/meta-data"
+    },
+    {
+      "glob": "draft/2020-12/meta/unevaluated"
+    },
+    {
+      "glob": "draft/2020-12/meta/validation"
+    },
+    {
+      "glob": "draft/2020-12/schema"
     },
     {
       "glob": "jakarta/servlet/LocalStrings.properties"

@@ -594,10 +594,8 @@
                                         <package>maverick-ssh-mcp</package>
                                         <version>${product.version}</version>
                                         <extension>.exe</extension>
-                                        
-                                        <!-- TODO Temporary until JDK crash on Athene is fixed -->
-                                      <!--  <key>${athene.windows.sign.key}</key>
-                                        <passphrase>${athene.windows.sign.passphrase}</passphrase>-->
+                                        <key>${athene.windows.sign.key}</key>
+                                        <passphrase>${athene.windows.sign.passphrase}</passphrase>
                                     </options>
                                 </configuration>
                             </execution>

@@ -1249,9 +1249,6 @@ final class McpToolset {
 
         String protocol = defaultString(stringArg(args, "protocol", false), "tcp");
         
-        System.out.println("tunnelOpenLocal called with protocol: " + protocol);
-        args.forEach((k, v) -> System.out.println("Arg: " + k + " = " + v));
-
         try {
             ForwardingRequestBuilder builder = ForwardingRequestBuilder.create();
 
@@ -1542,9 +1539,9 @@ final class McpToolset {
         byte[] bytes = new byte[size];
         int read = input.read(bytes);
         
-        if(read != available) {
-            System.err.println("Warning: readAvailable read " + read + " bytes, but available was " + available);
-        }
+//        if(read != available) {
+//            System.err.println("Warning: readAvailable read " + read + " bytes, but available was " + available);
+//        }
         
         return read == -1 ? new byte[0] : bytes;
         
