@@ -609,10 +609,22 @@
       "type": "io.micrometer.context.ContextRegistry"
     },
     {
-      "type": "io.modelcontextprotocol.spec.McpSchema$Annotated"
+      "type": "io.modelcontextprotocol.spec.McpSchema$Annotated",
+      "allPublicConstructors": true,
+      "allDeclaredConstructors": true,
+      "allPublicMethods": true,
+      "allDeclaredMethods": true,
+      "allPublicFields": true,
+      "allDeclaredFields": true
     },
     {
-      "type": "io.modelcontextprotocol.spec.McpSchema$Annotations"
+      "type": "io.modelcontextprotocol.spec.McpSchema$Annotations",
+      "allPublicConstructors": true,
+      "allDeclaredConstructors": true,
+      "allPublicMethods": true,
+      "allDeclaredMethods": true,
+      "allPublicFields": true,
+      "allDeclaredFields": true
     },
     {
       "type": "io.modelcontextprotocol.spec.McpError",
@@ -633,7 +645,13 @@
       "allDeclaredFields": true
     },
     {
-      "type": "io.modelcontextprotocol.spec.McpSchema$BaseMetadata"
+      "type": "io.modelcontextprotocol.spec.McpSchema$BaseMetadata",
+      "allPublicConstructors": true,
+      "allDeclaredConstructors": true,
+      "allPublicMethods": true,
+      "allDeclaredMethods": true,
+      "allPublicFields": true,
+      "allDeclaredFields": true
     },
     {
       "type": "io.modelcontextprotocol.spec.McpSchema$CallToolRequest",
@@ -646,7 +664,13 @@
             "java.util.Map"
           ]
         }
-      ]
+      ],
+      "allPublicConstructors": true,
+      "allDeclaredConstructors": true,
+      "allPublicMethods": true,
+      "allDeclaredMethods": true,
+      "allPublicFields": true,
+      "allDeclaredFields": true
     },
     {
       "type": "io.modelcontextprotocol.spec.McpSchema$JSONRPCResponse$JSONRPCError",
@@ -676,7 +700,13 @@
           "name": "structuredContent",
           "parameterTypes": []
         }
-      ]
+      ],
+      "allPublicConstructors": true,
+      "allDeclaredConstructors": true,
+      "allPublicMethods": true,
+      "allDeclaredMethods": true,
+      "allPublicFields": true,
+      "allDeclaredFields": true
     },
     {
       "type": "io.modelcontextprotocol.spec.McpSchema$ClientCapabilities",
@@ -690,10 +720,22 @@
             "io.modelcontextprotocol.spec.McpSchema$ClientCapabilities$Elicitation"
           ]
         }
-      ]
+      ],
+      "allPublicConstructors": true,
+      "allDeclaredConstructors": true,
+      "allPublicMethods": true,
+      "allDeclaredMethods": true,
+      "allPublicFields": true,
+      "allDeclaredFields": true
     },
     {
-      "type": "io.modelcontextprotocol.spec.McpSchema$ClientCapabilities$Elicitation"
+      "type": "io.modelcontextprotocol.spec.McpSchema$ClientCapabilities$Elicitation",
+      "allPublicConstructors": true,
+      "allDeclaredConstructors": true,
+      "allPublicMethods": true,
+      "allDeclaredMethods": true,
+      "allPublicFields": true,
+      "allDeclaredFields": true
     },
     {
       "type": "io.modelcontextprotocol.spec.McpSchema$ClientCapabilities$RootCapabilities",
@@ -704,7 +746,13 @@
             "java.lang.Boolean"
           ]
         }
-      ]
+      ],
+      "allPublicConstructors": true,
+      "allDeclaredConstructors": true,
+      "allPublicMethods": true,
+      "allDeclaredMethods": true,
+      "allPublicFields": true,
+      "allDeclaredFields": true
     },
     {
       "type": "io.modelcontextprotocol.spec.McpSchema$ClientCapabilities$Sampling",
@@ -713,10 +761,22 @@
           "name": "<init>",
           "parameterTypes": []
         }
-      ]
+      ],
+      "allPublicConstructors": true,
+      "allDeclaredConstructors": true,
+      "allPublicMethods": true,
+      "allDeclaredMethods": true,
+      "allPublicFields": true,
+      "allDeclaredFields": true
     },
     {
-      "type": "io.modelcontextprotocol.spec.McpSchema$Content"
+      "type": "io.modelcontextprotocol.spec.McpSchema$Content",
+      "allPublicConstructors": true,
+      "allDeclaredConstructors": true,
+      "allPublicMethods": true,
+      "allDeclaredMethods": true,
+      "allPublicFields": true,
+      "allDeclaredFields": true
     },
     {
       "type": "io.modelcontextprotocol.spec.McpSchema$Implementation",
@@ -764,7 +824,13 @@
           "name": "websiteUrl",
           "parameterTypes": []
         }
-      ]
+      ],
+      "allPublicConstructors": true,
+      "allDeclaredConstructors": true,
+      "allPublicMethods": true,
+      "allDeclaredMethods": true,
+      "allPublicFields": true,
+      "allDeclaredFields": true
     },
     {
       "type": "io.modelcontextprotocol.spec.McpSchema$InitializeRequest",
@@ -778,7 +844,13 @@
             "java.util.Map"
           ]
         }
-      ]
+      ],
+      "allPublicConstructors": true,
+      "allDeclaredConstructors": true,
+      "allPublicMethods": true,
+      "allDeclaredMethods": true,
+      "allPublicFields": true,
+      "allDeclaredFields": true
     },
     {
       "type": "io.modelcontextprotocol.spec.McpSchema$InitializeResult",
@@ -803,10 +875,22 @@
           "name": "serverInfo",
           "parameterTypes": []
         }
-      ]
+      ],
+      "allPublicConstructors": true,
+      "allDeclaredConstructors": true,
+      "allPublicMethods": true,
+      "allDeclaredMethods": true,
+      "allPublicFields": true,
+      "allDeclaredFields": true
     },
     {
-      "type": "io.modelcontextprotocol.spec.McpSchema$JSONRPCMessage"
+      "type": "io.modelcontextprotocol.spec.McpSchema$JSONRPCMessage",
+      "allPublicConstructors": true,
+      "allDeclaredConstructors": true,
+      "allPublicMethods": true,
+      "allDeclaredMethods": true,
+      "allPublicFields": true,
+      "allDeclaredFields": true
     },
     {
       "type": "io.modelcontextprotocol.spec.McpSchema$JSONRPCNotification",
@@ -819,7 +903,13 @@
             "java.lang.Object"
           ]
         }
-      ]
+      ],
+      "allPublicConstructors": true,
+      "allDeclaredConstructors": true,
+      "allPublicMethods": true,
+      "allDeclaredMethods": true,
+      "allPublicFields": true,
+      "allDeclaredFields": true
     },
     {
       "type": "io.modelcontextprotocol.spec.McpSchema$JSONRPCRequest",
@@ -849,7 +939,13 @@
           "name": "params",
           "parameterTypes": []
         }
-      ]
+      ],
+      "allPublicConstructors": true,
+      "allDeclaredConstructors": true,
+      "allPublicMethods": true,
+      "allDeclaredMethods": true,
+      "allPublicFields": true,
+      "allDeclaredFields": true
     },
     {
       "type": "io.modelcontextprotocol.spec.McpSchema$JSONRPCResponse",
@@ -879,9 +975,14 @@
           "name": "result",
           "parameterTypes": []
         }
-      ]
+      ],
+      "allPublicConstructors": true,
+      "allDeclaredConstructors": true,
+      "allPublicMethods": true,
+      "allDeclaredMethods": true,
+      "allPublicFields": true,
+      "allDeclaredFields": true
     },
-
     {
       "type": "io.modelcontextprotocol.spec.McpSchema$JsonSchema",
       "methods": [
@@ -909,7 +1010,13 @@
           "name": "type",
           "parameterTypes": []
         }
-      ]
+      ],
+      "allPublicConstructors": true,
+      "allDeclaredConstructors": true,
+      "allPublicMethods": true,
+      "allDeclaredMethods": true,
+      "allPublicFields": true,
+      "allDeclaredFields": true
     },
     {
       "type": "io.modelcontextprotocol.spec.McpSchema$ListResourceTemplatesResult",
@@ -926,7 +1033,13 @@
           "name": "resourceTemplates",
           "parameterTypes": []
         }
-      ]
+      ],
+      "allPublicConstructors": true,
+      "allDeclaredConstructors": true,
+      "allPublicMethods": true,
+      "allDeclaredMethods": true,
+      "allPublicFields": true,
+      "allDeclaredFields": true
     },
     {
       "type": "io.modelcontextprotocol.spec.McpSchema$ListToolsResult",
@@ -943,7 +1056,13 @@
           "name": "tools",
           "parameterTypes": []
         }
-      ]
+      ],
+      "allPublicConstructors": true,
+      "allDeclaredConstructors": true,
+      "allPublicMethods": true,
+      "allDeclaredMethods": true,
+      "allPublicFields": true,
+      "allDeclaredFields": true
     },
     {
       "type": "io.modelcontextprotocol.spec.McpSchema$ReadResourceRequest",
@@ -954,8 +1073,21 @@
             "java.lang.String",
             "java.util.Map"
           ]
+        },
+        {
+          "name": "fromJson",
+          "parameterTypes": [
+            "java.lang.String",
+            "java.util.Map"
+          ]
         }
-      ]
+      ],
+      "allPublicConstructors": true,
+      "allDeclaredConstructors": true,
+      "allPublicMethods": true,
+      "allDeclaredMethods": true,
+      "allPublicFields": true,
+      "allDeclaredFields": true
     },
     {
       "type": "io.modelcontextprotocol.spec.McpSchema$ReadResourceResult",
@@ -968,10 +1100,22 @@
           "name": "meta",
           "parameterTypes": []
         }
-      ]
+      ],
+      "allPublicConstructors": true,
+      "allDeclaredConstructors": true,
+      "allPublicMethods": true,
+      "allDeclaredMethods": true,
+      "allPublicFields": true,
+      "allDeclaredFields": true
     },
     {
-      "type": "io.modelcontextprotocol.spec.McpSchema$Request"
+      "type": "io.modelcontextprotocol.spec.McpSchema$Request",
+      "allPublicConstructors": true,
+      "allDeclaredConstructors": true,
+      "allPublicMethods": true,
+      "allDeclaredMethods": true,
+      "allPublicFields": true,
+      "allDeclaredFields": true
     },
     {
       "type": "io.modelcontextprotocol.spec.McpSchema$Resource",
@@ -983,13 +1127,31 @@
       "allDeclaredFields": true
     },
     {
-      "type": "io.modelcontextprotocol.spec.McpSchema$ResourceContents"
+      "type": "io.modelcontextprotocol.spec.McpSchema$ResourceContents",
+      "allPublicConstructors": true,
+      "allDeclaredConstructors": true,
+      "allPublicMethods": true,
+      "allDeclaredMethods": true,
+      "allPublicFields": true,
+      "allDeclaredFields": true
     },
     {
-      "type": "io.modelcontextprotocol.spec.McpSchema$ResourceTemplate"
+      "type": "io.modelcontextprotocol.spec.McpSchema$ResourceTemplate",
+      "allPublicConstructors": true,
+      "allDeclaredConstructors": true,
+      "allPublicMethods": true,
+      "allDeclaredMethods": true,
+      "allPublicFields": true,
+      "allDeclaredFields": true
     },
     {
-      "type": "io.modelcontextprotocol.spec.McpSchema$Result"
+      "type": "io.modelcontextprotocol.spec.McpSchema$Result",
+      "allPublicConstructors": true,
+      "allDeclaredConstructors": true,
+      "allPublicMethods": true,
+      "allDeclaredMethods": true,
+      "allPublicFields": true,
+      "allDeclaredFields": true
     },
     {
       "type": "io.modelcontextprotocol.spec.McpSchema$ServerCapabilities",
@@ -1018,16 +1180,40 @@
           "name": "tools",
           "parameterTypes": []
         }
-      ]
+      ],
+      "allPublicConstructors": true,
+      "allDeclaredConstructors": true,
+      "allPublicMethods": true,
+      "allDeclaredMethods": true,
+      "allPublicFields": true,
+      "allDeclaredFields": true
     },
     {
-      "type": "io.modelcontextprotocol.spec.McpSchema$ServerCapabilities$CompletionCapabilities"
+      "type": "io.modelcontextprotocol.spec.McpSchema$ServerCapabilities$CompletionCapabilities",
+      "allPublicConstructors": true,
+      "allDeclaredConstructors": true,
+      "allPublicMethods": true,
+      "allDeclaredMethods": true,
+      "allPublicFields": true,
+      "allDeclaredFields": true
     },
     {
-      "type": "io.modelcontextprotocol.spec.McpSchema$ServerCapabilities$LoggingCapabilities"
+      "type": "io.modelcontextprotocol.spec.McpSchema$ServerCapabilities$LoggingCapabilities",
+      "allPublicConstructors": true,
+      "allDeclaredConstructors": true,
+      "allPublicMethods": true,
+      "allDeclaredMethods": true,
+      "allPublicFields": true,
+      "allDeclaredFields": true
     },
     {
-      "type": "io.modelcontextprotocol.spec.McpSchema$ServerCapabilities$PromptCapabilities"
+      "type": "io.modelcontextprotocol.spec.McpSchema$ServerCapabilities$PromptCapabilities",
+      "allPublicConstructors": true,
+      "allDeclaredConstructors": true,
+      "allPublicMethods": true,
+      "allDeclaredMethods": true,
+      "allPublicFields": true,
+      "allDeclaredFields": true
     },
     {
       "type": "io.modelcontextprotocol.spec.McpSchema$ServerCapabilities$ResourceCapabilities",
@@ -1040,7 +1226,13 @@
           "name": "subscribe",
           "parameterTypes": []
         }
-      ]
+      ],
+      "allPublicConstructors": true,
+      "allDeclaredConstructors": true,
+      "allPublicMethods": true,
+      "allDeclaredMethods": true,
+      "allPublicFields": true,
+      "allDeclaredFields": true
     },
     {
       "type": "io.modelcontextprotocol.spec.McpSchema$ServerCapabilities$ToolCapabilities",
@@ -1049,7 +1241,13 @@
           "name": "listChanged",
           "parameterTypes": []
         }
-      ]
+      ],
+      "allPublicConstructors": true,
+      "allDeclaredConstructors": true,
+      "allPublicMethods": true,
+      "allDeclaredMethods": true,
+      "allPublicFields": true,
+      "allDeclaredFields": true
     },
     {
       "type": "io.modelcontextprotocol.spec.McpSchema$TextContent",
@@ -1066,7 +1264,13 @@
           "name": "text",
           "parameterTypes": []
         }
-      ]
+      ],
+      "allPublicConstructors": true,
+      "allDeclaredConstructors": true,
+      "allPublicMethods": true,
+      "allDeclaredMethods": true,
+      "allPublicFields": true,
+      "allDeclaredFields": true
     },
     {
       "type": "io.modelcontextprotocol.spec.McpSchema$TextResourceContents",
@@ -1087,7 +1291,13 @@
           "name": "uri",
           "parameterTypes": []
         }
-      ]
+      ],
+      "allPublicConstructors": true,
+      "allDeclaredConstructors": true,
+      "allPublicMethods": true,
+      "allDeclaredMethods": true,
+      "allPublicFields": true,
+      "allDeclaredFields": true
     },
     {
       "type": "io.modelcontextprotocol.spec.McpSchema$Tool",
@@ -1124,10 +1334,22 @@
           "name": "title",
           "parameterTypes": []
         }
-      ]
+      ],
+      "allPublicConstructors": true,
+      "allDeclaredConstructors": true,
+      "allPublicMethods": true,
+      "allDeclaredMethods": true,
+      "allPublicFields": true,
+      "allDeclaredFields": true
     },
     {
-      "type": "io.modelcontextprotocol.spec.McpSchema$ToolAnnotations"
+      "type": "io.modelcontextprotocol.spec.McpSchema$ToolAnnotations",
+      "allPublicConstructors": true,
+      "allDeclaredConstructors": true,
+      "allPublicMethods": true,
+      "allDeclaredMethods": true,
+      "allPublicFields": true,
+      "allDeclaredFields": true
     },
     {
       "type": "io.modelcontextprotocol.json.jackson3.JacksonMcpJsonMapperSupplier"
@@ -1136,34 +1358,94 @@
       "type": "io.modelcontextprotocol.json.schema.jackson3.JacksonJsonSchemaValidatorSupplier"
     },
     {
-      "type": "io.modelcontextprotocol.spec.McpSchema$ClientCapabilities$Elicitation$Form"
+      "type": "io.modelcontextprotocol.spec.McpSchema$ClientCapabilities$Elicitation$Form",
+      "allPublicConstructors": true,
+      "allDeclaredConstructors": true,
+      "allPublicMethods": true,
+      "allDeclaredMethods": true,
+      "allPublicFields": true,
+      "allDeclaredFields": true
     },
     {
-      "type": "io.modelcontextprotocol.spec.McpSchema$ClientCapabilities$Elicitation$Url"
+      "type": "io.modelcontextprotocol.spec.McpSchema$ClientCapabilities$Elicitation$Url",
+      "allPublicConstructors": true,
+      "allDeclaredConstructors": true,
+      "allPublicMethods": true,
+      "allDeclaredMethods": true,
+      "allPublicFields": true,
+      "allDeclaredFields": true
     },
     {
-      "type": "io.modelcontextprotocol.spec.McpSchema$Icon"
+      "type": "io.modelcontextprotocol.spec.McpSchema$Icon",
+      "allPublicConstructors": true,
+      "allDeclaredConstructors": true,
+      "allPublicMethods": true,
+      "allDeclaredMethods": true,
+      "allPublicFields": true,
+      "allDeclaredFields": true
     },
     {
-      "type": "io.modelcontextprotocol.spec.McpSchema$Identifier"
+      "type": "io.modelcontextprotocol.spec.McpSchema$Identifier",
+      "allPublicConstructors": true,
+      "allDeclaredConstructors": true,
+      "allPublicMethods": true,
+      "allDeclaredMethods": true,
+      "allPublicFields": true,
+      "allDeclaredFields": true
     },
     {
-      "type": "io.modelcontextprotocol.spec.McpSchema$ListResourcesResult"
+      "type": "io.modelcontextprotocol.spec.McpSchema$ListResourcesResult",
+      "allPublicConstructors": true,
+      "allDeclaredConstructors": true,
+      "allPublicMethods": true,
+      "allDeclaredMethods": true,
+      "allPublicFields": true,
+      "allDeclaredFields": true
     },
     {
-      "type": "io.modelcontextprotocol.spec.McpSchema$Meta"
+      "type": "io.modelcontextprotocol.spec.McpSchema$Meta",
+      "allPublicConstructors": true,
+      "allDeclaredConstructors": true,
+      "allPublicMethods": true,
+      "allDeclaredMethods": true,
+      "allPublicFields": true,
+      "allDeclaredFields": true
     },
     {
-      "type": "io.modelcontextprotocol.spec.McpSchema$ResourceContent"
+      "type": "io.modelcontextprotocol.spec.McpSchema$ResourceContent",
+      "allPublicConstructors": true,
+      "allDeclaredConstructors": true,
+      "allPublicMethods": true,
+      "allDeclaredMethods": true,
+      "allPublicFields": true,
+      "allDeclaredFields": true
     },
     {
-      "type": "io.modelcontextprotocol.spec.McpSchema$Resource[]"
+      "type": "io.modelcontextprotocol.spec.McpSchema$Resource[]",
+      "allPublicConstructors": true,
+      "allDeclaredConstructors": true,
+      "allPublicMethods": true,
+      "allDeclaredMethods": true,
+      "allPublicFields": true,
+      "allDeclaredFields": true
     },
     {
-      "type": "io.modelcontextprotocol.spec.McpSchema$ResourceTemplate[]"
+      "type": "io.modelcontextprotocol.spec.McpSchema$ResourceTemplate[]",
+      "allPublicConstructors": true,
+      "allDeclaredConstructors": true,
+      "allPublicMethods": true,
+      "allDeclaredMethods": true,
+      "allPublicFields": true,
+      "allDeclaredFields": true
     },
     {
-      "type": "io.modelcontextprotocol.spec.McpSchema$Tool[]"
+      "type": "io.modelcontextprotocol.spec.McpSchema$Tool[]",
+      "allPublicConstructors": true,
+      "allDeclaredConstructors": true,
+      "allPublicMethods": true,
+      "allDeclaredMethods": true,
+      "allPublicFields": true,
+      "allDeclaredFields": true
     },
     {
       "type": "java.lang.Iterable"

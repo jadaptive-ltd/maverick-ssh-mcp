@@ -535,7 +535,8 @@
                                     </options>
                                 </configuration>
                             </execution>
-                            <execution>
+                            <!-- TODO RPM signing seeems to have randomly broke! -->
+                            <!--<execution>
                                 <id>linux-deploy-maverick-mcp-rpm</id>
                                 <phase>deploy</phase>
                                 <goals>
@@ -552,7 +553,7 @@
                                         <file>${project.build.directory}/rpm/maverick-ssh-mcp/RPMS/${build.arch.rpm}/maverick-ssh-mcp-${product.version}-${build.number}.${build.arch.rpm}.rpm</file>
                                     </files>
                                 </configuration>
-                            </execution>
+                            </execution>-->
                         </executions>
                     </plugin>
                 </plugins>
