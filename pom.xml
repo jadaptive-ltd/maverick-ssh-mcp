@@ -592,7 +592,7 @@
                                         <os>WINDOWS</os>
                                         <architecture>AMD64</architecture>
                                         <package>maverick-ssh-mcp</package>
-                                        <version>${product.version}</version>
+                                        <version>${product.version}-${build.number}</version>
                                         <extension>.exe</extension>
                                         <key>${athene.windows.sign.key}</key>
                                         <passphrase>${athene.windows.sign.passphrase}</passphrase>
