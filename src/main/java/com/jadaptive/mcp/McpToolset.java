@@ -53,13 +53,18 @@ final class McpToolset {
     private static final ObjectMapper MAPPER = new ObjectMapper();
     private static final TypeReference<Map<String, Object>> MAP_TYPE = new TypeReference<>() {
     };
+    private static volatile boolean debugRequests;
+    private static volatile boolean stdioMode;
 
     private McpToolset() {
     }
 
     @SuppressWarnings("unused")
 	static void register(McpServer.SyncSpecification<?> spec, HandleRegistry registry, DestructivePolicy destructivePolicy,
-            SshTeamService sshTeamService) {
+            SshTeamService sshTeamService, boolean debugRequests, boolean stdioMode) {
+        McpToolset.debugRequests = debugRequests;
+        McpToolset.stdioMode = stdioMode;
+
         spec.toolCall(tool("sshteam_register", "Register this MCP runtime as an SSH Team device using OAuth device flow.",
                 """
                 {"type":"object","required":["serverUrl"],"properties":{"serverUrl":{"type":"string"},"clientId":{"type":"string","default":"sshteam-cli"},"scope":{"type":"string","default":"signing"},"deviceName":{"type":"string"},"pollIntervalSeconds":{"type":"integer","default":5},"maxWaitSeconds":{"type":"integer","default":600},"waitForAuthorization":{"type":"boolean","default":false},"ignoreSslTrust":{"type":"boolean","default":false},"setDefault":{"type":"boolean","default":true}}}
@@ -1434,7 +1439,59 @@ final class McpToolset {
 
     private static Map<String, Object> toolArgs(McpSchema.CallToolRequest request) {
         Map<String, Object> arguments = request.arguments();
-        return arguments == null ? Collections.emptyMap() : arguments;
+        Map<String, Object> toolArguments = arguments == null ? Collections.emptyMap() : arguments;
+        debugToolRequest(request, toolArguments);
+        return toolArguments;
+    }
+
+    private static void debugToolRequest(McpSchema.CallToolRequest request, Map<String, Object> arguments) {
+        if (!debugRequests) {
+            return;
+        }
+
+        String transport = stdioMode ? "STDIO" : "HTTP";
+        String requestSummary = request == null ? "<null>" : request.toString();
+        String argsSummary = asJson(redacted(arguments));
+        System.err.println("[maverick-mcp][" + transport + "] tool request=" + requestSummary + " arguments=" + argsSummary);
+    }
+
+    private static Map<String, Object> redacted(Map<String, Object> source) {
+        if (source == null || source.isEmpty()) {
+            return Collections.emptyMap();
+        }
+
+        Map<String, Object> copy = new LinkedHashMap<>();
+        for (Map.Entry<String, Object> entry : source.entrySet()) {
+            String key = entry.getKey();
+            Object value = entry.getValue();
+            if (isSensitiveKey(key)) {
+                copy.put(key, "<redacted>");
+            }
+            else if (value instanceof Map<?, ?> nestedMap) {
+                copy.put(key, redacted(castMap(nestedMap)));
+            }
+            else {
+                copy.put(key, value);
+            }
+        }
+        return copy;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static Map<String, Object> castMap(Map<?, ?> map) {
+        return (Map<String, Object>) map;
+    }
+
+    private static boolean isSensitiveKey(String key) {
+        if (key == null) {
+            return false;
+        }
+        String normalized = key.toLowerCase();
+        return normalized.contains("password")
+                || normalized.contains("passphrase")
+                || normalized.contains("token")
+                || normalized.contains("secret")
+                || normalized.contains("privatekey");
     }
 
     private static McpSchema.Tool tool(String name, String description, String schemaJson) {

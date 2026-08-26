@@ -26,6 +26,9 @@ public class MaverickMcpApplication implements Callable<Integer> {
     @Option(names = "--destructive-policy", defaultValue = "prompt", description = "Destructive operation policy: prompt|allow")
     private String destructivePolicy;
 
+    @Option(names = "--debug-requests", defaultValue = "false", description = "Log MCP tool requests to stderr")
+    private boolean debugRequests;
+
     public static void main(String[] args) {
         int code = new CommandLine(new MaverickMcpApplication()).execute(args);
         System.exit(code);
@@ -35,13 +38,22 @@ public class MaverickMcpApplication implements Callable<Integer> {
     public Integer call() throws Exception {
         DestructivePolicy policy = DestructivePolicy.fromCli(destructivePolicy);
         Mode runtimeMode = mode == ModeOption.http ? Mode.HTTP : Mode.STDIO;
+        boolean requestDebugEnabled = debugRequests || isTrue(System.getenv("MCP_DEBUG_REQUESTS"));
 
-        try (McpRuntime runtime = new McpRuntime(policy, runtimeMode, host, port, endpoint)) {
+        try (McpRuntime runtime = new McpRuntime(policy, runtimeMode, host, port, endpoint, requestDebugEnabled)) {
             runtime.start();
             Runtime.getRuntime().addShutdownHook(new Thread(runtime::close));
             runtime.blockUntilStopped();
             return 0;
         }
+    }
+
+    private static boolean isTrue(String value) {
+        if (value == null) {
+            return false;
+        }
+        String normalized = value.trim().toLowerCase();
+        return "1".equals(normalized) || "true".equals(normalized) || "yes".equals(normalized) || "on".equals(normalized);
     }
 
     enum ModeOption {

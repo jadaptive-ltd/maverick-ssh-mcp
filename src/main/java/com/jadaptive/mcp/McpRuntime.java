@@ -41,23 +41,35 @@ final class McpRuntime implements AutoCloseable {
     private final int bindPort;
     private final String endpoint;
     private final String mcpToken;
+    private final boolean debugRequests;
     private final McpJsonMapper mcpJsonMapper;
 
     private McpSyncServer mcpServer;
     private Server httpServer;
 
     McpRuntime(DestructivePolicy destructivePolicy, Mode mode, String bindHost, int bindPort, String endpoint) {
-        this(destructivePolicy, mode, bindHost, bindPort, endpoint, System.getenv("MCP_TOKEN"));
+        this(destructivePolicy, mode, bindHost, bindPort, endpoint, System.getenv("MCP_TOKEN"), false);
+    }
+
+    McpRuntime(DestructivePolicy destructivePolicy, Mode mode, String bindHost, int bindPort, String endpoint,
+            boolean debugRequests) {
+        this(destructivePolicy, mode, bindHost, bindPort, endpoint, System.getenv("MCP_TOKEN"), debugRequests);
     }
 
     McpRuntime(DestructivePolicy destructivePolicy, Mode mode, String bindHost, int bindPort, String endpoint,
             String mcpToken) {
+        this(destructivePolicy, mode, bindHost, bindPort, endpoint, mcpToken, false);
+    }
+
+    McpRuntime(DestructivePolicy destructivePolicy, Mode mode, String bindHost, int bindPort, String endpoint,
+            String mcpToken, boolean debugRequests) {
         this.destructivePolicy = destructivePolicy;
         this.mode = mode;
         this.bindHost = bindHost;
         this.bindPort = bindPort;
         this.endpoint = endpoint;
         this.mcpToken = emptyToNull(mcpToken);
+        this.debugRequests = debugRequests;
         this.mcpJsonMapper = createJsonMapper();
     }
 
@@ -135,7 +147,7 @@ final class McpRuntime implements AutoCloseable {
     }
 
     private McpSyncServer buildServer(McpServer.SyncSpecification<?> specification) {
-        McpToolset.register(specification, registry, destructivePolicy, sshTeamService);
+        McpToolset.register(specification, registry, destructivePolicy, sshTeamService, debugRequests, mode == Mode.STDIO);
         return specification
                 .serverInfo("maverick-mcp", "0.0.1-SNAPSHOT")
                 .instructions("Maverick Synergy MCP server. Use handle-based tools for SSH, local sockets, shell, SFTP, tunnels, and SCP workflows.")

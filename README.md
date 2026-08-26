@@ -18,6 +18,12 @@ Maverick SSH MCP is a handle-oriented MCP server for SSH automation.
 docker run --rm -p 7693:7693 -e MCP_TOKEN=replace-with-token jadaptive/maverick-ssh-mcp:latest
 ```
 
+## Request Debug Logging
+
+- Enable with CLI flag: `--debug-requests`
+- Or enable with environment variable: `MCP_DEBUG_REQUESTS=true`
+- Logs are written to stderr only, so STDIO MCP payloads on stdout remain unchanged.
+
 ### Compose Fragment
 
 ```yaml
