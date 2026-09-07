@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const phrases = [
     'apt install maverick-ssh-mcp',
     'yum install maverick-ssh-mcp',
-    'curl http://https://athene.jadaptive.com/r/files/jadaptive/maverick-ssh-mcp/current/WINDOWS/AMD64/maverick-ssh-mcp.exe',
+    'curl https://athene.jadaptive.com/r/files/jadaptive/maverick-ssh-mcp/current/WINDOWS/AMD64/maverick-ssh-mcp.exe',
     'docker run --rm -p 7693:7693 -e MCP_TOKEN=replace-with-token jadaptive/maverick-ssh-mcp:latest',
     'wget https://athene.jadaptive.com/r/files/jadaptive/maverick-ssh-mcp/0.0.1-51/MACOS/aarch64/maverick-ssh-mcp.pkg'
   ];

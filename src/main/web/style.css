@@ -216,6 +216,33 @@ a {
   box-shadow: var(--glow-green);
 }
 
+/* ---------- Inline animated link (get-started note) ---------- */
+.cta-note-link {
+  color: var(--accent-green);
+  text-decoration: none;
+  position: relative;
+  transition: color 0.3s ease;
+}
+
+.cta-note-link::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: var(--accent-green);
+  transition: width 0.3s ease;
+}
+
+.cta-note-link:hover {
+  color: var(--text-primary);
+}
+
+.cta-note-link:hover::after {
+  width: 100%;
+}
+
 /* ---------- Hero Section ---------- */
 .hero {
   min-height: 100vh;
@@ -872,6 +899,14 @@ a {
 
 .cta-terminal .terminal-body {
   min-height: auto;
+}
+
+.cta-note {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  text-align: center;
+  margin: 0 auto 24px;
+  max-width: 620px;
 }
 
 .cta-actions {
