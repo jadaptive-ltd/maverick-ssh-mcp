@@ -58,16 +58,18 @@
                     <span class="terminal-dot red"></span>
                     <span class="terminal-dot yellow"></span>
                     <span class="terminal-dot green"></span>
-                    <span class="terminal-title">maverick-ssh-mcp session</span>
+                    <span class="terminal-title">VS Code  (Cmd/Ctrl+Shift+P)</span>
                 </div>
                 <div class="terminal-body" id="terminalBody">
                     <div class="terminal-line">
-                        <span class="prompt">$ </span><span class="command">maverick ssh --connect enterprise-node-01 --shell</span>
-                    </div>
-                    <div class="terminal-line output">
-                        <span class="output-green">✓ SSH Teams auth resolved (device-cert: OK)</span><br>
-                        <span class="output-green">✓ Shell session established</span><br>
-                        <span class="cursor-blink">&gt; </span><span id="heroTypeText"></span>
+                        <code><pre>{
+  "mcp.servers": {
+    "maverick-ssh-mcp": {
+      "type": "command",
+      "command": "/path/to/maverick-ssh-mcp"
+    }
+  }
+}</pre></code>
                     </div>
                 </div>
             </div>
@@ -101,7 +103,6 @@
                 <div class="stat-divider"></div>
                 <div class="stat">
                     <span class="stat-value">UDS</span>
-                    <span class="stat-value-alt">&amp;</span>
                     <span class="stat-label">Unix Domain Sockets</span>
                 </div>
             </div>
@@ -264,39 +265,20 @@
                             <span class="terminal-dot red"></span>
                             <span class="terminal-dot yellow"></span>
                             <span class="terminal-dot green"></span>
-                            <span class="code-lang">maverick-config.json</span>
+                            <span class="code-lang">mcp-prompts.txt</span>
                         </div>
-                        <pre class="code-content"><code><span class="code-brace">{</span>
-  <span class="code-key">"maverick"</span>: {
-    <span class="code-key">"server"</span>: <span class="code-string">"ssh://maverick.local:8000"</span>,
-    <span class="code-key">"teams"</span>: {
-      <span class="code-key">"enabled"</span>: <span class="code-bool">true</span>,
-      <span class="code-key">"mode"</span>: <span class="code-string">"passwordless"</span>
-    }
-  },
-  <span class="code-key">"connections"</span>: [
-    {
-      <span class="code-key">"alias"</span>: <span class="code-string">"prod-web-01"</span>,
-      <span class="code-key">"host"</span>: <span class="code-string">"10.0.1.50"</span>,
-      <span class="code-key">"port"</span>: <span class="code-num">22</span>,
-      <span class="code-key">"methods"</span>: [
-        <span class="code-string">"shell"</span>,
-        <span class="code-string">"sftp"</span>,
-        <span class="code-string">"tunnel-local"</span>
-      ]
-    },
-    {
-      <span class="code-key">"alias"</span>: <span class="code-string">"db-cluster-01"</span>,
-      <span class="code-key">"host"</span>: <span class="code-string">"10.0.2.100"</span>,
-      <span class="code-key">"port"</span>: <span class="code-num">22</span>,
-      <span class="code-key">"methods"</span>: [
-        <span class="code-string">"sftp"</span>,
-        <span class="code-string">"tunnel-remote"</span>,
-        <span class="code-string">"uds-forward"</span>
-      ]
-    }
-  ]
-}<span class="code-brace">}</span></code></pre>
+                        <pre class="code-content"><code><span class="code-string">"Connect to myserver.lan as root"</span>
+<span class="code-string">"Download the file /tmp/log.txt"</span>
+<span class="code-string">"Show the 20 most recent lines from /var/log/app.log"</span>
+<span class="code-string">"Restart the nginx service on web-01"</span>
+<span class="code-string">"Upload backup.tar.gz to /backups on db-cluster-01"</span>
+<span class="code-string">"Set up a remote tunnel to the database on port 5432"</span>
+<span class="code-string">"Show disk usage on each host in the production cluster"</span>
+<span class="code-string">"Is the SSH service running on 10.0.1.50?"</span>
+<span class="code-string">"Kill any hung processes matching node.js"</span>
+<span class="code-string">"Create a new user 'deployer' with sudo access"</span>
+<span class="code-string">"Copy the SSL certificate from the load balancer"</span>
+<span class="code-string">"List all listening ports and their services"</span></code></pre>
                     </div>
                 </div>
             </div>
@@ -372,13 +354,13 @@
                         <span class="terminal-title">install</span>
                     </div>
                     <div class="terminal-body">
-                        <div class="terminal-line">
-                            <span class="prompt">$ </span><span class="command" id="installCmd">npm install -g @maverick/ssh-mcp</span>
+                        <div class="terminal-line cta-command">
+                            <span class="prompt">$ </span><span class="command" id="installCmd"></span><span class="cursor-blink">&gt; </span>
                         </div>
                         <div class="terminal-line output terminal-output" id="installOutput" style="display:none;">
                             <span class="output-green">✓ Installed successfully</span><br>
-                            <span class="output-blue">→ Configure your maverick-ssh-mcp.json</span><br>
-                            <span class="output-blue">→ Start: npx maverick-ssh-mcp serve</span><br>
+                            <span class="output-blue">→ Configure your harness for the maverick-ssh-mcp executable</span><br>
+                            <span class="output-blue">→ or point it at the server if using  HTTP mode.</span><br>
                             <span class="cursor-blink">&gt; </span>
                         </div>
                     </div>

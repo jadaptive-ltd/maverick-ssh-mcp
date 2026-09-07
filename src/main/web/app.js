@@ -29,15 +29,13 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // ---- Terminal typing effect ----
-  const heroTypeText = document.getElementById('heroTypeText');
+  const heroTypeText = document.getElementById('installCmd');
   const phrases = [
-    'ls -la /var/log',
-    'cat /etc/ssh/sshd_config',
-    'sftp --get remote-file.tar.gz',
-    'tunnel --local 8080:app-server:3000',
-    'uds --forward /run/app.sock',
-    'sftp --put backup.sql prod-db-01:/backups/',
-    'tunnel --remote :443:internal-api:8443',
+    'apt install maverick-ssh-mcp',
+    'yum install maverick-ssh-mcp',
+    'curl http://https://athene.jadaptive.com/r/files/jadaptive/maverick-ssh-mcp/current/WINDOWS/AMD64/maverick-ssh-mcp.exe',
+    'docker run --rm -p 7693:7693 -e MCP_TOKEN=replace-with-token jadaptive/maverick-ssh-mcp:latest',
+    'wget https://athene.jadaptive.com/r/files/jadaptive/maverick-ssh-mcp/0.0.1-51/MACOS/aarch64/maverick-ssh-mcp.pkg'
   ];
 
   let phraseIndex = 0;

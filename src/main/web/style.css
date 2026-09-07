@@ -769,12 +769,11 @@ a {
 /* ---------- Architecture Flow ---------- */
 .arch-flow {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 0;
   max-width: 1000px;
   margin: 0 auto;
-  flex-wrap: wrap;
+  gap: 0;
 }
 
 .arch-layer {
@@ -823,7 +822,7 @@ a {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0 12px;
+  transform: rotate(90deg);
   margin: 24px 0;
 }
 
@@ -842,6 +841,10 @@ a {
 .cta-content .section-title,
 .cta-content .section-desc {
   text-align: center;
+}
+
+.cta-command {
+  text-align: left;
 }
 
 .cta-title {
@@ -949,14 +952,6 @@ a {
   .split-layout {
     grid-template-columns: 1fr;
     gap: 48px;
-  }
-  .arch-flow {
-    flex-direction: column;
-    gap: 0;
-  }
-  .arch-arrow {
-    padding: 8px 0;
-    transform: rotate(90deg);
   }
 }
 
