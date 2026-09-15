@@ -2,7 +2,7 @@ pipeline {
     agent none
 
     tools {
-        maven 'Maven 3.9.0'
+        maven 'Maven 4.0.0'
         jdk 'Graal JDK 25'
     }
 
