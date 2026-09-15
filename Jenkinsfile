@@ -124,7 +124,7 @@ pipeline {
                                         -Dathene.api=https://athene.jadaptive.com \
                                         -Dathene.repo=jadaptive \
                                         -Dathene.serverId=athene \
-                                        -Dathene.macos.sign.key=apple-codesign/222d3c8e269a4e5f98e3c9575aa8e810 \
+                                        -Dathene.macos.sign.key=222d3c8e269a4e5f98e3c9575aa8e810 \
                                         "-Dathene.macos.sign.passphrase=$SIGNING_PASSPHRASE" \
                                         -Dbuild.number="${BUILD_NUMBER}" \
                                         clean deploy
@@ -164,12 +164,12 @@ pipeline {
                                     globalMavenSettingsConfig: '14324b85-c597-44e8-a575-61f925dba528'
                                 ) {
                                     sh '''
-                                        mvn -U -P native-image,macos-packages,aarch64-packages \
+                                        mvn -U -P native-image,macos-packages \
                                         "-Dbuild.projectProperties=$BUILD_PROPERTIES" \
                                         -Dathene.api=https://athene.jadaptive.com \
                                         -Dathene.repo=jadaptive \
                                         -Dathene.serverId=athene \
-                                        -Dathene.macos.sign.key=apple-codesign/222d3c8e269a4e5f98e3c9575aa8e810 \
+                                        -Dathene.macos.sign.key=222d3c8e269a4e5f98e3c9575aa8e810 \
                                         "-Dathene.macos.sign.passphrase=$SIGNING_PASSPHRASE" \
                                         -Dbuild.number="${BUILD_NUMBER}" \
                                         clean deploy
