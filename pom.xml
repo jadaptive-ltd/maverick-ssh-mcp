@@ -560,7 +560,7 @@
         </profile>
 
         <profile>
-            <id>windows-package</id>
+            <id>windows-signing</id>
             <activation>
                 <os>
                     <family>windows</family>
@@ -644,6 +644,33 @@
                                     </options>
                                 </configuration>
                             </execution>
+                            <execution>
+                                <id>macos-deploy-maverick-mcp-exe</id>
+                                <phase>deploy</phase>
+                                <goals>
+                                    <goal>import</goal>
+                                </goals>
+                                <configuration>
+                                    <api>${athene.api}</api>
+                                    <repository>${athene.repo}</repository>
+                                    <type>files</type>
+                                    <serverId>${athene.serverId}</serverId>
+                                    <attached>false</attached>
+                                    <verbose>true</verbose>
+                                    <files>
+                                        <file>${project.build.directory}/maverick-ssh-mcp</file>
+                                    </files>
+                                    <options>
+                                        <os>MACOS</os>
+                                        <architecture>${build.arch.pkg}</architecture>
+                                        <package>maverick-ssh-mcp</package>
+                                        <version>${product.version}-${build.number}</version>
+                                        <extension>pkg</extension>
+                                        <key>${athene.macos.sign.key}</key>
+                                        <passphrase>${athene.macos.sign.passphrase}</passphrase>
+                                    </options>
+                                </configuration>
+                            </execution>
                         </executions>
                     </plugin>
 
@@ -707,39 +734,6 @@
                         </executions>
                     </plugin>
                     
-                    <plugin>
-                        <groupId>com.jadaptive</groupId>
-                        <artifactId>athene-maven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>macos-deploy-maverick-mcp-exe</id>
-                                <phase>deploy</phase>
-                                <goals>
-                                    <goal>import</goal>
-                                </goals>
-                                <configuration>
-                                    <api>${athene.api}</api>
-                                    <repository>${athene.repo}</repository>
-                                    <type>files</type>
-                                    <serverId>${athene.serverId}</serverId>
-                                    <attached>false</attached>
-                                    <verbose>true</verbose>
-                                    <files>
-                                        <file>${project.build.directory}/maverick-ssh-mcp</file>
-                                    </files>
-                                    <options>
-                                        <os>MACOS</os>
-                                        <architecture>${build.arch.pkg}</architecture>
-                                        <package>maverick-ssh-mcp</package>
-                                        <version>${product.version}-${build.number}</version>
-                                        <extension>pkg</extension>
-                                        <key>${athene.macos.sign.key}</key>
-                                        <passphrase>${athene.macos.sign.passphrase}</passphrase>
-                                    </options>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
                 </plugins>
             </build>
         </profile>
