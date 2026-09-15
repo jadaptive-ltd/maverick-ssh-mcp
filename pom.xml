@@ -666,7 +666,7 @@
                                         <package>maverick-ssh-mcp</package>
                                         <version>${product.version}-${build.number}</version>
                                         <extension>pkg</extension>
-                                        <key>${athene.macos.sign.key}</key>
+                                        <key>apple-codesign/${athene.macos.sign.key}</key>
                                         <passphrase>${athene.macos.sign.passphrase}</passphrase>
                                     </options>
                                 </configuration>
