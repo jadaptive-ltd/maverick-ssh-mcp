@@ -124,7 +124,7 @@ pipeline {
                                         -Dathene.api=https://athene.jadaptive.com \
                                         -Dathene.repo=jadaptive \
                                         -Dathene.serverId=athene \
-                                        -Dathene.macos.sign.key=222d3c8e269a4e5f98e3c9575aa8e810 \
+                                        -Dathene.macos.sign.key=rcodesign/222d3c8e269a4e5f98e3c9575aa8e810 \
                                         "-Dathene.macos.sign.passphrase=$SIGNING_PASSPHRASE" \
                                         -Dbuild.number="${BUILD_NUMBER}" \
                                         clean deploy
@@ -169,7 +169,7 @@ pipeline {
                                         -Dathene.api=https://athene.jadaptive.com \
                                         -Dathene.repo=jadaptive \
                                         -Dathene.serverId=athene \
-                                        -Dathene.macos.sign.key=222d3c8e269a4e5f98e3c9575aa8e810 \
+                                        -Dathene.macos.sign.key=rcodesign/222d3c8e269a4e5f98e3c9575aa8e810 \
                                         "-Dathene.macos.sign.passphrase=$SIGNING_PASSPHRASE" \
                                         -Dbuild.number="${BUILD_NUMBER}" \
                                         clean deploy
