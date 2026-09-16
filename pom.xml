@@ -658,7 +658,7 @@
                                     <attached>false</attached>
                                     <verbose>true</verbose>
                                     <files>
-                                        <file>${project.build.directory}/maverick-ssh-mcp</file>
+                                        <file>${project.build.directory}/media/maverick-ssh-mcp-${build.os}_${product.version}-${build.number}.pkg</file>
                                     </files>
                                     <options>
                                         <os>MACOS</os>
