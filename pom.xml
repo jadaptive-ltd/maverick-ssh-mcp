@@ -638,8 +638,6 @@
                                     <file>${project.build.directory}/maverick-ssh-mcp</file>
                                     <outputFile>${project.build.directory}/maverick-ssh-mcp</outputFile>
                                     <options>
-                                        <notarize>true</notarize>
-                                        <staple>true</staple>
                                         <key>${athene.macos.sign.key}</key>
                                         <passphrase>${athene.macos.sign.passphrase}</passphrase>
                                         <codeSignatureFlags>runtime</codeSignatureFlags>
