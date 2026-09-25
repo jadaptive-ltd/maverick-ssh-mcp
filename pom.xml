@@ -691,7 +691,7 @@
                                         <package>maverick-ssh-mcp</package>
                                         <version>${product.version}-${build.number}</version>
                                         <extension>.exe</extension>
-                                        <key>${athene.windows.sign.key}</key>
+                                        <key>safenet/${athene.windows.sign.key}</key>
                                         <passphrase>${athene.windows.sign.passphrase}</passphrase>
                                     </options>
                                 </configuration>
