@@ -630,7 +630,7 @@
                             <scriptFile>${project.basedir}/src/main/nsis/maverick-ssh-mcp-installer.nsi</scriptFile>
                             <outputFile>${project.build.directory}/media/maverick-ssh-mcp-setup-${full.version}-${build.arch.win}.exe</outputFile>
                             <defines>
-                                <APP_BINARY>${project.build.directory}/maverick-ssh-mcp.exe</APP_BINARY>
+                                <APP_BINARY>${project.build.directory}\maverick-ssh-mcp.exe</APP_BINARY>
                                 <APP_EXE_NAME>maverick-ssh-mcp.exe</APP_EXE_NAME>
                                 <APP_VERSION>${full.version}</APP_VERSION>
                             </defines>
