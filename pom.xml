@@ -18,6 +18,7 @@
         <jetty.version>11.0.26</jetty.version>
         <junit.version>5.11.4</junit.version>
         <native.maven.plugin.version>0.10.5</native.maven.plugin.version>
+        <nsis.maven.plugin.version>1.0.6</nsis.maven.plugin.version>
         <build.number>0</build.number>
         <athene.sign.url></athene.sign.url>
         <athene.api></athene.api>
@@ -25,6 +26,7 @@
         <athene.serverId></athene.serverId>
         <athene.macos.sign.key></athene.macos.sign.key>
         <athene.macos.sign.passphrase></athene.macos.sign.passphrase>
+        <athene.windows.sign.type>authenticode</athene.windows.sign.type>
         <athene.windows.sign.key></athene.windows.sign.key>
         <athene.windows.sign.passphrase></athene.windows.sign.passphrase>
     </properties>
@@ -552,6 +554,101 @@
                                         <file>${project.build.directory}/rpm/maverick-ssh-mcp/RPMS/${build.arch.rpm}/maverick-ssh-mcp-${product.version}-${build.number}.${build.arch.rpm}.rpm</file>
                                     </files>
                                 </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>windows-packages</id>
+            <properties>
+                <build.os>windows</build.os>
+                <build.arch.win>amd64</build.arch.win>
+                <full.version>${project.version}</full.version>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.jadaptive</groupId>
+                        <artifactId>athene-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>windows-sign-native-before-installer</id>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                                <configuration>
+                                    <api>${athene.api}</api>
+                                    <type>${athene.windows.sign.type}</type>
+                                    <serverId>${athene.serverId}</serverId>
+                                    <file>${project.build.directory}/maverick-ssh-mcp.exe</file>
+                                    <outputFile>${project.build.directory}/maverick-ssh-mcp.exe</outputFile>
+                                    <options>
+                                        <key>${athene.windows.sign.key}</key>
+                                        <passphrase>${athene.windows.sign.passphrase}</passphrase>
+                                    </options>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>windows-deploy-nsis-installer</id>
+                                <phase>deploy</phase>
+                                <goals>
+                                    <goal>import</goal>
+                                </goals>
+                                <configuration>
+                                    <api>${athene.api}</api>
+                                    <repository>${athene.repo}</repository>
+                                    <type>files</type>
+                                    <serverId>${athene.serverId}</serverId>
+                                    <attached>false</attached>
+                                    <verbose>true</verbose>
+                                    <files>
+                                        <file>${project.build.directory}/media/maverick-ssh-mcp-setup-${full.version}-${build.arch.win}.exe</file>
+                                    </files>
+                                    <options>
+                                        <os>WINDOWS</os>
+                                        <architecture>AMD64</architecture>
+                                        <package>maverick-ssh-mcp-installer</package>
+                                        <version>${full.version}</version>
+                                        <extension>.exe</extension>
+                                        <key>${athene.windows.sign.key}</key>
+                                        <passphrase>${athene.windows.sign.passphrase}</passphrase>
+                                    </options>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <plugin>
+                        <groupId>org.digitalmediaserver</groupId>
+                        <artifactId>nsis-maven-plugin</artifactId>
+                        <version>${nsis.maven.plugin.version}</version>
+                        <configuration>
+                            <scriptFile>${project.basedir}/src/main/nsis/maverick-ssh-mcp-installer.nsi</scriptFile>
+                            <outputFile>${project.build.directory}/media/maverick-ssh-mcp-setup-${full.version}-${build.arch.win}.exe</outputFile>
+                            <defines>
+                                <APP_BINARY>${project.build.directory}/maverick-ssh-mcp.exe</APP_BINARY>
+                                <APP_EXE_NAME>maverick-ssh-mcp.exe</APP_EXE_NAME>
+                                <APP_VERSION>${full.version}</APP_VERSION>
+                            </defines>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>generate-windows-nsis-header</id>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>generate-headerfile</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>build-windows-nsis-installer</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>make</goal>
+                                </goals>
                             </execution>
                         </executions>
                     </plugin>

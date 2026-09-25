@@ -272,6 +272,26 @@ pipeline {
                     )
                 }
 
+                withMaven(
+                    globalMavenSettingsConfig: '14324b85-c597-44e8-a575-61f925dba528'
+                ) {
+                    withCredentials([string(credentialsId: 'windows-signing-etoken-pin', variable: 'SIGNING_PIN')]) {
+                        sh '''
+                        set -euo pipefail
+
+                        mvn -U -P windows-packages \
+                            -DskipTests \
+                            -Dfull.version="${FULL_VERSION}" \
+                            -Dathene.api=https://athene.jadaptive.com \
+                            -Dathene.repo=jadaptive \
+                            -Dathene.serverId=athene \
+                            -Dathene.windows.sign.key="safenet/b69c9c2e8b5e40d3b5d0d3b97afb2baf" \
+                            "-Dathene.windows.sign.passphrase=$SIGNING_PIN" \
+                            deploy
+                        '''
+                    }
+                }
+
                 sh '''
                 set -euo pipefail
 

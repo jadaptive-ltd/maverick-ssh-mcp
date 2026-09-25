@@ -64,6 +64,7 @@ Distribution channels:
   - [Apple Silicon (aarch64) package](https://athene.jadaptive.com/r/files/jadaptive/maverick-ssh-mcp/current/MACOS/aarch64/maverick-ssh-mcp.pkg)
   - [Intel (amd64) package](https://athene.jadaptive.com/r/files/jadaptive/maverick-ssh-mcp/current/MACOS/amd64/maverick-ssh-mcp.pkg)
 - Windows executable (.exe):
+  - [Windows setup installer (NSIS)](https://athene.jadaptive.com/r/files/jadaptive/maverick-ssh-mcp-installer/current/WINDOWS/amd64/maverick-ssh-mcp-setup.exe)
   - [amd64 executable](https://athene.jadaptive.com/r/files/jadaptive/maverick-ssh-mcp/current/WINDOWS/amd64/maverick-ssh-mcp.exe)
 
 For development and local build instructions, see `BUILDING.md`.
