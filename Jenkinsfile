@@ -210,7 +210,7 @@ pipeline {
                             ) {
                                 
                                 withCredentials([string(credentialsId: 'windows-signing-etoken-pin', variable: 'SIGNING_PIN')]) {
-                                    bat 'mvn -U -P native-image,windows-signing clean deploy -Dbuild.projectProperties="%BUILD_PROPERTIES%"  -Dbuild.number="%BUILD_NUMBER%" -Dathene.serverId=athene -Dathene.api=https://athene.jadaptive.com -Dathene.repo=jadaptive -Dathene.windows.sign.key="safenet/b69c9c2e8b5e40d3b5d0d3b97afb2baf" -Dathene.windows.sign.passphrase="%SIGNING_PIN%"'
+                                    bat 'mvn -U -P native-image,windows-signing,windows-packages clean deploy -Dbuild.projectProperties="%BUILD_PROPERTIES%" -Dbuild.number="%BUILD_NUMBER%" -Dfull.version="%FULL_VERSION%" -Dathene.serverId=athene -Dathene.api=https://athene.jadaptive.com -Dathene.repo=jadaptive -Dathene.windows.sign.key="safenet/b69c9c2e8b5e40d3b5d0d3b97afb2baf" -Dathene.windows.sign.passphrase="%SIGNING_PIN%"'
                                     bat 'if not exist mcpb\\server mkdir mcpb\\server'
                                     bat 'copy /Y target\\maverick-ssh-mcp.exe mcpb\\server\\maverick-ssh-mcp.exe'
                                     stash name: 'maverick-ssh-mcp-native-windows-amd64', includes: 'mcpb/server/maverick-ssh-mcp.exe'
@@ -270,26 +270,6 @@ pipeline {
                         file: 'target/mcpb-bundle/manifest.json',
                         text: groovy.json.JsonOutput.prettyPrint(groovy.json.JsonOutput.toJson(manifest)) + '\n'
                     )
-                }
-
-                withMaven(
-                    globalMavenSettingsConfig: '14324b85-c597-44e8-a575-61f925dba528'
-                ) {
-                    withCredentials([string(credentialsId: 'windows-signing-etoken-pin', variable: 'SIGNING_PIN')]) {
-                        sh '''
-                        set -euo pipefail
-
-                        mvn -U -P windows-packages \
-                            -DskipTests \
-                            -Dfull.version="${FULL_VERSION}" \
-                            -Dathene.api=https://athene.jadaptive.com \
-                            -Dathene.repo=jadaptive \
-                            -Dathene.serverId=athene \
-                            -Dathene.windows.sign.key="safenet/b69c9c2e8b5e40d3b5d0d3b97afb2baf" \
-                            "-Dathene.windows.sign.passphrase=$SIGNING_PIN" \
-                            deploy
-                        '''
-                    }
                 }
 
                 sh '''
@@ -397,4 +377,3 @@ String getFullVersion() {
     def suffixArray = pomVersionArray[2].split('-')
     return pomVersionArray[0] + '.' + pomVersionArray[1] + '.' + suffixArray[0] + "-${BUILD_NUMBER}"
 }
-
