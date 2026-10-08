@@ -91,7 +91,7 @@ final class McpToolset {
 
         spec.toolCall(tool("ssh_connect", "Open an SSH connection and return a handle.",
                 """
-                {"type":"object","required":["host","username"],"properties":{"host":{"type":"string"},"port":{"type":"integer","default":22},"username":{"type":"string"},"password":{"type":"string"},"privateKeyPath":{"type":"string"},"privateKeyPassphrase":{"type":"string"},"keyboardInteractivePassword":{"type":"boolean","default":false},"connectTimeoutMs":{"type":"integer","default":30000},"sshTeamEnabled":{"type":"boolean","default":true},"sshTeamServer":{"type":"string"},"sshTeamIgnoreSslTrust":{"type":"boolean","default":false},"sshTeamCertificateType":{"type":"string","default":"ED25519"},"sshTeamTimezone":{"type":"string"}}}
+                {"type":"object","required":["host","username"],"properties":{"host":{"type":"string"},"port":{"type":"integer","default":22},"username":{"type":"string"},"password":{"type":"string"},"privateKeyPath":{"type":"string"},"privateKeyPassphrase":{"type":"string"},"keyboardInteractivePassword":{"type":"boolean","default":false},"connectTimeoutMs":{"type":"integer","default":30000},"sshTeamEnabled":{"type":"boolean","default":true},"fallbackAuthentication":{"type":"boolean","default":true},"sshTeamServer":{"type":"string"},"sshTeamIgnoreSslTrust":{"type":"boolean","default":false},"sshTeamCertificateType":{"type":"string","default":"ED25519"},"sshTeamTimezone":{"type":"string"}}}
                 """),
                 (exchange, request) -> sshConnect(toolArgs(request), registry, sshTeamService));
 
@@ -161,7 +161,7 @@ final class McpToolset {
                 """),
                 (exchange, request) -> closeResult("socketlistener", registry.closeSocketListener(stringArg(toolArgs(request), "socketListenerHandle", true))));
 
-        spec.toolCall(tool("shell_open", "Open a shell or exec command on an SSH connection.",
+        spec.toolCall(tool("shell_open", "Open a shell or exec command on an SSH connection. Prefer shell mode (omit command) unless the command path is explicitly known on the remote host.",
                 """
                 {"type":"object","required":["sshHandle"],"properties":{"sshHandle":{"type":"string"},"pty":{"type":"boolean","default":true},"term":{"type":"string","default":"xterm"},"cols":{"type":"integer","default":120},"rows":{"type":"integer","default":40},"command":{"type":"string"},"timeoutMs":{"type":"integer","default":30000}}}
                 """),
@@ -368,6 +368,7 @@ final class McpToolset {
             boolean keyboardInteractivePassword = boolArg(args, "keyboardInteractivePassword", false);
             int connectTimeoutMs = intArg(args, "connectTimeoutMs", 30000);
             boolean sshTeamEnabled = boolArg(args, "sshTeamEnabled", true);
+            boolean fallbackAuthentication = boolArg(args, "fallbackAuthentication", true);
             String sshTeamServer = stringArg(args, "sshTeamServer", false);
             boolean sshTeamIgnoreSslTrust = boolArg(args, "sshTeamIgnoreSslTrust", false);
             String sshTeamCertificateType = stringArg(args, "sshTeamCertificateType", false);
@@ -408,22 +409,85 @@ final class McpToolset {
                 builder.addAuthenticators(new KeyboardInteractiveAuthenticator(new PasswordOverKeyboardInteractiveCallback(auth)));
             }
 
-            SshClient client = builder.build();
-            String handle = registry.registerSsh(client);
+            try {
+                SshClient client = builder.build();
+                return ok(sshConnectPayload(registry, client, sshTeamEnabled, sshTeamCertAttempted, false));
+            }
+            catch (Exception firstFailure) {
+                if (shouldRetryWithoutSshTeam(fallbackAuthentication, sshTeamCertAttempted, firstFailure)) {
+                    SshClientBuilder fallbackBuilder = SshClientBuilder.create()
+                            .withTarget(host, port)
+                            .withUsername(username)
+                            .withConnectTimeout(Duration.ofMillis(connectTimeoutMs));
+                    fallbackBuilder.withPolicies(ForwardingPolicyBuilder.create().allowAll().build());
+                    if (password != null) {
+                        fallbackBuilder.withPassword(password);
+                    }
+                    if (privateKeyPath != null) {
+                        if (privateKeyPassphrase != null) {
+                            fallbackBuilder.withPrivateKeyFile(Path.of(privateKeyPath), (keyInfo) -> privateKeyPassphrase);
+                        }
+                        else {
+                            fallbackBuilder.withPrivateKeyFile(Path.of(privateKeyPath));
+                        }
+                    }
+                    if (keyboardInteractivePassword && password != null) {
+                        PasswordAuthenticator auth = PasswordAuthenticator.forPassword(password);
+                        fallbackBuilder.addAuthenticators(new KeyboardInteractiveAuthenticator(new PasswordOverKeyboardInteractiveCallback(auth)));
+                    }
 
-            Map<String, Object> payload = new LinkedHashMap<>();
-            payload.put("sshHandle", handle);
-            payload.put("host", client.getHost());
-            payload.put("port", client.getPort());
-            payload.put("authenticated", client.isAuthenticated());
-            payload.put("remotePublicKeys", client.getRemotePublicKeys());
-            payload.put("sshTeamAttempted", sshTeamEnabled);
-            payload.put("sshTeamCertAttempted", sshTeamCertAttempted);
-            return ok(payload);
+                    try {
+                        SshClient fallbackClient = fallbackBuilder.build();
+                        return ok(sshConnectPayload(registry, fallbackClient, sshTeamEnabled, sshTeamCertAttempted, true));
+                    }
+                    catch (Exception fallbackFailure) {
+                        firstFailure.addSuppressed(fallbackFailure);
+                        String fallbackMessage = fallbackFailure.getMessage() == null ? "unknown error" : fallbackFailure.getMessage();
+                        return error("ssh_connect failed after SSH Teams fallback: " + fallbackMessage);
+                    }
+                }
+                throw firstFailure;
+            }
         }
         catch (Exception e) {
             return error("ssh_connect failed: " + e.getMessage());
         }
+    }
+
+    private static Map<String, Object> sshConnectPayload(HandleRegistry registry, SshClient client, boolean sshTeamEnabled,
+            boolean sshTeamCertAttempted, boolean fallbackUsed) {
+        String handle = registry.registerSsh(client);
+        Map<String, Object> payload = new LinkedHashMap<>();
+        payload.put("sshHandle", handle);
+        payload.put("host", client.getHost());
+        payload.put("port", client.getPort());
+        payload.put("authenticated", client.isAuthenticated());
+        payload.put("remotePublicKeys", client.getRemotePublicKeys());
+        payload.put("sshTeamAttempted", sshTeamEnabled);
+        payload.put("sshTeamCertAttempted", sshTeamCertAttempted);
+        payload.put("fallbackAuthenticationUsed", fallbackUsed);
+        return payload;
+    }
+
+    static boolean shouldRetryWithoutSshTeam(boolean fallbackAuthentication, boolean sshTeamCertAttempted, Throwable failure) {
+        return fallbackAuthentication && sshTeamCertAttempted && isAuthenticationFailure(failure);
+    }
+
+    static boolean isAuthenticationFailure(Throwable failure) {
+        Throwable current = failure;
+        while (current != null) {
+            String message = current.getMessage();
+            if (message != null) {
+                String normalized = message.toLowerCase();
+                if (normalized.contains("authentication failed")
+                        || normalized.contains("permission denied")
+                        || (normalized.contains("auth") && normalized.contains("fail"))) {
+                    return true;
+                }
+            }
+            current = current.getCause();
+        }
+        return false;
     }
 
     private static McpSchema.CallToolResult sshteamRegister(Map<String, Object> args, SshTeamService sshTeamService) {
