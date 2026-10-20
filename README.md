@@ -6,6 +6,7 @@ Maverick SSH MCP is a handle-oriented MCP server for SSH automation.
 
 - SSH connection lifecycle tools (open, inspect, close).
 - Shell and exec tools for command execution and output streaming.
+- ExpectShell tools for command-oriented shell automation with expect-style flows.
 - SFTP tools for directory and file operations.
 - SCP upload/download tools.
 - Local and remote tunnel tools (TCP and Unix sockets).

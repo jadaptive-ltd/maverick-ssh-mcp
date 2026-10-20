@@ -29,6 +29,9 @@ import com.sshtools.client.SessionChannelNG;
 import com.sshtools.client.SshClient;
 import com.sshtools.client.SshClient.SshClientBuilder;
 import com.sshtools.client.scp.ScpClient;
+import com.sshtools.client.shell.ExpectShell;
+import com.sshtools.client.shell.ShellProcess;
+import com.sshtools.client.shell.ShellTimeoutException;
 import com.sshtools.client.sftp.SftpChannel;
 import com.sshtools.client.sftp.SftpClient;
 import com.sshtools.client.sftp.SftpFile;
@@ -185,6 +188,114 @@ final class McpToolset {
                         "}"),
                 (exchange, request) -> closeResult("shell", registry.closeShell(stringArg(toolArgs(request), "shellHandle", true))));
 
+        spec.toolCall(tool("expectShellOpen", "Create an ExpectShell from an existing shell handle and return an expectShellHandle.",
+                """
+                {"type":"object","required":["shellHandle"],"properties":{"shellHandle":{"type":"string"},"os":{"type":"string"},"startupTimeoutSeconds":{"type":"integer","default":30},"detectSettings":{"type":"boolean","default":true},"encoding":{"type":"string"},"passwordPrompt":{"type":"string"},"passwordErrorText":{"type":"string"}}}
+                """),
+                (exchange, request) -> expectShellOpen(toolArgs(request), registry));
+
+        spec.toolCall(tool("expectShellClose", "Close an expectShellHandle.",
+                """
+                {"type":"object","required":["expectShellHandle"],"properties":{"expectShellHandle":{"type":"string"}}}
+                """),
+                (exchange, request) -> closeResult("expectshell", registry.closeExpectShell(stringArg(toolArgs(request), "expectShellHandle", true))));
+
+        spec.toolCall(tool("expectShellGetCharacterEncoding", "Get the configured character encoding for an expect shell.",
+                """
+                {"type":"object","required":["expectShellHandle"],"properties":{"expectShellHandle":{"type":"string"}}}
+                """),
+                (exchange, request) -> expectShellGetCharacterEncoding(toolArgs(request), registry));
+
+        spec.toolCall(tool("expectShellSetCharacterEncoding", "Set the character encoding for an expect shell.",
+                """
+                {"type":"object","required":["expectShellHandle","characterEncoding"],"properties":{"expectShellHandle":{"type":"string"},"characterEncoding":{"type":"string"}}}
+                """),
+                (exchange, request) -> expectShellSetCharacterEncoding(toolArgs(request), registry));
+
+        spec.toolCall(tool("expectShellSetShellInitTimeout", "Set the global ExpectShell shell-init timeout (legacy static setting).",
+                """
+                {"type":"object","required":["timeoutMs"],"properties":{"timeoutMs":{"type":"integer"}}}
+                """),
+                (exchange, request) -> expectShellSetShellInitTimeout(toolArgs(request)));
+
+        spec.toolCall(tool("expectShellInStartup", "Check whether the expect shell is still in startup detection mode.",
+                """
+                {"type":"object","required":["expectShellHandle"],"properties":{"expectShellHandle":{"type":"string"}}}
+                """),
+                (exchange, request) -> expectShellInStartup(toolArgs(request), registry));
+
+        spec.toolCall(tool("expectShellSu", "Run su and return a child expectShellHandle when successful.",
+                """
+                {"type":"object","required":["expectShellHandle","cmd"],"properties":{"expectShellHandle":{"type":"string"},"cmd":{"type":"string"},"password":{"type":"string"},"passwordPrompt":{"type":"string"}}}
+                """),
+                (exchange, request) -> expectShellSu(toolArgs(request), registry));
+
+        spec.toolCall(tool("expectShellSudo", "Run sudo and return process status, output, and exit code.",
+                """
+                {"type":"object","required":["expectShellHandle","cmd"],"properties":{"expectShellHandle":{"type":"string"},"cmd":{"type":"string"},"password":{"type":"string"},"promptExpression":{"type":"string"},"waitFor":{"type":"boolean","default":true}}}
+                """),
+                (exchange, request) -> expectShellSudo(toolArgs(request), registry));
+
+        spec.toolCall(tool("expectShellIsClosed", "Check whether an expect shell has been closed.",
+                """
+                {"type":"object","required":["expectShellHandle"],"properties":{"expectShellHandle":{"type":"string"}}}
+                """),
+                (exchange, request) -> expectShellIsClosed(toolArgs(request), registry));
+
+        spec.toolCall(tool("expectShellExit", "Exit the current shell and close the expect shell handle.",
+                """
+                {"type":"object","required":["expectShellHandle"],"properties":{"expectShellHandle":{"type":"string"}}}
+                """),
+                (exchange, request) -> expectShellExit(toolArgs(request), registry));
+
+        spec.toolCall(tool("expectShellGetNewline", "Get the newline sequence used by the remote shell OS profile.",
+                """
+                {"type":"object","required":["expectShellHandle"],"properties":{"expectShellHandle":{"type":"string"}}}
+                """),
+                (exchange, request) -> expectShellGetNewline(toolArgs(request), registry));
+
+        spec.toolCall(tool("expectShellExecuteWithOutput", "Execute a command and return command output.",
+                """
+                {"type":"object","required":["expectShellHandle","cmd"],"properties":{"expectShellHandle":{"type":"string"},"cmd":{"type":"string"}}}
+                """),
+                (exchange, request) -> expectShellExecuteWithOutput(toolArgs(request), registry));
+
+        spec.toolCall(tool("expectShellExecuteWithExitCode", "Execute a command and return its exit code.",
+                """
+                {"type":"object","required":["expectShellHandle","cmd"],"properties":{"expectShellHandle":{"type":"string"},"cmd":{"type":"string"}}}
+                """),
+                (exchange, request) -> expectShellExecuteWithExitCode(toolArgs(request), registry));
+
+        spec.toolCall(tool("expectShellExecute", "Execute a command without returning output.",
+                """
+                {"type":"object","required":["expectShellHandle","cmd"],"properties":{"expectShellHandle":{"type":"string"},"cmd":{"type":"string"}}}
+                """),
+                (exchange, request) -> expectShellExecute(toolArgs(request), registry));
+
+        spec.toolCall(tool("expectShellExecuteCommand", "Execute a command with advanced options and return process status.",
+                """
+                {"type":"object","required":["expectShellHandle","cmd"],"properties":{"expectShellHandle":{"type":"string"},"cmd":{"type":"string"},"matchPromptMarker":{"type":"boolean","default":false},"consume":{"type":"boolean","default":true},"charset":{"type":"string"}}}
+                """),
+                (exchange, request) -> expectShellExecuteCommand(toolArgs(request), registry));
+
+        spec.toolCall(tool("expectShellGetNumCommandsExecuted", "Get the number of commands executed through this expect shell.",
+                """
+                {"type":"object","required":["expectShellHandle"],"properties":{"expectShellHandle":{"type":"string"}}}
+                """),
+                (exchange, request) -> expectShellGetNumCommandsExecuted(toolArgs(request), registry));
+
+        spec.toolCall(tool("expectShellGetOsType", "Get the legacy OS type code detected by expect shell.",
+                """
+                {"type":"object","required":["expectShellHandle"],"properties":{"expectShellHandle":{"type":"string"}}}
+                """),
+                (exchange, request) -> expectShellGetOsType(toolArgs(request), registry));
+
+        spec.toolCall(tool("expectShellGetOsDescription", "Get the detected OS description for this expect shell.",
+                """
+                {"type":"object","required":["expectShellHandle"],"properties":{"expectShellHandle":{"type":"string"}}}
+                """),
+                (exchange, request) -> expectShellGetOsDescription(toolArgs(request), registry));
+
         spec.toolCall(tool("sftp_open", "Open an SFTP client from an SSH handle.",
                 """
                 {"type":"object","required":["sshHandle"],"properties":{"sshHandle":{"type":"string"},"remotePath":{"type":"string","default":"/"}}}
@@ -328,7 +439,7 @@ final class McpToolset {
                         McpSchema.Resource.builder()
                                 .uri("mcp://maverick/handles")
                                 .name("Maverick Handle Registry")
-                                .description("Current SSH/SFTP/shell/tunnel handles and status")
+                                .description("Current SSH/SFTP/shell/expect-shell/tunnel handles and status")
                                 .mimeType("application/json")
                                 .build(),
                         (exchange, request) -> new McpSchema.ReadResourceResult(
@@ -962,6 +1073,302 @@ final class McpToolset {
         catch (IOException e) {
             return error("shell_read failed: " + e.getMessage());
         }
+    }
+
+    private static McpSchema.CallToolResult expectShellOpen(Map<String, Object> args, HandleRegistry registry) {
+        String shellHandle = stringArg(args, "shellHandle", true);
+        Optional<SessionChannelNG> shell = registry.shell(shellHandle);
+        if (shell.isEmpty()) {
+            return error("Unknown shellHandle: " + shellHandle);
+        }
+
+        try {
+            ExpectShell.ExpectShellBuilder builder = ExpectShell.ExpectShellBuilder.create().withSession(shell.get());
+            int startupTimeoutSeconds = intArg(args, "startupTimeoutSeconds", 30);
+            builder.withStartupTimeoutSec(Math.max(1, startupTimeoutSeconds));
+
+            if (!boolArg(args, "detectSettings", true)) {
+                builder.withoutDetectSettings();
+            }
+
+            String osValue = stringArg(args, "os", false);
+            if (osValue != null && !osValue.isBlank()) {
+                Optional<ExpectShell.OS> os = parseExpectShellOs(osValue);
+                if (os.isEmpty()) {
+                    return error("Invalid os value for expectShellOpen: " + osValue);
+                }
+                builder.withOS(os.get());
+            }
+
+            String encoding = stringArg(args, "encoding", false);
+            if (encoding != null && !encoding.isBlank()) {
+                builder.withEncoding(encoding);
+            }
+
+            String passwordPrompt = stringArg(args, "passwordPrompt", false);
+            if (passwordPrompt != null) {
+                builder.withPasswordPrompt(passwordPrompt);
+            }
+
+            String passwordErrorText = stringArg(args, "passwordErrorText", false);
+            if (passwordErrorText != null) {
+                builder.withPasswordErrorText(passwordErrorText);
+            }
+
+            ExpectShell expectShell = builder.build();
+            String expectShellHandle = registry.registerExpectShell(expectShell);
+            return ok(Map.of(
+                    "expectShellHandle", expectShellHandle,
+                    "shellHandle", shellHandle,
+                    "osType", expectShell.getOsType(),
+                    "osDescription", expectShell.getOsDescription()));
+        }
+        catch (ShellTimeoutException e) {
+            return error("expectShellOpen timed out during startup: " + e.getMessage());
+        }
+        catch (Exception e) {
+            return error("expectShellOpen failed: " + e.getMessage());
+        }
+    }
+
+    private static McpSchema.CallToolResult expectShellGetCharacterEncoding(Map<String, Object> args, HandleRegistry registry) {
+        String expectShellHandle = stringArg(args, "expectShellHandle", true);
+        Optional<ExpectShell> expectShell = registry.expectShell(expectShellHandle);
+        if (expectShell.isEmpty()) {
+            return error("Unknown expectShellHandle: " + expectShellHandle);
+        }
+        return ok(Map.of(
+                "expectShellHandle", expectShellHandle,
+                "characterEncoding", expectShell.get().getCharacterEncoding()));
+    }
+
+    private static McpSchema.CallToolResult expectShellSetCharacterEncoding(Map<String, Object> args, HandleRegistry registry) {
+        String expectShellHandle = stringArg(args, "expectShellHandle", true);
+        String characterEncoding = stringArg(args, "characterEncoding", true);
+        Optional<ExpectShell> expectShell = registry.expectShell(expectShellHandle);
+        if (expectShell.isEmpty()) {
+            return error("Unknown expectShellHandle: " + expectShellHandle);
+        }
+        try {
+            expectShell.get().setCharacterEncoding(characterEncoding);
+            return ok(Map.of(
+                    "expectShellHandle", expectShellHandle,
+                    "characterEncoding", expectShell.get().getCharacterEncoding()));
+        }
+        catch (Exception e) {
+            return error("expectShellSetCharacterEncoding failed: " + e.getMessage());
+        }
+    }
+
+    private static McpSchema.CallToolResult expectShellSetShellInitTimeout(Map<String, Object> args) {
+        int timeoutMs = intArg(args, "timeoutMs", -1);
+        if (timeoutMs < 0) {
+            return error("expectShellSetShellInitTimeout requires timeoutMs >= 0");
+        }
+        ExpectShell.setShellInitTimeout(timeoutMs);
+        return ok(Map.of("timeoutMs", timeoutMs));
+    }
+
+    private static McpSchema.CallToolResult expectShellInStartup(Map<String, Object> args, HandleRegistry registry) {
+        String expectShellHandle = stringArg(args, "expectShellHandle", true);
+        Optional<ExpectShell> expectShell = registry.expectShell(expectShellHandle);
+        if (expectShell.isEmpty()) {
+            return error("Unknown expectShellHandle: " + expectShellHandle);
+        }
+        return ok(Map.of("expectShellHandle", expectShellHandle, "inStartup", expectShell.get().inStartup()));
+    }
+
+    private static McpSchema.CallToolResult expectShellSu(Map<String, Object> args, HandleRegistry registry) {
+        String expectShellHandle = stringArg(args, "expectShellHandle", true);
+        String cmd = stringArg(args, "cmd", true);
+        String password = stringArg(args, "password", false);
+        String passwordPrompt = stringArg(args, "passwordPrompt", false);
+
+        Optional<ExpectShell> expectShell = registry.expectShell(expectShellHandle);
+        if (expectShell.isEmpty()) {
+            return error("Unknown expectShellHandle: " + expectShellHandle);
+        }
+
+        try {
+            ExpectShell child = password == null
+                    ? expectShell.get().su(cmd)
+                    : (passwordPrompt == null ? expectShell.get().su(cmd, password) : expectShell.get().su(cmd, password, passwordPrompt));
+            String childHandle = registry.registerExpectShell(child);
+            return ok(Map.of(
+                    "expectShellHandle", expectShellHandle,
+                    "childExpectShellHandle", childHandle,
+                    "osType", child.getOsType(),
+                    "osDescription", child.getOsDescription()));
+        }
+        catch (Exception e) {
+            return error("expectShellSu failed: " + e.getMessage());
+        }
+    }
+
+    private static McpSchema.CallToolResult expectShellSudo(Map<String, Object> args, HandleRegistry registry) {
+        String expectShellHandle = stringArg(args, "expectShellHandle", true);
+        String cmd = stringArg(args, "cmd", true);
+        String password = stringArg(args, "password", false);
+        String promptExpression = stringArg(args, "promptExpression", false);
+        boolean waitFor = boolArg(args, "waitFor", true);
+
+        Optional<ExpectShell> expectShell = registry.expectShell(expectShellHandle);
+        if (expectShell.isEmpty()) {
+            return error("Unknown expectShellHandle: " + expectShellHandle);
+        }
+
+        try {
+            ShellProcess process = password == null
+                    ? expectShell.get().sudo(cmd)
+                    : (promptExpression == null ? expectShell.get().sudo(cmd, password) : expectShell.get().sudo(cmd, password, promptExpression));
+            if (waitFor) {
+                process.waitFor();
+            }
+            return ok(shellProcessPayload(expectShellHandle, process));
+        }
+        catch (Exception e) {
+            return error("expectShellSudo failed: " + e.getMessage());
+        }
+    }
+
+    private static McpSchema.CallToolResult expectShellIsClosed(Map<String, Object> args, HandleRegistry registry) {
+        String expectShellHandle = stringArg(args, "expectShellHandle", true);
+        Optional<ExpectShell> expectShell = registry.expectShell(expectShellHandle);
+        if (expectShell.isEmpty()) {
+            return error("Unknown expectShellHandle: " + expectShellHandle);
+        }
+        return ok(Map.of("expectShellHandle", expectShellHandle, "closed", expectShell.get().isClosed()));
+    }
+
+    private static McpSchema.CallToolResult expectShellExit(Map<String, Object> args, HandleRegistry registry) {
+        String expectShellHandle = stringArg(args, "expectShellHandle", true);
+        Optional<ExpectShell> expectShell = registry.expectShell(expectShellHandle);
+        if (expectShell.isEmpty()) {
+            return error("Unknown expectShellHandle: " + expectShellHandle);
+        }
+
+        try {
+            expectShell.get().exit();
+            registry.closeExpectShell(expectShellHandle);
+            return ok(Map.of("expectShellHandle", expectShellHandle, "closed", true));
+        }
+        catch (Exception e) {
+            return error("expectShellExit failed: " + e.getMessage());
+        }
+    }
+
+    private static McpSchema.CallToolResult expectShellGetNewline(Map<String, Object> args, HandleRegistry registry) {
+        String expectShellHandle = stringArg(args, "expectShellHandle", true);
+        Optional<ExpectShell> expectShell = registry.expectShell(expectShellHandle);
+        if (expectShell.isEmpty()) {
+            return error("Unknown expectShellHandle: " + expectShellHandle);
+        }
+        return ok(Map.of("expectShellHandle", expectShellHandle, "newline", expectShell.get().getNewline()));
+    }
+
+    private static McpSchema.CallToolResult expectShellExecuteWithOutput(Map<String, Object> args, HandleRegistry registry) {
+        String expectShellHandle = stringArg(args, "expectShellHandle", true);
+        String cmd = stringArg(args, "cmd", true);
+        Optional<ExpectShell> expectShell = registry.expectShell(expectShellHandle);
+        if (expectShell.isEmpty()) {
+            return error("Unknown expectShellHandle: " + expectShellHandle);
+        }
+
+        try {
+            return ok(Map.of(
+                    "expectShellHandle", expectShellHandle,
+                    "cmd", cmd,
+                    "output", expectShell.get().executeWithOutput(cmd)));
+        }
+        catch (Exception e) {
+            return error("expectShellExecuteWithOutput failed: " + e.getMessage());
+        }
+    }
+
+    private static McpSchema.CallToolResult expectShellExecuteWithExitCode(Map<String, Object> args, HandleRegistry registry) {
+        String expectShellHandle = stringArg(args, "expectShellHandle", true);
+        String cmd = stringArg(args, "cmd", true);
+        Optional<ExpectShell> expectShell = registry.expectShell(expectShellHandle);
+        if (expectShell.isEmpty()) {
+            return error("Unknown expectShellHandle: " + expectShellHandle);
+        }
+
+        try {
+            return ok(Map.of(
+                    "expectShellHandle", expectShellHandle,
+                    "cmd", cmd,
+                    "exitCode", expectShell.get().executeWithExitCode(cmd)));
+        }
+        catch (Exception e) {
+            return error("expectShellExecuteWithExitCode failed: " + e.getMessage());
+        }
+    }
+
+    private static McpSchema.CallToolResult expectShellExecute(Map<String, Object> args, HandleRegistry registry) {
+        String expectShellHandle = stringArg(args, "expectShellHandle", true);
+        String cmd = stringArg(args, "cmd", true);
+        Optional<ExpectShell> expectShell = registry.expectShell(expectShellHandle);
+        if (expectShell.isEmpty()) {
+            return error("Unknown expectShellHandle: " + expectShellHandle);
+        }
+
+        try {
+            expectShell.get().execute(cmd);
+            return ok(Map.of("expectShellHandle", expectShellHandle, "cmd", cmd, "executed", true));
+        }
+        catch (Exception e) {
+            return error("expectShellExecute failed: " + e.getMessage());
+        }
+    }
+
+    private static McpSchema.CallToolResult expectShellExecuteCommand(Map<String, Object> args, HandleRegistry registry) {
+        String expectShellHandle = stringArg(args, "expectShellHandle", true);
+        String cmd = stringArg(args, "cmd", true);
+        boolean matchPromptMarker = boolArg(args, "matchPromptMarker", false);
+        boolean consume = boolArg(args, "consume", true);
+        String charset = stringArg(args, "charset", false);
+
+        Optional<ExpectShell> expectShell = registry.expectShell(expectShellHandle);
+        if (expectShell.isEmpty()) {
+            return error("Unknown expectShellHandle: " + expectShellHandle);
+        }
+
+        try {
+            ShellProcess process = charset == null
+                    ? expectShell.get().executeCommand(cmd, matchPromptMarker, consume)
+                    : expectShell.get().executeCommand(cmd, matchPromptMarker, consume, charset);
+            return ok(shellProcessPayload(expectShellHandle, process));
+        }
+        catch (Exception e) {
+            return error("expectShellExecuteCommand failed: " + e.getMessage());
+        }
+    }
+
+    private static McpSchema.CallToolResult expectShellGetNumCommandsExecuted(Map<String, Object> args, HandleRegistry registry) {
+        String expectShellHandle = stringArg(args, "expectShellHandle", true);
+        Optional<ExpectShell> expectShell = registry.expectShell(expectShellHandle);
+        if (expectShell.isEmpty()) {
+            return error("Unknown expectShellHandle: " + expectShellHandle);
+        }
+        return ok(Map.of("expectShellHandle", expectShellHandle, "numCommandsExecuted", expectShell.get().getNumCommandsExecuted()));
+    }
+
+    private static McpSchema.CallToolResult expectShellGetOsType(Map<String, Object> args, HandleRegistry registry) {
+        String expectShellHandle = stringArg(args, "expectShellHandle", true);
+        Optional<ExpectShell> expectShell = registry.expectShell(expectShellHandle);
+        if (expectShell.isEmpty()) {
+            return error("Unknown expectShellHandle: " + expectShellHandle);
+        }
+        return ok(Map.of("expectShellHandle", expectShellHandle, "osType", expectShell.get().getOsType()));
+    }
+
+    private static McpSchema.CallToolResult expectShellGetOsDescription(Map<String, Object> args, HandleRegistry registry) {
+        String expectShellHandle = stringArg(args, "expectShellHandle", true);
+        Optional<ExpectShell> expectShell = registry.expectShell(expectShellHandle);
+        if (expectShell.isEmpty()) {
+            return error("Unknown expectShellHandle: " + expectShellHandle);
+        }
+        return ok(Map.of("expectShellHandle", expectShellHandle, "osDescription", expectShell.get().getOsDescription()));
     }
 
     private static McpSchema.CallToolResult sftpOpen(Map<String, Object> args, HandleRegistry registry) {
@@ -1678,6 +2085,25 @@ final class McpToolset {
         map.put("longName", file.getLongname());
         map.put("attributes", sftpAttributesToMap(file.attributes()));
         return map;
+    }
+
+    private static Optional<ExpectShell.OS> parseExpectShellOs(String value) {
+        try {
+            return Optional.of(ExpectShell.OS.valueOf(value.trim().toUpperCase()));
+        }
+        catch (Exception e) {
+            return Optional.empty();
+        }
+    }
+
+    private static Map<String, Object> shellProcessPayload(String expectShellHandle, ShellProcess process) {
+        Map<String, Object> payload = new LinkedHashMap<>();
+        payload.put("expectShellHandle", expectShellHandle);
+        payload.put("active", process.isActive());
+        payload.put("exitCode", process.getExitCode());
+        payload.put("succeeded", process.hasSucceeded());
+        payload.put("output", process.getCommandOutput());
+        return payload;
     }
 
     private static Map<String, Object> sftpAttributesToMap(SftpFileAttributes attrs) {

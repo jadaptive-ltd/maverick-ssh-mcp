@@ -17,6 +17,7 @@ import java.util.concurrent.ConcurrentMap;
 import com.sshtools.client.SessionChannelNG;
 import com.sshtools.client.SshClient;
 import com.sshtools.client.scp.ScpClient;
+import com.sshtools.client.shell.ExpectShell;
 import com.sshtools.client.sftp.SftpClient;
 import com.sshtools.client.sftp.SftpHandle;
 import com.sshtools.common.forwarding.ForwardingHandle;
@@ -25,6 +26,7 @@ final class HandleRegistry implements Closeable {
 
     private final ConcurrentMap<String, SshClient> sshClients = new ConcurrentHashMap<>();
     private final ConcurrentMap<String, SessionChannelNG> shells = new ConcurrentHashMap<>();
+    private final ConcurrentMap<String, ExpectShell> expectShells = new ConcurrentHashMap<>();
     private final ConcurrentMap<String, SftpClient> sftpClients = new ConcurrentHashMap<>();
     private final ConcurrentMap<String, SftpHandle> sftpFiles = new ConcurrentHashMap<>();
     private final ConcurrentMap<String, ForwardingHandle> tunnels = new ConcurrentHashMap<>();
@@ -38,6 +40,10 @@ final class HandleRegistry implements Closeable {
 
     String registerShell(SessionChannelNG channel) {
         return put(shells, channel, "shell");
+    }
+
+    String registerExpectShell(ExpectShell shell) {
+        return put(expectShells, shell, "expectshell");
     }
 
     String registerSftp(SftpClient client) {
@@ -68,6 +74,10 @@ final class HandleRegistry implements Closeable {
         return Optional.ofNullable(shells.get(id));
     }
 
+    Optional<ExpectShell> expectShell(String id) {
+        return Optional.ofNullable(expectShells.get(id));
+    }
+
     Optional<SftpClient> sftp(String id) {
         return Optional.ofNullable(sftpClients.get(id));
     }
@@ -96,6 +106,10 @@ final class HandleRegistry implements Closeable {
         return closeAndRemove(shells, id);
     }
 
+    boolean closeExpectShell(String id) {
+        return closeAndRemove(expectShells, id);
+    }
+
     boolean closeSftp(String id) {
         return closeAndRemove(sftpClients, id);
     }
@@ -120,6 +134,7 @@ final class HandleRegistry implements Closeable {
         Map<String, Object> map = new LinkedHashMap<>();
         map.put("ssh", summarizeSsh());
         map.put("shell", summarize(shells));
+        map.put("expectshell", summarize(expectShells));
         map.put("sftp", summarize(sftpClients));
         map.put("sftpfile", summarize(sftpFiles));
         map.put("tunnel", summarize(tunnels));
@@ -136,6 +151,9 @@ final class HandleRegistry implements Closeable {
         all.clear();
         all.addAll(shells.keySet());
         all.forEach(this::closeShell);
+        all.clear();
+        all.addAll(expectShells.keySet());
+        all.forEach(this::closeExpectShell);
         all.clear();
         all.addAll(sftpClients.keySet());
         all.forEach(this::closeSftp);
@@ -198,6 +216,9 @@ final class HandleRegistry implements Closeable {
             }
             else if (value instanceof ScpClient scp) {
                 scp.exit();
+            }
+            else if (value instanceof ExpectShell expectShell) {
+                expectShell.close();
             }
             else if (value instanceof Closeable closable) {
                 closable.close();
