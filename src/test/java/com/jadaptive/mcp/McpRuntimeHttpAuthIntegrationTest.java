@@ -17,7 +17,7 @@ class McpRuntimeHttpAuthIntegrationTest {
     @Test
     void rejectsRequestWithoutBearerTokenWhenConfigured() throws Exception {
         try (McpRuntime runtime = new McpRuntime(
-                DestructivePolicy.PROMPT,
+                new DumbToolGate(),
                 McpRuntime.Mode.HTTP,
                 "127.0.0.1",
                 0,
@@ -34,7 +34,7 @@ class McpRuntimeHttpAuthIntegrationTest {
     @Test
     void acceptsRequestWithMatchingBearerTokenWhenConfigured() throws Exception {
         try (McpRuntime runtime = new McpRuntime(
-                DestructivePolicy.PROMPT,
+                new DumbToolGate(),
                 McpRuntime.Mode.HTTP,
                 "127.0.0.1",
                 0,

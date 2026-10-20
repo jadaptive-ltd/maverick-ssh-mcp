@@ -19,7 +19,7 @@ class McpSocketToolsHttpIntegrationTest {
     @Test
     void listenerAcceptsAndExchangesDataWithOutboundSocket() throws Exception {
         try (McpRuntime runtime = new McpRuntime(
-                DestructivePolicy.PROMPT,
+                new DumbToolGate(),
                 McpRuntime.Mode.HTTP,
                 "127.0.0.1",
                 0,
@@ -79,7 +79,7 @@ class McpSocketToolsHttpIntegrationTest {
     @Test
     void listenerAcceptTimesOutWhenNoInboundConnectionArrives() throws Exception {
         try (McpRuntime runtime = new McpRuntime(
-                DestructivePolicy.PROMPT,
+                new DumbToolGate(),
                 McpRuntime.Mode.HTTP,
                 "127.0.0.1",
                 0,

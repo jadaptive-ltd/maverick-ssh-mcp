@@ -23,7 +23,7 @@ public class MaverickMcpApplication implements Callable<Integer> {
     @Option(names = "--endpoint", defaultValue = "/mcp", description = "MCP HTTP endpoint path")
     private String endpoint;
 
-    @Option(names = "--destructive-policy", defaultValue = "prompt", description = "Destructive operation policy: prompt|allow")
+    @Option(names = "--destructive-policy", defaultValue = "prompt", description = "Delete-operation tool gate policy: prompt|allow")
     private String destructivePolicy;
 
     @Option(names = "--debug-requests", defaultValue = "false", description = "Log MCP tool requests to stderr")
@@ -36,11 +36,11 @@ public class MaverickMcpApplication implements Callable<Integer> {
 
     @Override
     public Integer call() throws Exception {
-        DestructivePolicy policy = DestructivePolicy.fromCli(destructivePolicy);
+        ToolGate toolGate = SimpleToolGate.fromCli(destructivePolicy);
         Mode runtimeMode = mode == ModeOption.http ? Mode.HTTP : Mode.STDIO;
         boolean requestDebugEnabled = debugRequests || isTrue(System.getenv("MCP_DEBUG_REQUESTS"));
 
-        try (McpRuntime runtime = new McpRuntime(policy, runtimeMode, host, port, endpoint, requestDebugEnabled)) {
+        try (McpRuntime runtime = new McpRuntime(toolGate, runtimeMode, host, port, endpoint, requestDebugEnabled)) {
             runtime.start();
             Runtime.getRuntime().addShutdownHook(new Thread(runtime::close));
             runtime.blockUntilStopped();
