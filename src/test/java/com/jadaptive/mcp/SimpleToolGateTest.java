@@ -14,27 +14,27 @@ class SimpleToolGateTest {
         SimpleToolGate gate = SimpleToolGate.fromCli(null);
 
         assertEquals("Confirmation required for destructive operation.",
-                gate.verify(GatedTool.SFTP_RM, Map.of("path", "/tmp/test")).orElseThrow());
+                gate.verify(StandardGatedTool.SFTP_RM, Map.of("path", "/tmp/test")).orElseThrow());
     }
 
     @Test
     void allowsDeleteWhenConfirmProvided() throws Exception {
         SimpleToolGate gate = SimpleToolGate.fromCli("prompt");
 
-        assertTrue(gate.verify(GatedTool.SFTP_RM, Map.of("path", "/tmp/test", "confirm", true)).isEmpty());
+        assertTrue(gate.verify(StandardGatedTool.SFTP_RM, Map.of("path", "/tmp/test", "confirm", true)).isEmpty());
     }
 
     @Test
     void allowsAllDeleteOperationsWhenConfigured() throws Exception {
         SimpleToolGate gate = SimpleToolGate.fromCli("allow");
 
-        assertTrue(gate.verify(GatedTool.SFTP_RM, Map.of("path", "/tmp/test")).isEmpty());
+        assertTrue(gate.verify(StandardGatedTool.SFTP_RM, Map.of("path", "/tmp/test")).isEmpty());
     }
 
     @Test
     void doesNotGateNonDeleteOperations() throws Exception {
         SimpleToolGate gate = SimpleToolGate.fromCli("prompt");
 
-        assertTrue(gate.verify(GatedTool.SSH_STATUS, Map.of("sshHandle", "ssh-1")).isEmpty());
+        assertTrue(gate.verify(StandardGatedTool.SSH_STATUS, Map.of("sshHandle", "ssh-1")).isEmpty());
     }
 }

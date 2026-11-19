@@ -65,14 +65,21 @@ docker build -t maverick-ssh-mcp:local .
 Run local image:
 
 ```bash
-docker run --rm -p 7693:7693 maverick-ssh-mcp:local
+docker run --rm -p 7693:7693 \
+  -v maverick-sshteam-data:/root/.sshteam-mcp \
+  maverick-ssh-mcp:local
 ```
 
 Run local image with endpoint authentication:
 
 ```bash
-docker run --rm -p 7693:7693 -e MCP_TOKEN=my-secret-token maverick-ssh-mcp:local
+docker run --rm -p 7693:7693 \
+  -e MCP_TOKEN=my-secret-token \
+  -v maverick-sshteam-data:/root/.sshteam-mcp \
+  maverick-ssh-mcp:local
 ```
+
+The named volume persists SSH Team credentials across container runs. Omit it if you are not testing SSH Team authentication.
 
 ## Runtime Notes
 

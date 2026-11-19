@@ -22,7 +22,7 @@ import com.sshtools.client.sftp.SftpClient;
 import com.sshtools.client.sftp.SftpHandle;
 import com.sshtools.common.forwarding.ForwardingHandle;
 
-final class HandleRegistry implements Closeable {
+public final class HandleRegistry implements Closeable {
 
     private final ConcurrentMap<String, SshClient> sshClients = new ConcurrentHashMap<>();
     private final ConcurrentMap<String, SessionChannelNG> shells = new ConcurrentHashMap<>();

@@ -19,8 +19,8 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.release>25</maven.compiler.release>
-        <mcp.version>2.0.0</mcp.version>
+        <maven.compiler.release>21</maven.compiler.release>
+        <mcp.version>2.2.0-M1</mcp.version>
         <picocli.version>4.7.6</picocli.version>
         <maverick.version>3.2.0</maverick.version>
         <jetty.version>11.0.26</jetty.version>
@@ -71,12 +71,12 @@
         <dependency>
             <groupId>com.sshtools</groupId>
             <artifactId>sshteam-lib</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <version>0.0.3-SNAPSHOT</version> 
         </dependency>
         <dependency>
             <groupId>com.sshtools</groupId>
             <artifactId>jadaptive-hsm</artifactId>
-            <version>0.0.1</version>
+            <version>0.0.3-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>

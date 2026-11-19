@@ -17,8 +17,13 @@ Maverick SSH MCP is a handle-oriented MCP server for SSH automation.
 ## Run with Docker
 
 ```bash
-docker run --rm -p 7693:7693 -e MCP_TOKEN=replace-with-token jadaptive/maverick-ssh-mcp:latest
+docker run --rm -p 7693:7693 \
+  -e MCP_TOKEN=replace-with-token \
+  -v maverick-sshteam-data:/root/.sshteam-mcp \
+  jadaptive/maverick-ssh-mcp:latest
 ```
+
+The named volume keeps SSH Team registrations and credentials across container recreation. Omit it if you do not use SSH Team authentication.
 
 ## Request Debug Logging
 
@@ -38,6 +43,11 @@ services:
       MCP_HOST: 0.0.0.0
       MCP_PORT: 7693
       MCP_TOKEN: ${MCP_TOKEN}
+    volumes:
+      - maverick-sshteam-data:/root/.sshteam-mcp
+
+volumes:
+  maverick-sshteam-data:
 ```
 
 ## Download Locations

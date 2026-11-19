@@ -28,6 +28,8 @@ public class MaverickMcpApplication implements Callable<Integer> {
 
     @Option(names = "--debug-requests", defaultValue = "false", description = "Log MCP tool requests to stderr")
     private boolean debugRequests;
+    
+    private final SshTeamService sshTeamService = new SshTeamService(SshTeamDeviceStore.defaultStore());
 
     public static void main(String[] args) {
         int code = new CommandLine(new MaverickMcpApplication()).execute(args);
@@ -40,7 +42,7 @@ public class MaverickMcpApplication implements Callable<Integer> {
         Mode runtimeMode = mode == ModeOption.http ? Mode.HTTP : Mode.STDIO;
         boolean requestDebugEnabled = debugRequests || isTrue(System.getenv("MCP_DEBUG_REQUESTS"));
 
-        try (McpRuntime runtime = new McpRuntime(toolGate, runtimeMode, host, port, endpoint, requestDebugEnabled)) {
+        try (McpRuntime runtime = new McpRuntime(sshTeamService, toolGate, runtimeMode, host, port, endpoint, requestDebugEnabled)) {
             runtime.start();
             Runtime.getRuntime().addShutdownHook(new Thread(runtime::close));
             runtime.blockUntilStopped();

@@ -40,5 +40,8 @@ class SshTeamDeviceStoreTest {
         assertEquals("access-token", loaded.accessToken());
         assertEquals("refresh-token", loaded.refreshToken());
         assertEquals("kid-1", loaded.keyId());
+
+        store.setDefaultServer(server);
+        assertEquals(server, store.getDefaultServer().orElseThrow());
     }
 }

@@ -7,16 +7,22 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 class McpRuntimeHttpAuthIntegrationTest {
+    @TempDir
+    Path tempDir;
+
 
     private static final HttpClient HTTP = HttpClient.newHttpClient();
 
     @Test
     void rejectsRequestWithoutBearerTokenWhenConfigured() throws Exception {
         try (McpRuntime runtime = new McpRuntime(
+        		new SshTeamService(SshTeamDeviceStore.forPath(tempDir)),
                 new DumbToolGate(),
                 McpRuntime.Mode.HTTP,
                 "127.0.0.1",
@@ -34,6 +40,7 @@ class McpRuntimeHttpAuthIntegrationTest {
     @Test
     void acceptsRequestWithMatchingBearerTokenWhenConfigured() throws Exception {
         try (McpRuntime runtime = new McpRuntime(
+        		new SshTeamService(SshTeamDeviceStore.forPath(tempDir)),
                 new DumbToolGate(),
                 McpRuntime.Mode.HTTP,
                 "127.0.0.1",

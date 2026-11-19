@@ -5,9 +5,11 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.nio.file.Path;
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import io.modelcontextprotocol.client.McpClient;
 import io.modelcontextprotocol.client.McpSyncClient;
@@ -15,10 +17,14 @@ import io.modelcontextprotocol.client.transport.HttpClientStreamableHttpTranspor
 import io.modelcontextprotocol.spec.McpSchema;
 
 class McpSocketToolsHttpIntegrationTest {
+	
+    @TempDir
+    Path tempDir;
 
     @Test
     void listenerAcceptsAndExchangesDataWithOutboundSocket() throws Exception {
         try (McpRuntime runtime = new McpRuntime(
+        		new SshTeamService(SshTeamDeviceStore.forPath(tempDir)),
                 new DumbToolGate(),
                 McpRuntime.Mode.HTTP,
                 "127.0.0.1",
@@ -79,6 +85,7 @@ class McpSocketToolsHttpIntegrationTest {
     @Test
     void listenerAcceptTimesOutWhenNoInboundConnectionArrives() throws Exception {
         try (McpRuntime runtime = new McpRuntime(
+        		new SshTeamService(SshTeamDeviceStore.forPath(tempDir)),
                 new DumbToolGate(),
                 McpRuntime.Mode.HTTP,
                 "127.0.0.1",

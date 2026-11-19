@@ -1,5 +1,7 @@
 package com.jadaptive.mcp;
 
+import java.security.Provider;
+import java.security.Security;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -7,23 +9,32 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.security.Provider;
-import java.security.Security;
+import java.util.ServiceLoader;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.sshteam.lib.DeviceCredentials;
 import com.sshteam.lib.DpopSigner;
 import com.sshteam.lib.ServerUrlNormalizer;
 import com.sshteam.lib.SshteamHttpClient;
 
-final class SshTeamService {
+import tools.jackson.databind.JsonNode;
+
+public final class SshTeamService {
 
     private final SshTeamDeviceStore store;
+    private final List<SshTeamServiceExtension> extensions = new ArrayList<>();
 
-    SshTeamService(SshTeamDeviceStore store) {
+    public SshTeamService(SshTeamDeviceStore store) {
         this.store = store;
         ensureBouncyCastleProvider();
+        ServiceLoader.load(SshTeamServiceExtension.class).forEach(extensions::add);
     }
+    
+    public <T extends SshTeamServiceExtension> Optional<T> getExtension(Class<T> extensionClass) {
+    	return extensions.stream()
+				.filter(extensionClass::isInstance)
+				.map(extensionClass::cast)
+				.findFirst();
+	}
 
     private static void ensureBouncyCastleProvider() {
         if (Security.getProvider("BC") != null) {
@@ -47,7 +58,7 @@ final class SshTeamService {
 
         SshteamHttpClient client = new SshteamHttpClient(normalizedServerUrl, ignoreSslTrust);
         
-        /* TODO hrm... looks importantion ...  why is this here with unused variable? */
+        /* TODO hrm... looks important ...  why is this here with unused variable? */
         DpopSigner signer = DpopSigner.generate();
 
         JsonNode authResponse = client.deviceAuthorize(clientId, scope, deviceName);

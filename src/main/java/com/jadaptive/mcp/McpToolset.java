@@ -1,5 +1,17 @@
 package com.jadaptive.mcp;
 
+import static com.jadaptive.mcp.McpToolsetHelpers.asJson;
+import static com.jadaptive.mcp.McpToolsetHelpers.boolArg;
+import static com.jadaptive.mcp.McpToolsetHelpers.defaultString;
+import static com.jadaptive.mcp.McpToolsetHelpers.error;
+import static com.jadaptive.mcp.McpToolsetHelpers.intArg;
+import static com.jadaptive.mcp.McpToolsetHelpers.longArg;
+import static com.jadaptive.mcp.McpToolsetHelpers.mapArg;
+import static com.jadaptive.mcp.McpToolsetHelpers.ok;
+import static com.jadaptive.mcp.McpToolsetHelpers.stringArg;
+import static com.jadaptive.mcp.McpToolsetHelpers.tool;
+import static com.jadaptive.mcp.McpToolsetHelpers.toolArgs;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -14,11 +26,11 @@ import java.nio.file.Path;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Base64;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.ServiceLoader;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -26,9 +38,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sshtools.client.KeyboardInteractiveAuthenticator;
 import com.sshtools.client.PasswordAuthenticator;
 import com.sshtools.client.PasswordOverKeyboardInteractiveCallback;
@@ -36,13 +45,13 @@ import com.sshtools.client.SessionChannelNG;
 import com.sshtools.client.SshClient;
 import com.sshtools.client.SshClient.SshClientBuilder;
 import com.sshtools.client.scp.ScpClient;
-import com.sshtools.client.shell.ExpectShell;
-import com.sshtools.client.shell.ShellProcess;
-import com.sshtools.client.shell.ShellTimeoutException;
 import com.sshtools.client.sftp.SftpChannel;
 import com.sshtools.client.sftp.SftpClient;
 import com.sshtools.client.sftp.SftpFile;
 import com.sshtools.client.sftp.SftpHandle;
+import com.sshtools.client.shell.ExpectShell;
+import com.sshtools.client.shell.ShellProcess;
+import com.sshtools.client.shell.ShellTimeoutException;
 import com.sshtools.common.forwarding.ForwardingHandle;
 import com.sshtools.common.forwarding.ForwardingPolicy.ForwardingPolicyBuilder;
 import com.sshtools.common.forwarding.ForwardingRequest.ForwardingRequestBuilder;
@@ -65,20 +74,14 @@ final class McpToolset {
         McpSchema.CallToolResult execute(Map<String, Object> args);
     }
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
-    private static final TypeReference<Map<String, Object>> MAP_TYPE = new TypeReference<>() {
-    };
-    private static volatile boolean debugRequests;
-    private static volatile boolean stdioMode;
-
     private McpToolset() {
     }
 
     @SuppressWarnings("unused")
 	static void register(McpServer.SyncSpecification<?> spec, HandleRegistry registry, ToolGate toolGate,
             SshTeamService sshTeamService, boolean debugRequests, boolean stdioMode) {
-        McpToolset.debugRequests = debugRequests;
-        McpToolset.stdioMode = stdioMode;
+        McpToolsetHelpers.debugRequests = debugRequests;
+        McpToolsetHelpers.stdioMode = stdioMode;
 
         spec.toolCall(tool("sshteam_register", "Register this MCP runtime as an SSH Team device using OAuth device flow.",
                 """
@@ -469,7 +472,9 @@ final class McpToolset {
                                         "application/json",
                                         asJson(registry.snapshot())))))
                 );
-    }
+        
+        ServiceLoader.load(McpToolsetExtensions.class).forEach(extension -> extension.register(spec, registry, toolGate, sshTeamService));
+	}
     
     @SuppressWarnings("unused")
 	private static McpSchema.CallToolResult sshConnect(Map<String, Object> args, HandleRegistry registry,
@@ -1974,7 +1979,7 @@ final class McpToolset {
     private static McpSchema.CallToolResult runGated(ToolGate toolGate, McpSchema.CallToolRequest request, ToolExecutor executor) {
         Map<String, Object> args = toolArgs(request);
         String toolName = request.name();
-        Optional<GatedTool> gatedTool = GatedTool.fromToolName(toolName);
+        Optional<StandardGatedTool> gatedTool = StandardGatedTool.fromToolName(toolName);
         if (gatedTool.isEmpty()) {
             return error("Unknown gated tool: " + toolName);
         }
@@ -1991,7 +1996,7 @@ final class McpToolset {
         }
     }
 
-    private static McpSchema.CallToolResult confirmationRequired(String message, GatedTool tool, Map<String, Object> args) {
+    private static McpSchema.CallToolResult confirmationRequired(String message, StandardGatedTool tool, Map<String, Object> args) {
         Map<String, Object> payload = new LinkedHashMap<>();
         payload.put("approved", false);
         payload.put("policy", "prompt");
@@ -2002,152 +2007,11 @@ final class McpToolset {
         return ok(payload);
     }
 
-    private static Map<String, Object> toolArgs(McpSchema.CallToolRequest request) {
-        Map<String, Object> arguments = request.arguments();
-        Map<String, Object> toolArguments = arguments == null ? Collections.emptyMap() : arguments;
-        debugToolRequest(request, toolArguments);
-        return toolArguments;
-    }
-
-    private static void debugToolRequest(McpSchema.CallToolRequest request, Map<String, Object> arguments) {
-        if (!debugRequests) {
-            return;
-        }
-
-        String transport = stdioMode ? "STDIO" : "HTTP";
-        String requestSummary = request == null ? "<null>" : request.toString();
-        String argsSummary = asJson(redacted(arguments));
-        System.err.println("[maverick-mcp][" + transport + "] tool request=" + requestSummary + " arguments=" + argsSummary);
-    }
-
-    private static Map<String, Object> redacted(Map<String, Object> source) {
-        if (source == null || source.isEmpty()) {
-            return Collections.emptyMap();
-        }
-
-        Map<String, Object> copy = new LinkedHashMap<>();
-        for (Map.Entry<String, Object> entry : source.entrySet()) {
-            String key = entry.getKey();
-            Object value = entry.getValue();
-            if (isSensitiveKey(key)) {
-                copy.put(key, "<redacted>");
-            }
-            else if (value instanceof Map<?, ?> nestedMap) {
-                copy.put(key, redacted(castMap(nestedMap)));
-            }
-            else {
-                copy.put(key, value);
-            }
-        }
-        return copy;
-    }
-
-    @SuppressWarnings("unchecked")
-    private static Map<String, Object> castMap(Map<?, ?> map) {
-        return (Map<String, Object>) map;
-    }
-
-    private static boolean isSensitiveKey(String key) {
-        if (key == null) {
-            return false;
-        }
-        String normalized = key.toLowerCase();
-        return normalized.contains("password")
-                || normalized.contains("passphrase")
-                || normalized.contains("token")
-                || normalized.contains("secret")
-                || normalized.contains("privatekey");
-    }
-
-    private static McpSchema.Tool tool(String name, String description, String schemaJson) {
-        return McpSchema.Tool.builder()
-                .name(name)
-                .description(description)
-                .inputSchema(jsonSchema(schemaJson))
-                .build();
-    }
-
-    private static McpSchema.JsonSchema jsonSchema(String schemaJson) {
-        try {
-            Map<String, Object> root = MAPPER.readValue(schemaJson, MAP_TYPE);
-            return new McpSchema.JsonSchema(
-                    asString(root.get("type")),
-                    asMap(root.get("properties")),
-                    asStringList(root.get("required")),
-                    asBoolean(root.get("additionalProperties")),
-                    asMap(root.get("$defs")),
-                    asMap(root.get("definitions")));
-        }
-        catch (JsonProcessingException e) {
-            throw new IllegalArgumentException("Invalid tool schema JSON.", e);
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    private static Map<String, Object> asMap(Object value) {
-        if (value == null) {
-            return Collections.emptyMap();
-        }
-        if (value instanceof Map<?, ?> map) {
-            return (Map<String, Object>) map;
-        }
-        throw new IllegalArgumentException("Schema field must be an object.");
-    }
-
-    @SuppressWarnings("unchecked")
-    private static List<String> asStringList(Object value) {
-        if (value == null) {
-            return List.of();
-        }
-        if (value instanceof List<?> list) {
-            return (List<String>) list;
-        }
-        throw new IllegalArgumentException("Schema field must be an array.");
-    }
-
-    private static String asString(Object value) {
-        return value == null ? null : String.valueOf(value);
-    }
-
-    private static Boolean asBoolean(Object value) {
-        if (value == null) {
-            return null;
-        }
-        if (value instanceof Boolean b) {
-            return b;
-        }
-        return Boolean.parseBoolean(String.valueOf(value));
-    }
-
     private static McpSchema.CallToolResult closeResult(String type, boolean closed) {
         if (!closed) {
             return error(type + " handle not found or close failed");
         }
         return ok(Map.of("closed", true, "type", type));
-    }
-
-    private static McpSchema.CallToolResult ok(Map<String, Object> payload) {
-        return McpSchema.CallToolResult.builder()
-                .structuredContent(payload)
-                .addTextContent(asJson(payload))
-                .isError(false)
-                .build();
-    }
-
-    private static McpSchema.CallToolResult error(String message) {
-        return McpSchema.CallToolResult.builder()
-                .isError(true)
-                .addTextContent(message)
-                .build();
-    }
-
-    private static String asJson(Object value) {
-        try {
-            return MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(value);
-        }
-        catch (JsonProcessingException e) {
-            return String.valueOf(value);
-        }
     }
 
     private static byte[] readAvailable(InputStream input, int maxBytes) throws IOException {
@@ -2231,77 +2095,5 @@ final class McpToolset {
             map.put("lastAccessTime", attrs.lastAccessTime().toMillis());
         }
         return map;
-    }
-
-    private static String defaultString(String value, String fallback) {
-        return value == null || value.isBlank() ? fallback : value;
-    }
-
-    @SuppressWarnings("unchecked")
-    private static Map<String, Object> mapArg(Map<String, Object> args, String key) {
-        Object value = args.get(key);
-        if (value == null) {
-            return Collections.emptyMap();
-        }
-        if (!(value instanceof Map<?, ?> map)) {
-            throw new IllegalArgumentException("Argument must be an object: " + key);
-        }
-        return (Map<String, Object>) map;
-    }
-
-    private static String stringArg(Map<String, Object> args, String key, boolean required) {
-        Object value = args.get(key);
-        if (value == null) {
-            if (required) {
-                throw new IllegalArgumentException("Missing required argument: " + key);
-            }
-            return null;
-        }
-        String str = String.valueOf(value);
-        if (required && str.isBlank()) {
-            throw new IllegalArgumentException("Blank argument: " + key);
-        }
-        return str;
-    }
-
-    private static int intArg(Map<String, Object> args, String key, int fallback) {
-        Object value = args.get(key);
-        if (value == null) {
-            return fallback;
-        }
-        if (value instanceof Number number) {
-            return number.intValue();
-        }
-        String s = String.valueOf(value);
-        if (s.isBlank()) {
-            return fallback;
-        }
-        return Integer.parseInt(s);
-    }
-
-    private static long longArg(Map<String, Object> args, String key, long fallback) {
-        Object value = args.get(key);
-        if (value == null) {
-            return fallback;
-        }
-        if (value instanceof Number number) {
-            return number.longValue();
-        }
-        String s = String.valueOf(value);
-        if (s.isBlank()) {
-            return fallback;
-        }
-        return Long.parseLong(s);
-    }
-
-    private static boolean boolArg(Map<String, Object> args, String key, boolean fallback) {
-        Object value = args.get(key);
-        if (value == null) {
-            return fallback;
-        }
-        if (value instanceof Boolean b) {
-            return b;
-        }
-        return Boolean.parseBoolean(String.valueOf(value));
     }
 }

@@ -26,15 +26,15 @@ import io.modelcontextprotocol.server.McpSyncServer;
 import io.modelcontextprotocol.server.transport.HttpServletStreamableServerTransportProvider;
 import io.modelcontextprotocol.server.transport.StdioServerTransportProvider;
 
-final class McpRuntime implements AutoCloseable {
+public final class McpRuntime implements AutoCloseable {
 
-    enum Mode {
+    public enum Mode {
         STDIO,
         HTTP
     }
 
     private final HandleRegistry registry = new HandleRegistry();
-    private final SshTeamService sshTeamService = new SshTeamService(SshTeamDeviceStore.defaultStore());
+    private final SshTeamService sshTeamService;
     private final ToolGate toolGate;
     private final Mode mode;
     private final String bindHost;
@@ -47,22 +47,23 @@ final class McpRuntime implements AutoCloseable {
     private McpSyncServer mcpServer;
     private Server httpServer;
 
-    McpRuntime(ToolGate toolGate, Mode mode, String bindHost, int bindPort, String endpoint) {
-        this(toolGate, mode, bindHost, bindPort, endpoint, System.getenv("MCP_TOKEN"), false);
+    McpRuntime(SshTeamService sshTeamService, ToolGate toolGate, Mode mode, String bindHost, int bindPort, String endpoint) {
+        this(sshTeamService, toolGate, mode, bindHost, bindPort, endpoint, System.getenv("MCP_TOKEN"), false);
     }
 
-    McpRuntime(ToolGate toolGate, Mode mode, String bindHost, int bindPort, String endpoint,
+    public McpRuntime(SshTeamService sshTeamService, ToolGate toolGate, Mode mode, String bindHost, int bindPort, String endpoint,
             boolean debugRequests) {
-        this(toolGate, mode, bindHost, bindPort, endpoint, System.getenv("MCP_TOKEN"), debugRequests);
+        this(sshTeamService, toolGate, mode, bindHost, bindPort, endpoint, System.getenv("MCP_TOKEN"), debugRequests);
     }
 
-    McpRuntime(ToolGate toolGate, Mode mode, String bindHost, int bindPort, String endpoint,
+    McpRuntime(SshTeamService sshTeamService, ToolGate toolGate, Mode mode, String bindHost, int bindPort, String endpoint,
             String mcpToken) {
-        this(toolGate, mode, bindHost, bindPort, endpoint, mcpToken, false);
+        this(sshTeamService, toolGate, mode, bindHost, bindPort, endpoint, mcpToken, false);
     }
 
-    McpRuntime(ToolGate toolGate, Mode mode, String bindHost, int bindPort, String endpoint,
+    McpRuntime(SshTeamService sshTeamService, ToolGate toolGate, Mode mode, String bindHost, int bindPort, String endpoint,
             String mcpToken, boolean debugRequests) {
+    	this.sshTeamService = sshTeamService;
         this.toolGate = toolGate == null ? new DumbToolGate() : toolGate;
         this.mode = mode;
         this.bindHost = bindHost;
@@ -73,7 +74,7 @@ final class McpRuntime implements AutoCloseable {
         this.mcpJsonMapper = createJsonMapper();
     }
 
-    void start() throws Exception {
+    public void start() throws Exception {
         if (mode == Mode.STDIO) {
             StdioServerTransportProvider transport = new StdioServerTransportProvider(mcpJsonMapper);
             mcpServer = buildServer(McpServer.sync(transport));
@@ -106,7 +107,7 @@ final class McpRuntime implements AutoCloseable {
         httpServer.start();
     }
 
-    void blockUntilStopped() throws Exception {
+    public void blockUntilStopped() throws Exception {
         if (mode == Mode.HTTP && httpServer != null) {
             httpServer.join();
             return;
