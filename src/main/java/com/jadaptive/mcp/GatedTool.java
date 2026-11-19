@@ -13,6 +13,7 @@ enum GatedTool {
     SSHTEAM_REVOKE_DEVICE("sshteam_revoke_device"),
     SSH_CONNECT("ssh_connect"),
     SSH_STATUS("ssh_status"),
+    SSH_EXEC("ssh_exec"),
     SSH_CLOSE("ssh_close"),
     SOCKET_OPEN("socket_open"),
     SOCKET_STATUS("socket_status"),

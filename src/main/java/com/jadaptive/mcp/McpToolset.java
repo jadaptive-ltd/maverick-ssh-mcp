@@ -8,6 +8,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.time.Duration;
@@ -18,6 +19,12 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -109,6 +116,13 @@ final class McpToolset {
                         "}"),
                 (exchange, request) -> runGated(toolGate, request, args -> sshStatus(args, registry)));
 
+        spec.toolCall(tool("ssh_exec",
+                "Execute one command using an SSH exec request and wait for completion. Each call is stateless; shell state, environment changes, and working-directory changes are not retained. Include any required directory change in the command, for example: cd foo && ./run.",
+                """
+                {"type":"object","required":["sshHandle","command"],"properties":{"sshHandle":{"type":"string"},"command":{"type":"string"},"timeoutMs":{"type":"integer","default":30000},"charset":{"type":"string","default":"UTF-8"}}}
+                """),
+                (exchange, request) -> runGated(toolGate, request, args -> sshExec(args, registry)));
+
         spec.toolCall(tool("ssh_close", "Close an SSH handle.",
                 "{" +
                         "\"type\":\"object\",\"required\":[\"sshHandle\"],\"properties\":{\"sshHandle\":{\"type\":\"string\"}}" +
@@ -172,7 +186,7 @@ final class McpToolset {
                 (exchange, request) -> runGated(toolGate, request,
                         args -> closeResult("socketlistener", registry.closeSocketListener(stringArg(args, "socketListenerHandle", true)))));
 
-        spec.toolCall(tool("shell_open", "Open a shell or exec command on an SSH connection. Prefer shell mode (omit command) unless the command path is explicitly known on the remote host.",
+        spec.toolCall(tool("shell_open", "Open an interactive shell or legacy exec channel on an SSH connection. Use ssh_exec for a single stateless command.",
                 """
                 {"type":"object","required":["sshHandle"],"properties":{"sshHandle":{"type":"string"},"pty":{"type":"boolean","default":true},"term":{"type":"string","default":"xterm"},"cols":{"type":"integer","default":120},"rows":{"type":"integer","default":40},"command":{"type":"string"},"timeoutMs":{"type":"integer","default":30000}}}
                 """),
@@ -1006,6 +1020,88 @@ final class McpToolset {
         catch (Exception e) {
             return error("shell_open failed: " + e.getMessage());
         }
+    }
+
+    private static McpSchema.CallToolResult sshExec(Map<String, Object> args, HandleRegistry registry) {
+        String sshHandle = stringArg(args, "sshHandle", true);
+        String command = stringArg(args, "command", true);
+        int timeoutMs = intArg(args, "timeoutMs", 30000);
+        if (timeoutMs <= 0) {
+            return error("ssh_exec requires timeoutMs > 0");
+        }
+
+        Charset charset;
+        try {
+            charset = Charset.forName(defaultString(stringArg(args, "charset", false), "UTF-8"));
+        }
+        catch (Exception e) {
+            return error("ssh_exec invalid charset: " + e.getMessage());
+        }
+
+        Optional<SshClient> ssh = registry.ssh(sshHandle);
+        if (ssh.isEmpty()) {
+            return error("Unknown sshHandle: " + sshHandle);
+        }
+
+        SessionChannelNG channel = null;
+        ExecutorService outputReader = null;
+        long deadline = System.nanoTime() + TimeUnit.MILLISECONDS.toNanos(timeoutMs);
+        try {
+            channel = ssh.get().openSessionChannel(timeoutMs, false);
+            RequestFuture future = channel.executeCommand(command, charset.name())
+                    .waitFor(remainingTimeoutMs(deadline));
+            if (!future.isDoneAndSuccess()) {
+                return error("SSH exec request failed.");
+            }
+
+            outputReader = Executors.newFixedThreadPool(2);
+            SessionChannelNG execChannel = channel;
+            Future<byte[]> stdout = outputReader.submit(() -> execChannel.getInputStream().readAllBytes());
+            Future<byte[]> stderr = outputReader.submit(() -> execChannel.getStderrStream().readAllBytes());
+
+            long remaining = remainingTimeoutMs(deadline);
+            byte[] stdoutBytes = stdout.get(remaining, TimeUnit.MILLISECONDS);
+            remaining = remainingTimeoutMs(deadline);
+            byte[] stderrBytes = stderr.get(remaining, TimeUnit.MILLISECONDS);
+
+            int exitCode = channel.getExitCode();
+            Map<String, Object> payload = new LinkedHashMap<>();
+            payload.put("sshHandle", sshHandle);
+            payload.put("command", command);
+            payload.put("mode", "exec");
+            payload.put("stateful", false);
+            payload.put("stdout", new String(stdoutBytes, charset));
+            payload.put("stderr", new String(stderrBytes, charset));
+            payload.put("exitCode", exitCode);
+            payload.put("succeeded", exitCode == 0);
+            return ok(payload);
+        }
+        catch (TimeoutException e) {
+            return error("ssh_exec timed out after " + timeoutMs + " ms.");
+        }
+        catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return error("ssh_exec interrupted.");
+        }
+        catch (ExecutionException e) {
+            Throwable cause = e.getCause() == null ? e : e.getCause();
+            return error("ssh_exec failed: " + cause.getMessage());
+        }
+        catch (Exception e) {
+            return error("ssh_exec failed: " + e.getMessage());
+        }
+        finally {
+            if (channel != null) {
+                channel.close();
+            }
+            if (outputReader != null) {
+                outputReader.shutdownNow();
+            }
+        }
+    }
+
+    private static long remainingTimeoutMs(long deadlineNanos) {
+        return Math.max(1, TimeUnit.NANOSECONDS.toMillis(deadlineNanos - System.nanoTime()));
     }
 
     private static McpSchema.CallToolResult shellWrite(Map<String, Object> args, HandleRegistry registry) {

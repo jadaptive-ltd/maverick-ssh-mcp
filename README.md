@@ -5,7 +5,8 @@ Maverick SSH MCP is a handle-oriented MCP server for SSH automation.
 ## Features
 
 - SSH connection lifecycle tools (open, inspect, close).
-- Shell and exec tools for command execution and output streaming.
+- Stateless one-command execution through SSH exec requests.
+- Interactive shell tools for stateful command execution and output streaming.
 - ExpectShell tools for command-oriented shell automation with expect-style flows.
 - SFTP tools for directory and file operations.
 - SCP upload/download tools.
@@ -69,4 +70,3 @@ Distribution channels:
   - [amd64 executable](https://athene.jadaptive.com/r/files/jadaptive/maverick-ssh-mcp/current/WINDOWS/amd64/maverick-ssh-mcp.exe)
 
 For development and local build instructions, see `BUILDING.md`.
-
