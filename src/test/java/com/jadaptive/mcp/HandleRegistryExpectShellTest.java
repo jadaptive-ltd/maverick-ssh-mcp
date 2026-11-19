@@ -40,6 +40,21 @@ class HandleRegistryExpectShellTest {
         assertTrue(expectShell.isClosed());
     }
 
+    @Test
+    void evictsClosedExpectShellWithoutAffectingReplacement() throws Exception {
+        HandleRegistry registry = new HandleRegistry();
+        ExpectShell closedShell = testExpectShell();
+        String closedHandle = registry.registerExpectShell(closedShell);
+        closedShell.close();
+
+        assertTrue(registry.expectShell(closedHandle).isEmpty());
+        ExpectShell replacement = testExpectShell();
+        String replacementHandle = registry.registerExpectShell(replacement);
+
+        assertTrue(registry.expectShell(replacementHandle).isPresent());
+        assertFalse(replacement.isClosed());
+    }
+
     private static ExpectShell testExpectShell() throws Exception {
         return ExpectShell.ExpectShellBuilder.create()
                 .withInput(new ByteArrayInputStream(new byte[0]))

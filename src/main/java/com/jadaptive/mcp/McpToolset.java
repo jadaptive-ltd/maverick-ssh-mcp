@@ -987,6 +987,9 @@ final class McpToolset {
         if (ssh.isEmpty()) {
             return error("Unknown sshHandle: " + sshHandle);
         }
+        if (!ssh.get().isConnected()) {
+            return error("SSH handle is closed or disconnected; open a new SSH connection: " + sshHandle);
+        }
 
         int timeout = intArg(args, "timeoutMs", 30000);
         boolean pty = boolArg(args, "pty", true);
@@ -1015,7 +1018,7 @@ final class McpToolset {
                 return error("Shell/exec start request failed.");
             }
 
-            String shellHandle = registry.registerShell(channel);
+            String shellHandle = registry.registerShell(channel, sshHandle);
             Map<String, Object> payload = Map.of(
                     "shellHandle", shellHandle,
                     "sshHandle", sshHandle,
@@ -1171,7 +1174,7 @@ final class McpToolset {
         String shellHandle = stringArg(args, "shellHandle", true);
         Optional<SessionChannelNG> shell = registry.shell(shellHandle);
         if (shell.isEmpty()) {
-            return error("Unknown shellHandle: " + shellHandle);
+            return error("Unknown or closed shellHandle: " + shellHandle);
         }
 
         try {
@@ -1208,7 +1211,7 @@ final class McpToolset {
             }
 
             ExpectShell expectShell = builder.build();
-            String expectShellHandle = registry.registerExpectShell(expectShell);
+            String expectShellHandle = registry.registerExpectShell(expectShell, shellHandle);
             return ok(Map.of(
                     "expectShellHandle", expectShellHandle,
                     "shellHandle", shellHandle,
@@ -1257,8 +1260,8 @@ final class McpToolset {
         if (timeoutMs < 0) {
             return error("expectShellSetShellInitTimeout requires timeoutMs >= 0");
         }
-        ExpectShell.setShellInitTimeout(timeoutMs);
-        return ok(Map.of("timeoutMs", timeoutMs));
+        return error("The legacy process-global ExpectShell init timeout is disabled. "
+                + "Use startupTimeoutSeconds on expectShellOpen for each shell.");
     }
 
     private static McpSchema.CallToolResult expectShellInStartup(Map<String, Object> args, HandleRegistry registry) {
@@ -1278,14 +1281,14 @@ final class McpToolset {
 
         Optional<ExpectShell> expectShell = registry.expectShell(expectShellHandle);
         if (expectShell.isEmpty()) {
-            return error("Unknown expectShellHandle: " + expectShellHandle);
+            return error("Unknown or closed expectShellHandle: " + expectShellHandle);
         }
 
         try {
             ExpectShell child = password == null
                     ? expectShell.get().su(cmd)
                     : (passwordPrompt == null ? expectShell.get().su(cmd, password) : expectShell.get().su(cmd, password, passwordPrompt));
-            String childHandle = registry.registerExpectShell(child);
+            String childHandle = registry.registerChildExpectShell(child, expectShellHandle);
             return ok(Map.of(
                     "expectShellHandle", expectShellHandle,
                     "childExpectShellHandle", childHandle,
@@ -1303,10 +1306,13 @@ final class McpToolset {
         String password = stringArg(args, "password", false);
         String promptExpression = stringArg(args, "promptExpression", false);
         boolean waitFor = boolArg(args, "waitFor", true);
+        if (!waitFor) {
+            return error("expectShellSudo requires waitFor=true so the shell is left ready for the next command.");
+        }
 
         Optional<ExpectShell> expectShell = registry.expectShell(expectShellHandle);
         if (expectShell.isEmpty()) {
-            return error("Unknown expectShellHandle: " + expectShellHandle);
+            return error("Unknown or closed expectShellHandle: " + expectShellHandle);
         }
 
         try {
@@ -1419,12 +1425,14 @@ final class McpToolset {
         boolean matchPromptMarker = boolArg(args, "matchPromptMarker", false);
         boolean consume = boolArg(args, "consume", true);
         String charset = stringArg(args, "charset", false);
+        if (!consume) {
+            return error("expectShellExecuteCommand requires consume=true; asynchronous ShellProcess handles are not retained.");
+        }
 
         Optional<ExpectShell> expectShell = registry.expectShell(expectShellHandle);
         if (expectShell.isEmpty()) {
-            return error("Unknown expectShellHandle: " + expectShellHandle);
+            return error("Unknown or closed expectShellHandle: " + expectShellHandle);
         }
-
         try {
             ShellProcess process = charset == null
                     ? expectShell.get().executeCommand(cmd, matchPromptMarker, consume)
@@ -1454,7 +1462,7 @@ final class McpToolset {
         return ok(Map.of("expectShellHandle", expectShellHandle, "osType", expectShell.get().getOsType()));
     }
 
-    private static McpSchema.CallToolResult expectShellGetOsDescription(Map<String, Object> args, HandleRegistry registry) {
+   private static McpSchema.CallToolResult expectShellGetOsDescription(Map<String, Object> args, HandleRegistry registry) {
         String expectShellHandle = stringArg(args, "expectShellHandle", true);
         Optional<ExpectShell> expectShell = registry.expectShell(expectShellHandle);
         if (expectShell.isEmpty()) {

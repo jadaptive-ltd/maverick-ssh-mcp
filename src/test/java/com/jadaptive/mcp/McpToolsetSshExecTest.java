@@ -4,10 +4,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.lang.reflect.Method;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import io.modelcontextprotocol.client.McpClient;
 import io.modelcontextprotocol.client.McpSyncClient;
@@ -16,14 +18,18 @@ import io.modelcontextprotocol.spec.McpSchema;
 
 class McpToolsetSshExecTest {
 
+    @TempDir
+    Path tempDir;
+
     @Test
     void mapsSshExecToolToPermissionGate() {
-        assertEquals(GatedTool.SSH_EXEC, GatedTool.fromToolName("ssh_exec").orElseThrow());
+        assertEquals(StandardGatedTool.SSH_EXEC, StandardGatedTool.fromToolName("ssh_exec").orElseThrow());
     }
 
     @Test
     void registersStatelessSshExecToolContract() throws Exception {
         try (McpRuntime runtime = new McpRuntime(
+                new SshTeamService(SshTeamDeviceStore.forPath(tempDir)),
                 new DumbToolGate(),
                 McpRuntime.Mode.HTTP,
                 "127.0.0.1",
@@ -57,11 +63,12 @@ class McpToolsetSshExecTest {
 
     @Test
     void passesSshExecThroughToolGate() throws Exception {
-        ToolGate toolGate = (tool, parameters) -> tool == GatedTool.SSH_EXEC
+        ToolGate toolGate = (tool, parameters) -> tool == StandardGatedTool.SSH_EXEC
                 ? java.util.Optional.of("SSH exec denied for test")
                 : java.util.Optional.empty();
 
         try (McpRuntime runtime = new McpRuntime(
+                new SshTeamService(SshTeamDeviceStore.forPath(tempDir)),
                 toolGate,
                 McpRuntime.Mode.HTTP,
                 "127.0.0.1",

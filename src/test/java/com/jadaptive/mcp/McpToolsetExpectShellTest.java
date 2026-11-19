@@ -52,6 +52,29 @@ class McpToolsetExpectShellTest {
         }
     }
 
+    @Test
+    void rejectsLegacyGlobalInitTimeoutMutation() throws Exception {
+        Method method = McpToolset.class.getDeclaredMethod("expectShellSetShellInitTimeout", Map.class);
+        method.setAccessible(true);
+
+        McpSchema.CallToolResult result = (McpSchema.CallToolResult) method.invoke(null, Map.of("timeoutMs", 0));
+
+        assertTrue(Boolean.TRUE.equals(result.isError()));
+    }
+
+    @Test
+    void rejectsNonConsumingCommandExecution() throws Exception {
+        HandleRegistry registry = new HandleRegistry();
+        String handle = registry.registerExpectShell(testExpectShell());
+
+        McpSchema.CallToolResult result = invokeExpectShellTool(
+                "expectShellExecuteCommand",
+                Map.of("expectShellHandle", handle, "cmd", "true", "consume", false),
+                registry);
+
+        assertTrue(Boolean.TRUE.equals(result.isError()));
+    }
+
     private static McpSchema.CallToolResult invokeExpectShellTool(String methodName, Map<String, Object> args, HandleRegistry registry)
             throws Exception {
         Method method = McpToolset.class.getDeclaredMethod(methodName, Map.class, HandleRegistry.class);

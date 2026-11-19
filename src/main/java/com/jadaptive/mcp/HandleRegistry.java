@@ -33,17 +33,39 @@ public final class HandleRegistry implements Closeable {
     private final ConcurrentMap<String, Socket> sockets = new ConcurrentHashMap<>();
     private final ConcurrentMap<String, ServerSocket> socketListeners = new ConcurrentHashMap<>();
     private final ConcurrentMap<String, Instant> created = new ConcurrentHashMap<>();
+    private final ConcurrentMap<String, String> shellSshOwners = new ConcurrentHashMap<>();
+    private final ConcurrentMap<String, String> expectShellOwners = new ConcurrentHashMap<>();
 
     String registerSsh(SshClient client) {
         return put(sshClients, client, "ssh");
     }
 
     String registerShell(SessionChannelNG channel) {
-        return put(shells, channel, "shell");
+        return registerShell(channel, null);
+    }
+
+    String registerShell(SessionChannelNG channel, String sshHandle) {
+        String shellHandle = put(shells, channel, "shell");
+        if (sshHandle != null) {
+            shellSshOwners.put(shellHandle, sshHandle);
+        }
+        return shellHandle;
     }
 
     String registerExpectShell(ExpectShell shell) {
-        return put(expectShells, shell, "expectshell");
+        return registerExpectShell(shell, null);
+    }
+
+    String registerExpectShell(ExpectShell shell, String shellHandle) {
+        String expectShellHandle = put(expectShells, shell, "expectshell");
+        if (shellHandle != null) {
+            expectShellOwners.put(expectShellHandle, shellHandle);
+        }
+        return expectShellHandle;
+    }
+
+    String registerChildExpectShell(ExpectShell shell, String parentExpectShellHandle) {
+        return registerExpectShell(shell, expectShellOwners.get(parentExpectShellHandle));
     }
 
     String registerSftp(SftpClient client) {
@@ -71,11 +93,21 @@ public final class HandleRegistry implements Closeable {
     }
 
     Optional<SessionChannelNG> shell(String id) {
-        return Optional.ofNullable(shells.get(id));
+        SessionChannelNG shell = shells.get(id);
+        if (shell != null && shell.isClosed()) {
+            removeShell(id);
+            return Optional.empty();
+        }
+        return Optional.ofNullable(shell);
     }
 
     Optional<ExpectShell> expectShell(String id) {
-        return Optional.ofNullable(expectShells.get(id));
+        ExpectShell shell = expectShells.get(id);
+        if (shell != null && shell.isClosed()) {
+            removeExpectShell(id);
+            return Optional.empty();
+        }
+        return Optional.ofNullable(shell);
     }
 
     Optional<SftpClient> sftp(String id) {
@@ -99,15 +131,23 @@ public final class HandleRegistry implements Closeable {
     }
 
     boolean closeSsh(String id) {
+        closeOwned(shellSshOwners, id, this::closeShell);
         return closeAndRemove(sshClients, id);
     }
 
     boolean closeShell(String id) {
+        closeOwned(expectShellOwners, id, this::closeExpectShellOnly);
+        shellSshOwners.remove(id);
         return closeAndRemove(shells, id);
     }
 
     boolean closeExpectShell(String id) {
-        return closeAndRemove(expectShells, id);
+        String shellOwner = expectShellOwners.remove(id);
+        boolean closed = closeExpectShellOnly(id);
+        if (shellOwner != null) {
+            closeShell(shellOwner);
+        }
+        return closed;
     }
 
     boolean closeSftp(String id) {
@@ -146,14 +186,14 @@ public final class HandleRegistry implements Closeable {
     @Override
     public void close() {
         List<String> all = new ArrayList<>();
-        all.addAll(sshClients.keySet());
-        all.forEach(this::closeSsh);
+        all.addAll(expectShells.keySet());
+        all.forEach(this::closeExpectShellOnly);
         all.clear();
         all.addAll(shells.keySet());
         all.forEach(this::closeShell);
         all.clear();
-        all.addAll(expectShells.keySet());
-        all.forEach(this::closeExpectShell);
+        all.addAll(sshClients.keySet());
+        all.forEach(this::closeSsh);
         all.clear();
         all.addAll(sftpClients.keySet());
         all.forEach(this::closeSftp);
@@ -202,6 +242,31 @@ public final class HandleRegistry implements Closeable {
         map.put(id, value);
         created.put(id, Instant.now());
         return id;
+    }
+
+    private boolean closeExpectShellOnly(String id) {
+        expectShellOwners.remove(id);
+        return closeAndRemove(expectShells, id);
+    }
+
+    private void removeShell(String id) {
+        shells.remove(id);
+        created.remove(id);
+        shellSshOwners.remove(id);
+    }
+
+    private void removeExpectShell(String id) {
+        expectShells.remove(id);
+        created.remove(id);
+        expectShellOwners.remove(id);
+    }
+
+    private void closeOwned(Map<String, String> owners, String owner, java.util.function.Consumer<String> close) {
+        List<String> owned = owners.entrySet().stream()
+                .filter(entry -> owner.equals(entry.getValue()))
+                .map(Map.Entry::getKey)
+                .toList();
+        owned.forEach(close);
     }
 
     private <T> boolean closeAndRemove(ConcurrentMap<String, T> map, String id) {
