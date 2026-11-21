@@ -218,7 +218,7 @@ public final class SshTeamService {
         return certificate;
     }
 
-    boolean isRegistered(String preferredServerUrl) {
+    public boolean isRegistered(String preferredServerUrl) {
         try {
             String resolvedServer = resolveServer(preferredServerUrl);
             return store.loadCredentials(resolvedServer).isPresent();

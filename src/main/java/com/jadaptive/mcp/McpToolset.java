@@ -109,7 +109,7 @@ final class McpToolset {
 
         spec.toolCall(tool("ssh_connect", "Open an SSH connection and return a handle.",
                 """
-                {"type":"object","required":["host","username"],"properties":{"host":{"type":"string"},"port":{"type":"integer","default":22},"username":{"type":"string"},"password":{"type":"string"},"privateKeyPath":{"type":"string"},"privateKeyPassphrase":{"type":"string"},"keyboardInteractivePassword":{"type":"boolean","default":false},"connectTimeoutMs":{"type":"integer","default":30000},"sshTeamEnabled":{"type":"boolean","default":true},"fallbackAuthentication":{"type":"boolean","default":true},"sshTeamServer":{"type":"string"},"sshTeamIgnoreSslTrust":{"type":"boolean","default":false},"sshTeamCertificateType":{"type":"string","default":"ED25519"},"sshTeamTimezone":{"type":"string"}}}
+                {"type":"object","required":["host","username"],"properties":{"host":{"type":"string"},"port":{"type":"integer","default":22},"username":{"type":"string"},"password":{"type":"string"},"privateKeyPath":{"type":"string"},"privateKeyPassphrase":{"type":"string"},"keyboardInteractivePassword":{"type":"boolean","default":false},"connectTimeoutMs":{"type":"integer","default":30000},"sshTeamEnabled":{"type":"boolean","default":true},"fallbackAuthentication":{"type":"boolean","default":true},"sshTeamServer":{"type":"string"},"sshTeamIgnoreSslTrust":{"type":"boolean","default":false},"sshTeamCertificateType":{"type":"string","default":"ED25519"},"sshTeamTimezone":{"type":"string"},"confirm":{"type":"boolean","default":false}}}
                 """),
                 (exchange, request) -> runGated(toolGate, request, args -> sshConnect(args, registry, sshTeamService)));
 
@@ -214,110 +214,110 @@ final class McpToolset {
                 (exchange, request) -> runGated(toolGate, request,
                         args -> closeResult("shell", registry.closeShell(stringArg(args, "shellHandle", true)))));
 
-        spec.toolCall(tool("expectShellOpen", "Create an ExpectShell from an existing shell handle and return an expectShellHandle.",
+        spec.toolCall(tool("expect_open", "Create an ExpectShell from an existing shell handle and return an expectShellHandle.",
                 """
                 {"type":"object","required":["shellHandle"],"properties":{"shellHandle":{"type":"string"},"os":{"type":"string"},"startupTimeoutSeconds":{"type":"integer","default":30},"detectSettings":{"type":"boolean","default":true},"encoding":{"type":"string"},"passwordPrompt":{"type":"string"},"passwordErrorText":{"type":"string"}}}
                 """),
                 (exchange, request) -> runGated(toolGate, request, args -> expectShellOpen(args, registry)));
 
-        spec.toolCall(tool("expectShellClose", "Close an expectShellHandle.",
+        spec.toolCall(tool("expect_close", "Close an expectShellHandle.",
                 """
                 {"type":"object","required":["expectShellHandle"],"properties":{"expectShellHandle":{"type":"string"}}}
                 """),
                 (exchange, request) -> runGated(toolGate, request,
                         args -> closeResult("expectshell", registry.closeExpectShell(stringArg(args, "expectShellHandle", true)))));
 
-        spec.toolCall(tool("expectShellGetCharacterEncoding", "Get the configured character encoding for an expect shell.",
+        spec.toolCall(tool("expect_get_character_encoding", "Get the configured character encoding for an expect shell.",
                 """
                 {"type":"object","required":["expectShellHandle"],"properties":{"expectShellHandle":{"type":"string"}}}
                 """),
                 (exchange, request) -> runGated(toolGate, request, args -> expectShellGetCharacterEncoding(args, registry)));
 
-        spec.toolCall(tool("expectShellSetCharacterEncoding", "Set the character encoding for an expect shell.",
+        spec.toolCall(tool("expect_set_character_encoding", "Set the character encoding for an expect shell.",
                 """
                 {"type":"object","required":["expectShellHandle","characterEncoding"],"properties":{"expectShellHandle":{"type":"string"},"characterEncoding":{"type":"string"}}}
                 """),
                 (exchange, request) -> runGated(toolGate, request, args -> expectShellSetCharacterEncoding(args, registry)));
 
-        spec.toolCall(tool("expectShellSetShellInitTimeout", "Set the global ExpectShell shell-init timeout (legacy static setting).",
+        spec.toolCall(tool("expect_set_shell_init_timeout", "Set the global ExpectShell shell-init timeout (legacy static setting).",
                 """
                 {"type":"object","required":["timeoutMs"],"properties":{"timeoutMs":{"type":"integer"}}}
                 """),
                 (exchange, request) -> runGated(toolGate, request, McpToolset::expectShellSetShellInitTimeout));
 
-        spec.toolCall(tool("expectShellInStartup", "Check whether the expect shell is still in startup detection mode.",
+        spec.toolCall(tool("expect_in_startup", "Check whether the expect shell is still in startup detection mode.",
                 """
                 {"type":"object","required":["expectShellHandle"],"properties":{"expectShellHandle":{"type":"string"}}}
                 """),
                 (exchange, request) -> runGated(toolGate, request, args -> expectShellInStartup(args, registry)));
 
-        spec.toolCall(tool("expectShellSu", "Run su and return a child expectShellHandle when successful.",
+        spec.toolCall(tool("expect_su", "Run su and return a child expectShellHandle when successful.",
                 """
                 {"type":"object","required":["expectShellHandle","cmd"],"properties":{"expectShellHandle":{"type":"string"},"cmd":{"type":"string"},"password":{"type":"string"},"passwordPrompt":{"type":"string"}}}
                 """),
                 (exchange, request) -> runGated(toolGate, request, args -> expectShellSu(args, registry)));
 
-        spec.toolCall(tool("expectShellSudo", "Run sudo and return process status, output, and exit code.",
+        spec.toolCall(tool("expect_sudo", "Run sudo and return process status, output, and exit code.",
                 """
                 {"type":"object","required":["expectShellHandle","cmd"],"properties":{"expectShellHandle":{"type":"string"},"cmd":{"type":"string"},"password":{"type":"string"},"promptExpression":{"type":"string"},"waitFor":{"type":"boolean","default":true}}}
                 """),
                 (exchange, request) -> runGated(toolGate, request, args -> expectShellSudo(args, registry)));
 
-        spec.toolCall(tool("expectShellIsClosed", "Check whether an expect shell has been closed.",
+        spec.toolCall(tool("expect_is_closed", "Check whether an expect shell has been closed.",
                 """
                 {"type":"object","required":["expectShellHandle"],"properties":{"expectShellHandle":{"type":"string"}}}
                 """),
                 (exchange, request) -> runGated(toolGate, request, args -> expectShellIsClosed(args, registry)));
 
-        spec.toolCall(tool("expectShellExit", "Exit the current shell and close the expect shell handle.",
+        spec.toolCall(tool("expect_exit", "Exit the current shell and close the expect shell handle.",
                 """
                 {"type":"object","required":["expectShellHandle"],"properties":{"expectShellHandle":{"type":"string"}}}
                 """),
                 (exchange, request) -> runGated(toolGate, request, args -> expectShellExit(args, registry)));
 
-        spec.toolCall(tool("expectShellGetNewline", "Get the newline sequence used by the remote shell OS profile.",
+        spec.toolCall(tool("expect_get_newline", "Get the newline sequence used by the remote shell OS profile.",
                 """
                 {"type":"object","required":["expectShellHandle"],"properties":{"expectShellHandle":{"type":"string"}}}
                 """),
                 (exchange, request) -> runGated(toolGate, request, args -> expectShellGetNewline(args, registry)));
 
-        spec.toolCall(tool("expectShellExecuteWithOutput", "Execute a command and return command output.",
+        spec.toolCall(tool("expect_execute_with_output", "Execute a command and return command output.",
                 """
                 {"type":"object","required":["expectShellHandle","cmd"],"properties":{"expectShellHandle":{"type":"string"},"cmd":{"type":"string"}}}
                 """),
                 (exchange, request) -> runGated(toolGate, request, args -> expectShellExecuteWithOutput(args, registry)));
 
-        spec.toolCall(tool("expectShellExecuteWithExitCode", "Execute a command and return its exit code.",
+        spec.toolCall(tool("expect_execute_with_exit_code", "Execute a command and return its exit code.",
                 """
                 {"type":"object","required":["expectShellHandle","cmd"],"properties":{"expectShellHandle":{"type":"string"},"cmd":{"type":"string"}}}
                 """),
                 (exchange, request) -> runGated(toolGate, request, args -> expectShellExecuteWithExitCode(args, registry)));
 
-        spec.toolCall(tool("expectShellExecute", "Execute a command without returning output.",
+        spec.toolCall(tool("expect_execute", "Execute a command without returning output.",
                 """
                 {"type":"object","required":["expectShellHandle","cmd"],"properties":{"expectShellHandle":{"type":"string"},"cmd":{"type":"string"}}}
                 """),
                 (exchange, request) -> runGated(toolGate, request, args -> expectShellExecute(args, registry)));
 
-        spec.toolCall(tool("expectShellExecuteCommand", "Execute a command with advanced options and return process status.",
+        spec.toolCall(tool("expect_execute_command", "Execute a command with advanced options and return process status.",
                 """
                 {"type":"object","required":["expectShellHandle","cmd"],"properties":{"expectShellHandle":{"type":"string"},"cmd":{"type":"string"},"matchPromptMarker":{"type":"boolean","default":false},"consume":{"type":"boolean","default":true},"charset":{"type":"string"}}}
                 """),
                 (exchange, request) -> runGated(toolGate, request, args -> expectShellExecuteCommand(args, registry)));
 
-        spec.toolCall(tool("expectShellGetNumCommandsExecuted", "Get the number of commands executed through this expect shell.",
+        spec.toolCall(tool("expect_get_num_commands_executed", "Get the number of commands executed through this expect shell.",
                 """
                 {"type":"object","required":["expectShellHandle"],"properties":{"expectShellHandle":{"type":"string"}}}
                 """),
                 (exchange, request) -> runGated(toolGate, request, args -> expectShellGetNumCommandsExecuted(args, registry)));
 
-        spec.toolCall(tool("expectShellGetOsType", "Get the legacy OS type code detected by expect shell.",
+        spec.toolCall(tool("expect_get_os_type", "Get the legacy OS type code detected by expect shell.",
                 """
                 {"type":"object","required":["expectShellHandle"],"properties":{"expectShellHandle":{"type":"string"}}}
                 """),
                 (exchange, request) -> runGated(toolGate, request, args -> expectShellGetOsType(args, registry)));
 
-        spec.toolCall(tool("expectShellGetOsDescription", "Get the detected OS description for this expect shell.",
+        spec.toolCall(tool("expect_get_os_description", "Get the detected OS description for this expect shell.",
                 """
                 {"type":"object","required":["expectShellHandle"],"properties":{"expectShellHandle":{"type":"string"}}}
                 """),
@@ -1190,7 +1190,7 @@ final class McpToolset {
             if (osValue != null && !osValue.isBlank()) {
                 Optional<ExpectShell.OS> os = parseExpectShellOs(osValue);
                 if (os.isEmpty()) {
-                    return error("Invalid os value for expectShellOpen: " + osValue);
+                    return error("Invalid os value for expect_open: " + osValue);
                 }
                 builder.withOS(os.get());
             }
@@ -1219,10 +1219,10 @@ final class McpToolset {
                     "osDescription", expectShell.getOsDescription()));
         }
         catch (ShellTimeoutException e) {
-            return error("expectShellOpen timed out during startup: " + e.getMessage());
+            return error("expect_open timed out during startup: " + e.getMessage());
         }
         catch (Exception e) {
-            return error("expectShellOpen failed: " + e.getMessage());
+            return error("expect_open failed: " + e.getMessage());
         }
     }
 
@@ -1251,17 +1251,17 @@ final class McpToolset {
                     "characterEncoding", expectShell.get().getCharacterEncoding()));
         }
         catch (Exception e) {
-            return error("expectShellSetCharacterEncoding failed: " + e.getMessage());
+            return error("expect_set_character_encoding failed: " + e.getMessage());
         }
     }
 
     private static McpSchema.CallToolResult expectShellSetShellInitTimeout(Map<String, Object> args) {
         int timeoutMs = intArg(args, "timeoutMs", -1);
         if (timeoutMs < 0) {
-            return error("expectShellSetShellInitTimeout requires timeoutMs >= 0");
+            return error("expect_set_shell_init_timeout requires timeoutMs >= 0");
         }
         return error("The legacy process-global ExpectShell init timeout is disabled. "
-                + "Use startupTimeoutSeconds on expectShellOpen for each shell.");
+                + "Use startupTimeoutSeconds on expect_open for each shell.");
     }
 
     private static McpSchema.CallToolResult expectShellInStartup(Map<String, Object> args, HandleRegistry registry) {
@@ -1296,7 +1296,7 @@ final class McpToolset {
                     "osDescription", child.getOsDescription()));
         }
         catch (Exception e) {
-            return error("expectShellSu failed: " + e.getMessage());
+            return error("expect_su failed: " + e.getMessage());
         }
     }
 
@@ -1307,7 +1307,7 @@ final class McpToolset {
         String promptExpression = stringArg(args, "promptExpression", false);
         boolean waitFor = boolArg(args, "waitFor", true);
         if (!waitFor) {
-            return error("expectShellSudo requires waitFor=true so the shell is left ready for the next command.");
+            return error("expect_sudo requires waitFor=true so the shell is left ready for the next command.");
         }
 
         Optional<ExpectShell> expectShell = registry.expectShell(expectShellHandle);
@@ -1325,7 +1325,7 @@ final class McpToolset {
             return ok(shellProcessPayload(expectShellHandle, process));
         }
         catch (Exception e) {
-            return error("expectShellSudo failed: " + e.getMessage());
+            return error("expect_sudo failed: " + e.getMessage());
         }
     }
 
@@ -1351,7 +1351,7 @@ final class McpToolset {
             return ok(Map.of("expectShellHandle", expectShellHandle, "closed", true));
         }
         catch (Exception e) {
-            return error("expectShellExit failed: " + e.getMessage());
+            return error("expect_exit failed: " + e.getMessage());
         }
     }
 
@@ -1379,7 +1379,7 @@ final class McpToolset {
                     "output", expectShell.get().executeWithOutput(cmd)));
         }
         catch (Exception e) {
-            return error("expectShellExecuteWithOutput failed: " + e.getMessage());
+            return error("expect_execute_with_output failed: " + e.getMessage());
         }
     }
 
@@ -1398,7 +1398,7 @@ final class McpToolset {
                     "exitCode", expectShell.get().executeWithExitCode(cmd)));
         }
         catch (Exception e) {
-            return error("expectShellExecuteWithExitCode failed: " + e.getMessage());
+            return error("expect_execute_with_exit_code failed: " + e.getMessage());
         }
     }
 
@@ -1415,7 +1415,7 @@ final class McpToolset {
             return ok(Map.of("expectShellHandle", expectShellHandle, "cmd", cmd, "executed", true));
         }
         catch (Exception e) {
-            return error("expectShellExecute failed: " + e.getMessage());
+            return error("expect_execute failed: " + e.getMessage());
         }
     }
 
@@ -1426,7 +1426,7 @@ final class McpToolset {
         boolean consume = boolArg(args, "consume", true);
         String charset = stringArg(args, "charset", false);
         if (!consume) {
-            return error("expectShellExecuteCommand requires consume=true; asynchronous ShellProcess handles are not retained.");
+            return error("expect_execute_command requires consume=true; asynchronous ShellProcess handles are not retained.");
         }
 
         Optional<ExpectShell> expectShell = registry.expectShell(expectShellHandle);
@@ -1440,7 +1440,7 @@ final class McpToolset {
             return ok(shellProcessPayload(expectShellHandle, process));
         }
         catch (Exception e) {
-            return error("expectShellExecuteCommand failed: " + e.getMessage());
+            return error("expect_execute_command failed: " + e.getMessage());
         }
     }
 
@@ -2010,9 +2010,16 @@ final class McpToolset {
         payload.put("policy", "prompt");
         payload.put("message", message);
         payload.put("tool", tool.toolName());
-        payload.put("arguments", args);
+        payload.put("arguments", safeConfirmationArguments(args));
         payload.put("next", "Call again with confirm=true to continue.");
         return ok(payload);
+    }
+
+    private static Map<String, Object> safeConfirmationArguments(Map<String, Object> args) {
+        Map<String, Object> sanitized = new LinkedHashMap<>(args);
+        sanitized.remove("password");
+        sanitized.remove("privateKeyPassphrase");
+        return sanitized;
     }
 
     private static McpSchema.CallToolResult closeResult(String type, boolean closed) {
@@ -2104,4 +2111,6 @@ final class McpToolset {
         }
         return map;
     }
+
+
 }

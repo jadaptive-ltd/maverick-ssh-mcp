@@ -8,15 +8,25 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.lang.reflect.Method;
+import java.nio.file.Path;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import com.sshtools.client.shell.ExpectShell;
 
+import io.modelcontextprotocol.client.McpClient;
+import io.modelcontextprotocol.client.McpSyncClient;
+import io.modelcontextprotocol.client.transport.HttpClientStreamableHttpTransport;
 import io.modelcontextprotocol.spec.McpSchema;
 
 class McpToolsetExpectShellTest {
+
+    @TempDir
+    Path tempDir;
 
     @Test
     void returnsErrorForUnknownExpectShellHandle() throws Exception {
@@ -73,6 +83,50 @@ class McpToolsetExpectShellTest {
                 registry);
 
         assertTrue(Boolean.TRUE.equals(result.isError()));
+    }
+
+    @Test
+    void registersSnakeCaseExpectToolNames() throws Exception {
+        Set<String> expected = Set.of(
+                "expect_open", "expect_close", "expect_get_character_encoding",
+                "expect_set_character_encoding", "expect_set_shell_init_timeout", "expect_in_startup",
+                "expect_su", "expect_sudo", "expect_is_closed", "expect_exit", "expect_get_newline",
+                "expect_execute_with_output", "expect_execute_with_exit_code", "expect_execute",
+                "expect_execute_command", "expect_get_num_commands_executed", "expect_get_os_type",
+                "expect_get_os_description");
+
+        try (McpRuntime runtime = new McpRuntime(
+                new SshTeamService(SshTeamDeviceStore.forPath(tempDir)),
+                new DumbToolGate(),
+                McpRuntime.Mode.HTTP,
+                "127.0.0.1",
+                0,
+                "/mcp",
+                null)) {
+            runtime.start();
+
+            HttpClientStreamableHttpTransport transport = HttpClientStreamableHttpTransport
+                    .builder("http://127.0.0.1:" + runtime.httpPort())
+                    .endpoint("/mcp")
+                    .build();
+
+            try (McpSyncClient client = McpClient.sync(transport).build()) {
+                client.initialize();
+                Set<String> toolNames = client.listTools().tools().stream()
+                        .map(McpSchema.Tool::name)
+                        .collect(Collectors.toSet());
+
+                assertTrue(toolNames.containsAll(expected));
+                assertTrue(toolNames.stream().noneMatch(name -> name.startsWith("expectShell")));
+            }
+        }
+    }
+
+    @Test
+    void mapsSnakeCaseNamesToGatedTools() {
+        assertEquals(StandardGatedTool.EXPECT_SHELL_OPEN,
+                StandardGatedTool.fromToolName("expect_open").orElseThrow());
+        assertTrue(StandardGatedTool.fromToolName("expectShellOpen").isEmpty());
     }
 
     private static McpSchema.CallToolResult invokeExpectShellTool(String methodName, Map<String, Object> args, HandleRegistry registry)
