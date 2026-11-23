@@ -80,3 +80,21 @@ Distribution channels:
   - [amd64 executable](https://athene.jadaptive.com/r/files/jadaptive/maverick-ssh-mcp/current/WINDOWS/amd64/maverick-ssh-mcp.exe)
 
 For development and local build instructions, see `BUILDING.md`.
+
+## HTTP Authentication and OAuth
+
+When `MCP_TOKEN` is configured in HTTP mode, the server exposes MCP OAuth authorization-server discovery, dynamic client registration, authorization-code exchange with PKCE, and bearer-token validation. MCP clients can connect to `http://host:7693/mcp` without separately configuring an OAuth endpoint.
+
+The built-in authorization flow opens a browser form. Enter the same `MCP_TOKEN` value as the password, then select **Allow** or **Reject**. Issued access tokens, clients and authorization state are held in memory and remain valid only for the lifetime of that server process. No credentials or grants are persisted.
+
+Direct clients that already send `Authorization: Bearer <MCP_TOKEN>` continue to work. The static token is therefore both the legacy bearer credential and the password for the built-in OAuth form.
+
+```bash
+MCP_TOKEN=replace-with-token \
+  java -jar target/maverick-ssh-mcp-0.9.0-SNAPSHOT.jar \
+  --mode http --host 0.0.0.0 --port 7693
+```
+
+For a reverse proxy or published URL, set the externally visible origin with `--oauth-issuer` or `MCP_OAUTH_ISSUER`. It must be the origin clients use to reach the server, for example `https://mcp.example.com`.
+
+Custom authentication flows can implement `com.jadaptive.mcp.oauth.OAuthAuthorizationProvider` and pass it to the public `McpRuntime` constructor. The provider owns the interactive UI or external identity-provider redirects; the runtime continues to own OAuth registration, PKCE, authorization codes and access tokens.

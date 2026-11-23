@@ -23,6 +23,9 @@ public class MaverickMcpApplication implements Callable<Integer> {
     @Option(names = "--endpoint", defaultValue = "/mcp", description = "MCP HTTP endpoint path")
     private String endpoint;
 
+    @Option(names = "--oauth-issuer", description = "Public OAuth issuer URL (default: request origin; env: MCP_OAUTH_ISSUER)")
+    private String oauthIssuer;
+
     @Option(names = "--destructive-policy", defaultValue = "prompt", description = "Delete-operation tool gate policy: prompt|allow")
     private String destructivePolicy;
 
@@ -42,7 +45,18 @@ public class MaverickMcpApplication implements Callable<Integer> {
         Mode runtimeMode = mode == ModeOption.http ? Mode.HTTP : Mode.STDIO;
         boolean requestDebugEnabled = debugRequests || isTrue(System.getenv("MCP_DEBUG_REQUESTS"));
 
-        try (McpRuntime runtime = new McpRuntime(sshTeamService, toolGate, runtimeMode, host, port, endpoint, requestDebugEnabled)) {
+        try (McpRuntime runtime = new McpRuntime(
+                sshTeamService,
+                toolGate,
+                runtimeMode,
+                host,
+                port,
+                endpoint,
+                System.getenv("MCP_TOKEN"),
+                requestDebugEnabled,
+                oauthIssuer == null ? System.getenv("MCP_OAUTH_ISSUER") : oauthIssuer,
+                null)) {
+
             runtime.start();
             Runtime.getRuntime().addShutdownHook(new Thread(runtime::close));
             runtime.blockUntilStopped();

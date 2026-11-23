@@ -26,9 +26,11 @@ mvn -q exec:java -Dexec.args="--mode stdio"
 # Streamable HTTP mode
 mvn -q exec:java -Dexec.args="--mode http --host 0.0.0.0 --port 7693 --endpoint /mcp"
 
-# HTTP mode with Bearer token authentication
+# HTTP mode with Bearer token authentication and the built-in OAuth form
 MCP_TOKEN=my-secret-token mvn -q exec:java -Dexec.args="--mode http --host 0.0.0.0 --port 7693 --endpoint /mcp"
 ```
+
+OAuth-capable MCP clients discover the form flow from the protected `/mcp` endpoint. For a reverse proxy, add `--oauth-issuer https://mcp.example.com` or set `MCP_OAUTH_ISSUER` so discovery metadata advertises the externally reachable origin.
 
 ### Option 2: Launch with Classpath
 
@@ -84,5 +86,6 @@ The named volume persists SSH Team credentials across container runs. Omit it if
 ## Runtime Notes
 
 - Endpoint authentication is enabled when `MCP_TOKEN` is set.
-- Default streamable HTTP endpoint is `/mcp` on port `7693`.
-- SSH Teams credentials are stored under `~/.sshteam-mcp`.
+- OAuth metadata, dynamic client registrations, authorization state and issued access tokens are available only for the runtime lifetime.
+- The OAuth form uses `MCP_TOKEN` as its password; direct static bearer-token clients remain supported.
+- Set `MCP_OAUTH_ISSUER` or `--oauth-issuer` when the externally visible origin differs from the bind address.

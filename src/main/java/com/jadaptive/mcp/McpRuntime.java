@@ -5,6 +5,10 @@ import java.time.Duration;
 import java.util.EnumSet;
 import java.util.ServiceLoader;
 
+import com.jadaptive.mcp.oauth.FormOAuthAuthorizationProvider;
+import com.jadaptive.mcp.oauth.McpOAuthServlet;
+import com.jadaptive.mcp.oauth.OAuthAuthorizationProvider;
+
 import jakarta.servlet.DispatcherType;
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
@@ -41,35 +45,53 @@ public final class McpRuntime implements AutoCloseable {
     private final int bindPort;
     private final String endpoint;
     private final String mcpToken;
+    private final String oauthIssuer;
+    private final OAuthAuthorizationProvider oauthProvider;
     private final boolean debugRequests;
     private final McpJsonMapper mcpJsonMapper;
 
     private McpSyncServer mcpServer;
     private Server httpServer;
+    private McpOAuthServlet oauthServlet;
 
     McpRuntime(SshTeamService sshTeamService, ToolGate toolGate, Mode mode, String bindHost, int bindPort, String endpoint) {
-        this(sshTeamService, toolGate, mode, bindHost, bindPort, endpoint, System.getenv("MCP_TOKEN"), false);
+        this(sshTeamService, toolGate, mode, bindHost, bindPort, endpoint, System.getenv("MCP_TOKEN"), false,
+                System.getenv("MCP_OAUTH_ISSUER"), null);
     }
 
     public McpRuntime(SshTeamService sshTeamService, ToolGate toolGate, Mode mode, String bindHost, int bindPort, String endpoint,
             boolean debugRequests) {
-        this(sshTeamService, toolGate, mode, bindHost, bindPort, endpoint, System.getenv("MCP_TOKEN"), debugRequests);
+        this(sshTeamService, toolGate, mode, bindHost, bindPort, endpoint, System.getenv("MCP_TOKEN"), debugRequests,
+                System.getenv("MCP_OAUTH_ISSUER"), null);
     }
 
     McpRuntime(SshTeamService sshTeamService, ToolGate toolGate, Mode mode, String bindHost, int bindPort, String endpoint,
             String mcpToken) {
-        this(sshTeamService, toolGate, mode, bindHost, bindPort, endpoint, mcpToken, false);
+        this(sshTeamService, toolGate, mode, bindHost, bindPort, endpoint, mcpToken, false, null, null);
     }
 
     McpRuntime(SshTeamService sshTeamService, ToolGate toolGate, Mode mode, String bindHost, int bindPort, String endpoint,
             String mcpToken, boolean debugRequests) {
-    	this.sshTeamService = sshTeamService;
+        this(sshTeamService, toolGate, mode, bindHost, bindPort, endpoint, mcpToken, debugRequests, null, null);
+    }
+
+    /**
+     * Creates a runtime with a custom HTTP OAuth authorization flow. Passing a
+     * provider enables OAuth even when no static MCP token is configured.
+     */
+    public McpRuntime(SshTeamService sshTeamService, ToolGate toolGate, Mode mode, String bindHost, int bindPort, String endpoint,
+            String mcpToken, boolean debugRequests, String oauthIssuer, OAuthAuthorizationProvider oauthProvider) {
+        this.sshTeamService = sshTeamService;
         this.toolGate = toolGate == null ? new DumbToolGate() : toolGate;
         this.mode = mode;
         this.bindHost = bindHost;
         this.bindPort = bindPort;
         this.endpoint = endpoint;
         this.mcpToken = emptyToNull(mcpToken);
+        this.oauthIssuer = oauthIssuer;
+        this.oauthProvider = oauthProvider != null
+                ? oauthProvider
+                : this.mcpToken == null ? null : new FormOAuthAuthorizationProvider(this.mcpToken);
         this.debugRequests = debugRequests;
         this.mcpJsonMapper = createJsonMapper();
     }
@@ -96,9 +118,15 @@ public final class McpRuntime implements AutoCloseable {
 
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.NO_SESSIONS);
         context.setContextPath("/");
-        if (mcpToken != null) {
+        if (oauthProvider != null) {
+            oauthServlet = new McpOAuthServlet(normalizedEndpoint(), oauthIssuer, oauthProvider, mcpJsonMapper);
+            ServletHolder oauthHolder = new ServletHolder(oauthServlet);
+            context.addServlet(oauthHolder, "/oauth/*");
+            context.addServlet(oauthHolder, "/.well-known/*");
+        }
+        if (mcpToken != null || oauthServlet != null) {
             context.addFilter(
-                    new FilterHolder(new BearerTokenFilter(mcpToken)),
+                    new FilterHolder(new BearerTokenFilter(mcpToken, oauthServlet)),
                     normalizedEndpoint() + "/*",
                     EnumSet.of(DispatcherType.REQUEST));
         }
@@ -145,6 +173,14 @@ public final class McpRuntime implements AutoCloseable {
             catch (Exception ignored) {
             }
         }
+
+        if (oauthProvider != null) {
+            try {
+                oauthProvider.close();
+            }
+            catch (Exception ignored) {
+            }
+        }
     }
 
     private McpSyncServer buildServer(McpServer.SyncSpecification<?> specification) {
@@ -181,10 +217,12 @@ public final class McpRuntime implements AutoCloseable {
 
     private static final class BearerTokenFilter implements Filter {
 
-        private final String expectedAuthorization;
+        private final String expectedToken;
+        private final McpOAuthServlet oauthServlet;
 
-        private BearerTokenFilter(String token) {
-            this.expectedAuthorization = "Bearer " + token;
+        private BearerTokenFilter(String token, McpOAuthServlet oauthServlet) {
+            this.expectedToken = token;
+            this.oauthServlet = oauthServlet;
         }
 
         @Override
@@ -196,10 +234,30 @@ public final class McpRuntime implements AutoCloseable {
                 return;
             }
 
+            if ("OPTIONS".equalsIgnoreCase(httpRequest.getMethod())) {
+                httpResponse.setHeader("Access-Control-Allow-Origin", "*");
+                httpResponse.setHeader("Access-Control-Allow-Methods", "GET, POST, DELETE, OPTIONS");
+                httpResponse.setHeader("Access-Control-Allow-Headers",
+                        "Authorization, Content-Type, MCP-Protocol-Version, MCP-Session-Id, Last-Event-ID");
+                httpResponse.setStatus(HttpServletResponse.SC_NO_CONTENT);
+                return;
+            }
+
             String authorization = httpRequest.getHeader("Authorization");
-            if (!expectedAuthorization.equals(authorization)) {
+            String bearerToken = authorization != null && authorization.regionMatches(true, 0, "Bearer ", 0, 7)
+                    ? authorization.substring(7)
+                    : null;
+            boolean staticTokenAccepted = expectedToken != null && expectedToken.equals(bearerToken);
+            boolean oauthTokenAccepted = oauthServlet != null && oauthServlet.acceptsAccessToken(bearerToken);
+            if (!staticTokenAccepted && !oauthTokenAccepted) {
                 httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                httpResponse.setHeader("WWW-Authenticate", "Bearer");
+                String challenge = "Bearer";
+                if (oauthServlet != null) {
+                    challenge += " resource_metadata=\"" + oauthServlet.protectedResourceMetadataUrl(httpRequest) + "\"";
+                }
+                httpResponse.setHeader("WWW-Authenticate", challenge);
+                httpResponse.setHeader("Access-Control-Allow-Origin", "*");
+                httpResponse.setHeader("Access-Control-Expose-Headers", "WWW-Authenticate, MCP-Session-Id");
                 httpResponse.setContentType("text/plain;charset=UTF-8");
                 httpResponse.getWriter().write("Unauthorized");
                 return;
