@@ -21,4 +21,6 @@ module com.jadaptive.mcp {
 	uses io.modelcontextprotocol.json.McpJsonMapperSupplier;
 	uses McpToolsetExtensions;
 	uses SshTeamServiceExtension;
+	
+	opens com.jadaptive.mcp to info.picocli;
 }

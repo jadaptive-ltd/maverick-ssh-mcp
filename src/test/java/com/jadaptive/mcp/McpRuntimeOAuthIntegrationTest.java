@@ -30,6 +30,7 @@ class McpRuntimeOAuthIntegrationTest {
             .build();
     private static final Pattern CLIENT_ID = Pattern.compile("\"client_id\"\\s*:\\s*\"([^\"]+)\"");
     private static final Pattern FORM_ACTION = Pattern.compile("action=\"([^\"]+)\"");
+    private static final Pattern REGISTRATION_ENDPOINT = Pattern.compile("\"registration_endpoint\"\\s*:\\s*\"([^\"]+)\"");
     private static final Pattern ACCESS_TOKEN = Pattern.compile("\"access_token\"\\s*:\\s*\"([^\"]+)\"");
 
     @TempDir
@@ -55,6 +56,8 @@ class McpRuntimeOAuthIntegrationTest {
             assertEquals("*", serverMetadata.headers().firstValue("Access-Control-Allow-Origin").orElseThrow());
             assertTrue(serverMetadata.body().contains("/oauth/register"));
             assertTrue(serverMetadata.body().contains("S256"));
+            String registrationEndpoint = extract(REGISTRATION_ENDPOINT, serverMetadata.body());
+            assertEquals(origin + "/oauth/register", registrationEndpoint);
 
             HttpResponse<String> metadataPreflight = preflight(origin + "/.well-known/oauth-authorization-server");
             assertEquals(204, metadataPreflight.statusCode());
@@ -62,14 +65,14 @@ class McpRuntimeOAuthIntegrationTest {
             assertTrue(metadataPreflight.headers().firstValue("Access-Control-Allow-Headers").orElseThrow()
                     .contains("MCP-Protocol-Version"));
 
-            HttpResponse<String> registerPreflight = preflight(origin + "/oauth/register");
+            HttpResponse<String> registerPreflight = preflight(registrationEndpoint);
             assertEquals(204, registerPreflight.statusCode());
 
             HttpResponse<String> mcpPreflight = preflight(origin + "/mcp");
             assertEquals(204, mcpPreflight.statusCode());
 
             String redirectUri = "http://127.0.0.1:49999/callback";
-            HttpResponse<String> registration = postJson(origin + "/oauth/register", """
+            HttpResponse<String> registration = postJson(registrationEndpoint, """
                     {"client_name":"OAuth test","redirect_uris":["%s"],"token_endpoint_auth_method":"none"}
                     """.formatted(redirectUri));
             assertEquals(201, registration.statusCode());
