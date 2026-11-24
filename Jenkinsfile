@@ -320,6 +320,13 @@ pipeline {
                     echo "Full Version : ${env.FULL_VERSION}"
                 }
 
+                sh '''
+                file docker/native/maverick-ssh-mcp-linux-amd64
+                file docker/native/maverick-ssh-mcp-linux-arm64
+                readelf -h docker/native/maverick-ssh-mcp-linux-amd64 | grep -q 'Advanced Micro Devices X86-64'
+                readelf -h docker/native/maverick-ssh-mcp-linux-arm64 | grep -q 'AArch64'
+                '''
+
                 configFileProvider([
                     configFile(
                         fileId: 'b60f3998-d8fd-434b-b3c8-ed52aa52bc2e',
