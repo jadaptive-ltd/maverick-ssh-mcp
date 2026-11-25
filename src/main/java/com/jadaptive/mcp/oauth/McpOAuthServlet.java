@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -25,7 +26,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-/** MCP-compatible OAuth 2.1 authorization server with runtime-only state. */
+/** MCP-compatible OAuth 2.1 authorization server with persistent client registrations. */
 public final class McpOAuthServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
@@ -40,8 +41,9 @@ public final class McpOAuthServlet extends HttpServlet {
     private final String configuredIssuer;
     private final OAuthAuthorizationProvider provider;
     private final McpJsonMapper jsonMapper;
+    private final OAuthClientStore clientStore;
     private final SecureRandom random = new SecureRandom();
-    private final Map<String, RegisteredClient> clients = new ConcurrentHashMap<>();
+    private final Map<String, OAuthClient> clients = new ConcurrentHashMap<>();
     private final Map<String, AuthorizationTransaction> transactions = new ConcurrentHashMap<>();
     private final Map<String, AuthorizationCode> authorizationCodes = new ConcurrentHashMap<>();
     private final Set<String> accessTokens = ConcurrentHashMap.newKeySet();
@@ -51,10 +53,27 @@ public final class McpOAuthServlet extends HttpServlet {
             String configuredIssuer,
             OAuthAuthorizationProvider provider,
             McpJsonMapper jsonMapper) {
+        this(endpoint, configuredIssuer, provider, jsonMapper,
+                Path.of(System.getProperty("user.home"), ".sshteam-mcp"));
+    }
+
+    public McpOAuthServlet(
+            String endpoint,
+            String configuredIssuer,
+            OAuthAuthorizationProvider provider,
+            McpJsonMapper jsonMapper,
+            Path oauthStateDirectory) {
         this.endpoint = endpoint;
         this.configuredIssuer = normalizeIssuer(configuredIssuer);
         this.provider = Objects.requireNonNull(provider, "provider");
         this.jsonMapper = Objects.requireNonNull(jsonMapper, "jsonMapper");
+        this.clientStore = new OAuthClientStore(Objects.requireNonNull(oauthStateDirectory, "oauthStateDirectory"), jsonMapper);
+        try {
+            clients.putAll(clientStore.load());
+        }
+        catch (IOException ex) {
+            throw new IllegalStateException("Unable to load persistent OAuth clients from " + oauthStateDirectory, ex);
+        }
     }
 
     public boolean acceptsAccessToken(String token) {
@@ -157,8 +176,17 @@ public final class McpOAuthServlet extends HttpServlet {
 
         String clientId = randomToken(24);
         String clientName = optionalString(input.get("client_name"), "MCP client");
-        RegisteredClient client = new RegisteredClient(clientId, clientName, Set.copyOf(redirectUris));
+        OAuthClient client = new OAuthClient(clientId, clientName, Set.copyOf(redirectUris));
         clients.put(clientId, client);
+        try {
+            clientStore.save(clients.values());
+        }
+        catch (IOException ex) {
+            clients.remove(clientId, client);
+            oauthJsonError(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                    "server_error", "Unable to persist OAuth client registration");
+            return;
+        }
 
         LinkedHashMap<String, Object> registration = new LinkedHashMap<>();
         registration.put("client_id", clientId);
@@ -173,7 +201,7 @@ public final class McpOAuthServlet extends HttpServlet {
 
     private void beginAuthorization(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String clientId = request.getParameter("client_id");
-        RegisteredClient client = clientId == null ? null : clients.get(clientId);
+        OAuthClient client = clientId == null ? null : clients.get(clientId);
         if (client == null) {
             oauthError(response, HttpServletResponse.SC_BAD_REQUEST, "invalid_request", "Unknown client_id");
             return;
@@ -536,8 +564,6 @@ public final class McpOAuthServlet extends HttpServlet {
             McpOAuthServlet.this.deny(transaction, description, response);
         }
     }
-
-    private record RegisteredClient(String clientId, String clientName, Set<URI> redirectUris) { }
 
     private record AuthorizationTransaction(
             String id,

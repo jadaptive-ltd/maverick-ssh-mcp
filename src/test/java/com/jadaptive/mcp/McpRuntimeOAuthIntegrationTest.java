@@ -161,6 +161,36 @@ class McpRuntimeOAuthIntegrationTest {
         }
     }
 
+    @Test
+    void retainsDynamicClientRegistrationAcrossRestart() throws Exception {
+        String redirectUri = "http://127.0.0.1:49999/callback";
+        String clientId;
+        try (McpRuntime runtime = oauthRuntime()) {
+            runtime.start();
+            clientId = extract(CLIENT_ID, postJson("http://127.0.0.1:" + runtime.httpPort() + "/oauth/register", """
+                    {"client_name":"Restart test","redirect_uris":["%s"]}
+                    """.formatted(redirectUri)).body());
+        }
+
+        try (McpRuntime runtime = oauthRuntime()) {
+            runtime.start();
+            String origin = "http://127.0.0.1:" + runtime.httpPort();
+            String verifier = "a".repeat(64);
+            String challenge = Base64.getUrlEncoder().withoutPadding().encodeToString(
+                    MessageDigest.getInstance("SHA-256").digest(verifier.getBytes(StandardCharsets.US_ASCII)));
+            HttpResponse<String> login = get(origin + "/oauth/authorize?" + form(Map.of(
+                    "client_id", clientId,
+                    "redirect_uri", redirectUri,
+                    "response_type", "code",
+                    "code_challenge", challenge,
+                    "code_challenge_method", "S256")));
+
+            assertEquals(200, login.statusCode());
+            assertTrue(login.body().contains("Restart test"));
+            assertFalse(login.body().contains("Unknown client_id"));
+        }
+    }
+
     private McpRuntime oauthRuntime() {
         return new McpRuntime(
                 new SshTeamService(SshTeamDeviceStore.forPath(tempDir)),
@@ -169,7 +199,11 @@ class McpRuntimeOAuthIntegrationTest {
                 "127.0.0.1",
                 0,
                 "/mcp",
-                "test-token");
+                "test-token",
+                false,
+                null,
+                null,
+                tempDir.resolve("oauth-state"));
     }
 
     private static HttpResponse<String> get(String uri) throws Exception {

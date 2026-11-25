@@ -85,7 +85,7 @@ For development and local build instructions, see `BUILDING.md`.
 
 When `MCP_TOKEN` is configured in HTTP mode, the server exposes MCP OAuth authorization-server discovery, dynamic client registration, authorization-code exchange with PKCE, and bearer-token validation. MCP clients can connect to `http://host:7693/mcp` without separately configuring an OAuth endpoint.
 
-The built-in authorization flow opens a browser form. Enter the same `MCP_TOKEN` value as the password, then select **Allow** or **Reject**. Issued access tokens, clients and authorization state are held in memory and remain valid only for the lifetime of that server process. No credentials or grants are persisted.
+The built-in authorization flow opens a browser form. Enter the same `MCP_TOKEN` value as the password, then select **Allow** or **Reject**. Dynamic client registrations are persisted in `~/.sshteam-mcp/oauth-clients.json`, so MCP clients such as Inspector can reconnect after a server restart without re-registering. Set `--oauth-state-dir` or `MCP_OAUTH_STATE_DIR` to choose another state directory; containers should mount that directory as a volume. Authorization transactions, authorization codes, and issued bearer access tokens remain in memory and are intentionally invalidated on restart.
 
 Direct clients that already send `Authorization: Bearer <MCP_TOKEN>` continue to work. The static token is therefore both the legacy bearer credential and the password for the built-in OAuth form.
 

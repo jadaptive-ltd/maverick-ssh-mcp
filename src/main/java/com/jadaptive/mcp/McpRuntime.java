@@ -2,6 +2,7 @@ package com.jadaptive.mcp;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.nio.file.Path;
 import java.util.EnumSet;
 import java.util.ServiceLoader;
 
@@ -47,6 +48,7 @@ public final class McpRuntime implements AutoCloseable {
     private final String mcpToken;
     private final String oauthIssuer;
     private final OAuthAuthorizationProvider oauthProvider;
+    private final Path oauthStateDirectory;
     private final boolean debugRequests;
     private final McpJsonMapper mcpJsonMapper;
 
@@ -81,6 +83,13 @@ public final class McpRuntime implements AutoCloseable {
      */
     public McpRuntime(SshTeamService sshTeamService, ToolGate toolGate, Mode mode, String bindHost, int bindPort, String endpoint,
             String mcpToken, boolean debugRequests, String oauthIssuer, OAuthAuthorizationProvider oauthProvider) {
+        this(sshTeamService, toolGate, mode, bindHost, bindPort, endpoint,
+                mcpToken, debugRequests, oauthIssuer, oauthProvider, defaultOAuthStateDirectory());
+    }
+
+    public McpRuntime(SshTeamService sshTeamService, ToolGate toolGate, Mode mode, String bindHost, int bindPort, String endpoint,
+            String mcpToken, boolean debugRequests, String oauthIssuer, OAuthAuthorizationProvider oauthProvider,
+            Path oauthStateDirectory) {
         this.sshTeamService = sshTeamService;
         this.toolGate = toolGate == null ? new DumbToolGate() : toolGate;
         this.mode = mode;
@@ -90,8 +99,9 @@ public final class McpRuntime implements AutoCloseable {
         this.mcpToken = emptyToNull(mcpToken);
         this.oauthIssuer = oauthIssuer;
         this.oauthProvider = oauthProvider != null
-                ? oauthProvider
-                : this.mcpToken == null ? null : new FormOAuthAuthorizationProvider(this.mcpToken);
+                 ? oauthProvider
+                 : this.mcpToken == null ? null : new FormOAuthAuthorizationProvider(this.mcpToken);
+        this.oauthStateDirectory = oauthStateDirectory == null ? defaultOAuthStateDirectory() : oauthStateDirectory;
         this.debugRequests = debugRequests;
         this.mcpJsonMapper = createJsonMapper();
     }
@@ -119,7 +129,8 @@ public final class McpRuntime implements AutoCloseable {
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.NO_SESSIONS);
         context.setContextPath("/");
         if (oauthProvider != null) {
-            oauthServlet = new McpOAuthServlet(normalizedEndpoint(), oauthIssuer, oauthProvider, mcpJsonMapper);
+            oauthServlet = new McpOAuthServlet(normalizedEndpoint(), oauthIssuer, oauthProvider,
+                    mcpJsonMapper, oauthStateDirectory);
             ServletHolder oauthHolder = new ServletHolder(oauthServlet);
             context.addServlet(oauthHolder, "/oauth/*");
             context.addServlet(oauthHolder, "/.well-known/*");
@@ -213,6 +224,14 @@ public final class McpRuntime implements AutoCloseable {
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("No McpJsonMapperSupplier found on classpath."))
                 .get();
+    }
+
+    private static Path defaultOAuthStateDirectory() {
+        String configured = System.getenv("MCP_OAUTH_STATE_DIR");
+        if (configured != null && !configured.isBlank()) {
+            return Path.of(configured.trim());
+        }
+        return Path.of(System.getProperty("user.home"), ".sshteam-mcp");
     }
 
     private static final class BearerTokenFilter implements Filter {

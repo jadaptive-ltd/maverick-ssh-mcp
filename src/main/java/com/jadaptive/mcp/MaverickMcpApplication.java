@@ -1,5 +1,6 @@
 package com.jadaptive.mcp;
 
+import java.nio.file.Path;
 import java.util.concurrent.Callable;
 
 import com.jadaptive.mcp.McpRuntime.Mode;
@@ -25,6 +26,9 @@ public class MaverickMcpApplication implements Callable<Integer> {
 
     @Option(names = "--oauth-issuer", description = "Public OAuth issuer URL (default: request origin; env: MCP_OAUTH_ISSUER)")
     private String oauthIssuer;
+
+    @Option(names = "--oauth-state-dir", description = "OAuth client registration state directory (default: ~/.sshteam-mcp; env: MCP_OAUTH_STATE_DIR)")
+    private Path oauthStateDirectory;
 
     @Option(names = "--destructive-policy", defaultValue = "prompt", description = "Delete-operation tool gate policy: prompt|allow")
     private String destructivePolicy;
@@ -55,7 +59,8 @@ public class MaverickMcpApplication implements Callable<Integer> {
                 System.getenv("MCP_TOKEN"),
                 requestDebugEnabled,
                 oauthIssuer == null ? System.getenv("MCP_OAUTH_ISSUER") : oauthIssuer,
-                null)) {
+                null,
+                oauthStateDirectory)) {
 
             runtime.start();
             Runtime.getRuntime().addShutdownHook(new Thread(runtime::close));
