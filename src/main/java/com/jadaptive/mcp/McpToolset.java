@@ -2010,7 +2010,20 @@ final class McpToolset {
             if (verificationMessage.isPresent()) {
                 return confirmationRequired(verificationMessage.get(), gatedTool.get(), args);
             }
-            return executor.execute(args);
+            java.time.Instant startedAt = java.time.Instant.now();
+            McpSchema.CallToolResult result = null;
+            try {
+                result = executor.execute(args);
+                return result;
+            }
+            finally {
+                try {
+                    toolGate.completed(gatedTool.get(), args, result, startedAt, java.time.Instant.now());
+                }
+                catch (RuntimeException ignored) {
+                    // Outcome reporting must never alter the tool result.
+                }
+            }
         }
         catch (ToolPermissionDenied e) {
             return error(defaultString(e.getMessage(), "Permission denied for tool: " + toolName));
