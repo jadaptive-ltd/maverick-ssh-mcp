@@ -13,6 +13,7 @@ Maverick SSH MCP is a handle-oriented MCP server for SSH automation.
 - Local and remote tunnel tools (TCP and Unix sockets).
 - SSH Teams integration for OAuth device registration and certificate-based authentication.
 - MCP resources for handle registry and destructive-operation policy.
+- `get_version` tool for reporting the installed and cached available versions.
 
 ## Run with Docker
 
@@ -24,6 +25,37 @@ docker run --rm -p 7693:7693 \
 ```
 
 The named volume keeps SSH Team registrations and credentials across container recreation. Omit it if you do not use SSH Team authentication.
+
+## Version Update Checks
+
+At startup, Maverick SSH MCP reloads the last known available version from
+`~/.sshteam-mcp/maverick-ssh-mcp-available-version.json` (or the directory selected by
+`MCP_OAUTH_STATE_DIR` / `--oauth-state-dir`). It checks the Athene `current` metadata
+endpoint for a newer version when the cache is absent or stale, then approximately once
+per week. A small random jitter is added to the schedule to spread requests.
+
+The `get_version` MCP tool returns `currentVersion` and the cached `availableVersion`.
+Checks are best-effort: a network or server failure does not affect other MCP operations.
+
+Disable outbound update checks with either:
+
+```bash
+maverick-ssh-mcp --no-update-check
+```
+
+```bash
+MCP_UPDATE_CHECK=false maverick-ssh-mcp
+```
+
+When checks are disabled, an existing cached version is still loaded and exposed by
+`get_version`, but no update request is scheduled. The command-line option takes
+precedence over the environment variable.
+
+No personally identifiable information is ever sent by the update check. The request
+contains only generic JSON request headers, the installed Maverick SSH MCP version in
+the User-Agent, the Java system properties `os.name`, `os.arch`, and `os.version`, and
+no SSH hosts, usernames, commands, credentials, SSH Team data, or OAuth state. The
+version cache is stored only on the local machine.
 
 ## Request Debug Logging
 

@@ -16,6 +16,7 @@ module com.jadaptive.mcp {
 	requires transitive com.sshteam.lib;
 	requires org.eclipse.jetty.servlet;
 	requires io.modelcontextprotocol.sdk.mcp.core;
+	requires uk.co.bithatch.artifactversion;
 	exports com.jadaptive.mcp;
 	
 	uses io.modelcontextprotocol.json.McpJsonMapperSupplier;

@@ -79,9 +79,15 @@ final class McpToolset {
 
     @SuppressWarnings("unused")
 	static void register(McpServer.SyncSpecification<?> spec, HandleRegistry registry, ToolGate toolGate,
-            SshTeamService sshTeamService, boolean debugRequests, boolean stdioMode) {
+            SshTeamService sshTeamService, UpdateService updateService, boolean debugRequests, boolean stdioMode) {
         McpToolsetHelpers.debugRequests = debugRequests;
         McpToolsetHelpers.stdioMode = stdioMode;
+
+        spec.toolCall(tool("get_version", "Get the current and latest available Maverick SSH MCP versions.",
+                """
+                {"type":"object","properties":{}}
+                """),
+                (exchange, request) -> getVersion(updateService));
 
         spec.toolCall(tool("sshteam_register", "Register this MCP runtime as an SSH Team device using OAuth device flow.",
                 """
@@ -475,6 +481,13 @@ final class McpToolset {
         
         ServiceLoader.load(McpToolsetExtensions.class).forEach(extension -> extension.register(spec, registry, toolGate, sshTeamService));
 	}
+    
+    static McpSchema.CallToolResult getVersion(UpdateService updateService) {
+        Map<String, Object> payload = new LinkedHashMap<>();
+        payload.put("currentVersion", updateService.currentVersion());
+        payload.put("availableVersion", updateService.availableVersion());
+        return ok(payload);
+    }
     
     @SuppressWarnings("unused")
 	private static McpSchema.CallToolResult sshConnect(Map<String, Object> args, HandleRegistry registry,

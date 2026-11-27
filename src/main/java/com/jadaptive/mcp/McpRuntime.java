@@ -30,6 +30,7 @@ import io.modelcontextprotocol.server.McpServer;
 import io.modelcontextprotocol.server.McpSyncServer;
 import io.modelcontextprotocol.server.transport.HttpServletStreamableServerTransportProvider;
 import io.modelcontextprotocol.server.transport.StdioServerTransportProvider;
+import uk.co.bithatch.artifactversion.ArtifactVersion;
 
 public final class McpRuntime implements AutoCloseable {
 
@@ -51,6 +52,8 @@ public final class McpRuntime implements AutoCloseable {
     private final Path oauthStateDirectory;
     private final boolean debugRequests;
     private final McpJsonMapper mcpJsonMapper;
+    private final UpdateService updateService;
+    private final boolean updateChecksEnabled;
 
     private McpSyncServer mcpServer;
     private Server httpServer;
@@ -90,6 +93,13 @@ public final class McpRuntime implements AutoCloseable {
     public McpRuntime(SshTeamService sshTeamService, ToolGate toolGate, Mode mode, String bindHost, int bindPort, String endpoint,
             String mcpToken, boolean debugRequests, String oauthIssuer, OAuthAuthorizationProvider oauthProvider,
             Path oauthStateDirectory) {
+        this(sshTeamService, toolGate, mode, bindHost, bindPort, endpoint, mcpToken, debugRequests,
+                oauthIssuer, oauthProvider, oauthStateDirectory, updateChecksEnabled(System.getenv("MCP_UPDATE_CHECK")));
+    }
+
+    public McpRuntime(SshTeamService sshTeamService, ToolGate toolGate, Mode mode, String bindHost, int bindPort, String endpoint,
+            String mcpToken, boolean debugRequests, String oauthIssuer, OAuthAuthorizationProvider oauthProvider,
+            Path oauthStateDirectory, boolean updateChecksEnabled) {
         this.sshTeamService = sshTeamService;
         this.toolGate = toolGate == null ? new DumbToolGate() : toolGate;
         this.mode = mode;
@@ -104,9 +114,12 @@ public final class McpRuntime implements AutoCloseable {
         this.oauthStateDirectory = oauthStateDirectory == null ? defaultOAuthStateDirectory() : oauthStateDirectory;
         this.debugRequests = debugRequests;
         this.mcpJsonMapper = createJsonMapper();
+        this.updateService = new UpdateService(currentVersion(), this.oauthStateDirectory);
+        this.updateChecksEnabled = updateChecksEnabled;
     }
 
     public void start() throws Exception {
+        updateService.start(updateChecksEnabled);
         if (mode == Mode.STDIO) {
             StdioServerTransportProvider transport = new StdioServerTransportProvider(mcpJsonMapper);
             mcpServer = buildServer(McpServer.sync(transport));
@@ -169,6 +182,8 @@ public final class McpRuntime implements AutoCloseable {
         catch (Exception ignored) {
         }
 
+        updateService.close();
+
         if (mcpServer != null) {
             try {
                 mcpServer.closeGracefully();
@@ -195,9 +210,10 @@ public final class McpRuntime implements AutoCloseable {
     }
 
     private McpSyncServer buildServer(McpServer.SyncSpecification<?> specification) {
-        McpToolset.register(specification, registry, toolGate, sshTeamService, debugRequests, mode == Mode.STDIO);
+        McpToolset.register(specification, registry, toolGate, sshTeamService, updateService,
+                debugRequests, mode == Mode.STDIO);
         return specification
-                .serverInfo("maverick-mcp", "0.0.1-SNAPSHOT")
+                .serverInfo("maverick-mcp", updateService.currentVersion())
                 .instructions("Maverick Synergy MCP server. Use handle-based tools for SSH, stateless ssh_exec commands, interactive shells, local sockets, SFTP, tunnels, and SCP workflows.")
                 .requestTimeout(Duration.ofSeconds(60))
                 .immediateExecution(true)
@@ -226,12 +242,26 @@ public final class McpRuntime implements AutoCloseable {
                 .get();
     }
 
+    private static String currentVersion() {
+        return ArtifactVersion.getVersion("com.jadaptive", "maverick-ssh-mcp");
+    }
+
     private static Path defaultOAuthStateDirectory() {
         String configured = System.getenv("MCP_OAUTH_STATE_DIR");
         if (configured != null && !configured.isBlank()) {
             return Path.of(configured.trim());
         }
         return Path.of(System.getProperty("user.home"), ".sshteam-mcp");
+    }
+
+    static boolean updateChecksEnabled(String configured) {
+        if (configured == null || configured.isBlank()) {
+            return true;
+        }
+        return switch (configured.trim().toLowerCase(java.util.Locale.ROOT)) {
+            case "0", "false", "no", "off", "disabled" -> false;
+            default -> true;
+        };
     }
 
     private static final class BearerTokenFilter implements Filter {

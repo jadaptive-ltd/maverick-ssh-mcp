@@ -7,9 +7,11 @@ import com.jadaptive.mcp.McpRuntime.Mode;
 
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
+import picocli.CommandLine.IVersionProvider;
 import picocli.CommandLine.Option;
+import uk.co.bithatch.artifactversion.ArtifactVersion;
 
-@Command(name = "maverick-mcp", mixinStandardHelpOptions = true, description = "Maverick Synergy MCP server")
+@Command(name = "maverick-mcp", mixinStandardHelpOptions = true, description = "Maverick Synergy MCP server", versionProvider = MaverickMcpApplication.Version.class)
 public class MaverickMcpApplication implements Callable<Integer> {
 
     @Option(names = "--mode", defaultValue = "stdio", description = "Transport mode: ${COMPLETION-CANDIDATES}")
@@ -35,12 +37,23 @@ public class MaverickMcpApplication implements Callable<Integer> {
 
     @Option(names = "--debug-requests", defaultValue = "false", description = "Log MCP tool requests to stderr")
     private boolean debugRequests;
-    
+
+    @Option(names = "--update-check", negatable = true,
+            description = "Enable weekly version checks (default: true; env: MCP_UPDATE_CHECK)")
+    private Boolean updateCheck;
+
     private final SshTeamService sshTeamService = new SshTeamService(SshTeamDeviceStore.defaultStore());
 
     public static void main(String[] args) {
         int code = new CommandLine(new MaverickMcpApplication()).execute(args);
         System.exit(code);
+    } 
+    
+    public final static class Version implements IVersionProvider {
+    	@Override
+    	public String[] getVersion() throws Exception {
+    		return new String[] {  ArtifactVersion.getVersion("com.jadaptive", "maverick-ssh-mcp") };
+    	}	
     }
 
     @Override
@@ -48,6 +61,9 @@ public class MaverickMcpApplication implements Callable<Integer> {
         ToolGate toolGate = SimpleToolGate.fromCli(destructivePolicy);
         Mode runtimeMode = mode == ModeOption.http ? Mode.HTTP : Mode.STDIO;
         boolean requestDebugEnabled = debugRequests || isTrue(System.getenv("MCP_DEBUG_REQUESTS"));
+        boolean updateChecksEnabled = updateCheck != null
+                ? updateCheck
+                : McpRuntime.updateChecksEnabled(System.getenv("MCP_UPDATE_CHECK"));
 
         try (McpRuntime runtime = new McpRuntime(
                 sshTeamService,
@@ -60,7 +76,8 @@ public class MaverickMcpApplication implements Callable<Integer> {
                 requestDebugEnabled,
                 oauthIssuer == null ? System.getenv("MCP_OAUTH_ISSUER") : oauthIssuer,
                 null,
-                oauthStateDirectory)) {
+                oauthStateDirectory,
+                updateChecksEnabled)) {
 
             runtime.start();
             Runtime.getRuntime().addShutdownHook(new Thread(runtime::close));

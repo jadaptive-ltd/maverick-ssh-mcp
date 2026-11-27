@@ -54,6 +54,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>uk.co.bithatch</groupId>
+            <artifactId>artifact-version</artifactId>
+            <version>1.0.1</version>
+        </dependency> 
+        <dependency>
             <groupId>io.modelcontextprotocol.sdk</groupId>
             <artifactId>mcp</artifactId>
             <version>${mcp.version}</version>
