@@ -35,6 +35,12 @@ public final class HandleRegistry implements Closeable {
     private final ConcurrentMap<String, Instant> created = new ConcurrentHashMap<>();
     private final ConcurrentMap<String, String> shellSshOwners = new ConcurrentHashMap<>();
     private final ConcurrentMap<String, String> expectShellOwners = new ConcurrentHashMap<>();
+    /** Shell handles started as interactive shells (no command); unmediated input to these is unsafe. */
+    private final java.util.Set<String> interactiveShells = ConcurrentHashMap.newKeySet();
+    /** Child expect shell handle to its parent expect shell handle (su/sudo). */
+    private final ConcurrentMap<String, String> expectShellParents = new ConcurrentHashMap<>();
+    /** Privilege-changing command that created a child expect shell. */
+    private final ConcurrentMap<String, String> expectShellPrivilegeHops = new ConcurrentHashMap<>();
 
     String registerSsh(SshClient client) {
         return put(sshClients, client, "ssh");
@@ -45,9 +51,16 @@ public final class HandleRegistry implements Closeable {
     }
 
     String registerShell(SessionChannelNG channel, String sshHandle) {
+        return registerShell(channel, sshHandle, false);
+    }
+
+    String registerShell(SessionChannelNG channel, String sshHandle, boolean interactive) {
         String shellHandle = put(shells, channel, "shell");
         if (sshHandle != null) {
             shellSshOwners.put(shellHandle, sshHandle);
+        }
+        if (interactive) {
+            interactiveShells.add(shellHandle);
         }
         return shellHandle;
     }
@@ -65,7 +78,16 @@ public final class HandleRegistry implements Closeable {
     }
 
     String registerChildExpectShell(ExpectShell shell, String parentExpectShellHandle) {
-        return registerExpectShell(shell, expectShellOwners.get(parentExpectShellHandle));
+        return registerChildExpectShell(shell, parentExpectShellHandle, null);
+    }
+
+    String registerChildExpectShell(ExpectShell shell, String parentExpectShellHandle, String privilegeCommand) {
+        String child = registerExpectShell(shell, expectShellOwners.get(parentExpectShellHandle));
+        expectShellParents.put(child, parentExpectShellHandle);
+        if (privilegeCommand != null) {
+            expectShellPrivilegeHops.put(child, privilegeCommand);
+        }
+        return child;
     }
 
     String registerSftp(SftpClient client) {
@@ -86,6 +108,76 @@ public final class HandleRegistry implements Closeable {
 
     String registerSocketListener(ServerSocket socket) {
         return put(socketListeners, socket, "socketlistener");
+    }
+
+    /** Whether the shell handle was opened as an interactive shell (no command). */
+    boolean isInteractiveShell(String shellHandle) {
+        return shellHandle != null && interactiveShells.contains(shellHandle);
+    }
+
+    /**
+     * Resolves the trusted execution context for tool arguments from this registry. Only handles
+     * known to the registry contribute; caller-supplied host or identity values are never used.
+     */
+    Optional<ExecutionContext> executionContext(Map<String, Object> args) {
+        String expectShellHandle = handleArg(args, "expectShellHandle");
+        String shellHandle = handleArg(args, "shellHandle");
+        String sshHandle = handleArg(args, "sshHandle");
+
+        String sessionId;
+        boolean persistent;
+        String operatingSystem = null;
+        List<String> privilegeChain = new ArrayList<>();
+        if (expectShellHandle != null && expectShells.containsKey(expectShellHandle)) {
+            sessionId = expectShellHandle;
+            persistent = true;
+            ExpectShell shell = expectShells.get(expectShellHandle);
+            try {
+                operatingSystem = shell.getOsDescription();
+            }
+            catch (RuntimeException ignored) {
+                // OS detection is optional context.
+            }
+            for (String current = expectShellHandle; current != null; current = expectShellParents.get(current)) {
+                String hop = expectShellPrivilegeHops.get(current);
+                if (hop != null) {
+                    privilegeChain.add(0, hop);
+                }
+            }
+            shellHandle = expectShellOwners.get(expectShellHandle);
+            sshHandle = shellHandle == null ? null : shellSshOwners.get(shellHandle);
+        }
+        else if (shellHandle != null && shells.containsKey(shellHandle)) {
+            sessionId = shellHandle;
+            persistent = interactiveShells.contains(shellHandle);
+            sshHandle = shellSshOwners.get(shellHandle);
+        }
+        else if (sshHandle != null && sshClients.containsKey(sshHandle)) {
+            sessionId = sshHandle;
+            persistent = false;
+        }
+        else {
+            return Optional.empty();
+        }
+
+        SshClient client = sshHandle == null ? null : sshClients.get(sshHandle);
+        String host = client == null ? null : client.getHost();
+        int port = client == null ? 0 : client.getPort();
+        String identity = null;
+        if (client != null) {
+            try {
+                identity = client.getContext().getUsername();
+            }
+            catch (RuntimeException ignored) {
+                // Identity is optional context.
+            }
+        }
+        return Optional.of(new ExecutionContext(sessionId, sshHandle, host, port, identity, operatingSystem,
+                privilegeChain, persistent));
+    }
+
+    private static String handleArg(Map<String, Object> args, String name) {
+        return args.get(name) instanceof String value && !value.isBlank() ? value : null;
     }
 
     Optional<SshClient> ssh(String id) {
@@ -138,6 +230,7 @@ public final class HandleRegistry implements Closeable {
     boolean closeShell(String id) {
         closeOwned(expectShellOwners, id, this::closeExpectShellOnly);
         shellSshOwners.remove(id);
+        interactiveShells.remove(id);
         return closeAndRemove(shells, id);
     }
 
@@ -246,6 +339,8 @@ public final class HandleRegistry implements Closeable {
 
     private boolean closeExpectShellOnly(String id) {
         expectShellOwners.remove(id);
+        expectShellParents.remove(id);
+        expectShellPrivilegeHops.remove(id);
         return closeAndRemove(expectShells, id);
     }
 
@@ -253,12 +348,15 @@ public final class HandleRegistry implements Closeable {
         shells.remove(id);
         created.remove(id);
         shellSshOwners.remove(id);
+        interactiveShells.remove(id);
     }
 
     private void removeExpectShell(String id) {
         expectShells.remove(id);
         created.remove(id);
         expectShellOwners.remove(id);
+        expectShellParents.remove(id);
+        expectShellPrivilegeHops.remove(id);
     }
 
     private void closeOwned(Map<String, String> owners, String owner, java.util.function.Consumer<String> close) {

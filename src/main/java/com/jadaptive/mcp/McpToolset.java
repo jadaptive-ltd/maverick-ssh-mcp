@@ -93,376 +93,376 @@ final class McpToolset {
                 """
                 {"type":"object","required":["serverUrl"],"properties":{"serverUrl":{"type":"string"},"clientId":{"type":"string","default":"sshteam-cli"},"scope":{"type":"string","default":"signing"},"deviceName":{"type":"string"},"pollIntervalSeconds":{"type":"integer","default":5},"maxWaitSeconds":{"type":"integer","default":600},"waitForAuthorization":{"type":"boolean","default":false},"ignoreSslTrust":{"type":"boolean","default":false},"setDefault":{"type":"boolean","default":true}}}
                 """),
-                (exchange, request) -> runGated(toolGate, request, args -> sshteamRegister(args, sshTeamService)));
+                (exchange, request) -> runGated(toolGate, registry, request, args -> sshteamRegister(args, sshTeamService)));
 
         spec.toolCall(tool("sshteam_status", "List local SSH Team registrations and token state.",
                 """
                 {"type":"object","properties":{"serverUrl":{"type":"string"}}}
                 """),
-                (exchange, request) -> runGated(toolGate, request, args -> sshteamStatus(args, sshTeamService)));
+                (exchange, request) -> runGated(toolGate, registry, request, args -> sshteamStatus(args, sshTeamService)));
 
         spec.toolCall(tool("sshteam_register_poll", "Poll SSH Team OAuth device flow using a previously returned device code.",
                 """
                 {"type":"object","required":["serverUrl","deviceCode"],"properties":{"serverUrl":{"type":"string"},"deviceCode":{"type":"string"},"clientId":{"type":"string","default":"sshteam-cli"},"verificationUri":{"type":"string"},"userCode":{"type":"string"},"pollIntervalSeconds":{"type":"integer","default":5},"maxWaitSeconds":{"type":"integer","default":600},"ignoreSslTrust":{"type":"boolean","default":false},"setDefault":{"type":"boolean","default":true}}}
                 """),
-                (exchange, request) -> runGated(toolGate, request, args -> sshteamRegisterPoll(args, sshTeamService)));
+                (exchange, request) -> runGated(toolGate, registry, request, args -> sshteamRegisterPoll(args, sshTeamService)));
 
         spec.toolCall(tool("sshteam_revoke_device", "Revoke an SSH Team device by id.",
                 """
                 {"type":"object","required":["deviceId"],"properties":{"serverUrl":{"type":"string"},"deviceId":{"type":"string"},"ignoreSslTrust":{"type":"boolean","default":false}}}
                 """),
-                (exchange, request) -> runGated(toolGate, request, args -> sshteamRevokeDevice(args, sshTeamService)));
+                (exchange, request) -> runGated(toolGate, registry, request, args -> sshteamRevokeDevice(args, sshTeamService)));
 
         spec.toolCall(tool("ssh_connect", "Open an SSH connection and return a handle.",
                 """
                 {"type":"object","required":["host","username"],"properties":{"host":{"type":"string"},"port":{"type":"integer","default":22},"username":{"type":"string"},"password":{"type":"string"},"privateKeyPath":{"type":"string"},"privateKeyPassphrase":{"type":"string"},"keyboardInteractivePassword":{"type":"boolean","default":false},"connectTimeoutMs":{"type":"integer","default":30000},"sshTeamEnabled":{"type":"boolean","default":true},"fallbackAuthentication":{"type":"boolean","default":true},"sshTeamServer":{"type":"string"},"sshTeamIgnoreSslTrust":{"type":"boolean","default":false},"sshTeamCertificateType":{"type":"string","default":"ED25519"},"sshTeamTimezone":{"type":"string"},"confirm":{"type":"boolean","default":false}}}
                 """),
-                (exchange, request) -> runGated(toolGate, request, args -> sshConnect(args, registry, sshTeamService)));
+                (exchange, request) -> runGated(toolGate, registry, request, args -> sshConnect(args, registry, sshTeamService)));
 
         spec.toolCall(tool("ssh_status", "Get status for one SSH handle.",
                 "{" +
                         "\"type\":\"object\",\"required\":[\"sshHandle\"],\"properties\":{\"sshHandle\":{\"type\":\"string\"}}" +
                         "}"),
-                (exchange, request) -> runGated(toolGate, request, args -> sshStatus(args, registry)));
+                (exchange, request) -> runGated(toolGate, registry, request, args -> sshStatus(args, registry)));
 
         spec.toolCall(tool("ssh_exec",
                 "Execute one command using an SSH exec request and wait for completion. Each call is stateless; shell state, environment changes, and working-directory changes are not retained. Include any required directory change in the command, for example: cd foo && ./run.",
                 """
                 {"type":"object","required":["sshHandle","command"],"properties":{"sshHandle":{"type":"string"},"command":{"type":"string"},"timeoutMs":{"type":"integer","default":30000},"charset":{"type":"string","default":"UTF-8"}}}
                 """),
-                (exchange, request) -> runGated(toolGate, request, args -> sshExec(args, registry)));
+                (exchange, request) -> runGated(toolGate, registry, request, args -> sshExec(args, registry)));
 
         spec.toolCall(tool("ssh_close", "Close an SSH handle.",
                 "{" +
                         "\"type\":\"object\",\"required\":[\"sshHandle\"],\"properties\":{\"sshHandle\":{\"type\":\"string\"}}" +
                         "}"),
-                (exchange, request) -> runGated(toolGate, request,
+                (exchange, request) -> runGated(toolGate, registry, request,
                         args -> closeResult("ssh", registry.closeSsh(stringArg(args, "sshHandle", true)))));
 
         spec.toolCall(tool("socket_open", "Open a local raw TCP socket and return a handle.",
                 """
                 {"type":"object","required":["host","port"],"properties":{"host":{"type":"string"},"port":{"type":"integer"},"connectTimeoutMs":{"type":"integer","default":30000},"options":{"type":"object","properties":{"tcpNoDelay":{"type":"boolean"},"keepAlive":{"type":"boolean"},"reuseAddress":{"type":"boolean"},"oobInline":{"type":"boolean"},"sendBufferSize":{"type":"integer"},"receiveBufferSize":{"type":"integer"},"soTimeoutMs":{"type":"integer"},"lingerSeconds":{"type":"integer"},"trafficClass":{"type":"integer"}}}}}
                 """),
-                (exchange, request) -> runGated(toolGate, request, args -> socketOpen(args, registry)));
+                (exchange, request) -> runGated(toolGate, registry, request, args -> socketOpen(args, registry)));
 
         spec.toolCall(tool("socket_status", "Get status and metadata for one socket handle.",
                 """
                 {"type":"object","required":["socketHandle"],"properties":{"socketHandle":{"type":"string"}}}
                 """),
-                (exchange, request) -> runGated(toolGate, request, args -> socketStatus(args, registry)));
+                (exchange, request) -> runGated(toolGate, registry, request, args -> socketStatus(args, registry)));
 
         spec.toolCall(tool("socket_set_options", "Update options on an open socket handle.",
                 """
                 {"type":"object","required":["socketHandle"],"properties":{"socketHandle":{"type":"string"},"options":{"type":"object","properties":{"tcpNoDelay":{"type":"boolean"},"keepAlive":{"type":"boolean"},"reuseAddress":{"type":"boolean"},"oobInline":{"type":"boolean"},"sendBufferSize":{"type":"integer"},"receiveBufferSize":{"type":"integer"},"soTimeoutMs":{"type":"integer"},"lingerSeconds":{"type":"integer"},"trafficClass":{"type":"integer"}}}}}
                 """),
-                (exchange, request) -> runGated(toolGate, request, args -> socketSetOptions(args, registry)));
+                (exchange, request) -> runGated(toolGate, registry, request, args -> socketSetOptions(args, registry)));
 
         spec.toolCall(tool("socket_write", "Write bytes to an open socket handle.",
                 """
                 {"type":"object","required":["socketHandle","data"],"properties":{"socketHandle":{"type":"string"},"data":{"type":"string"},"base64":{"type":"boolean","default":false},"flush":{"type":"boolean","default":true}}}
                 """),
-                (exchange, request) -> runGated(toolGate, request, args -> socketWrite(args, registry)));
+                (exchange, request) -> runGated(toolGate, registry, request, args -> socketWrite(args, registry)));
 
         spec.toolCall(tool("socket_read", "Read bytes from an open socket handle.",
                 """
                 {"type":"object","required":["socketHandle"],"properties":{"socketHandle":{"type":"string"},"maxBytes":{"type":"integer","default":8192},"waitMs":{"type":"integer","default":250},"base64":{"type":"boolean","default":false}}}
                 """),
-                (exchange, request) -> runGated(toolGate, request, args -> socketRead(args, registry)));
+                (exchange, request) -> runGated(toolGate, registry, request, args -> socketRead(args, registry)));
 
         spec.toolCall(tool("socket_close", "Close a socket handle.",
                 """
                 {"type":"object","required":["socketHandle"],"properties":{"socketHandle":{"type":"string"}}}
                 """),
-                (exchange, request) -> runGated(toolGate, request,
+                (exchange, request) -> runGated(toolGate, registry, request,
                         args -> closeResult("socket", registry.closeSocket(stringArg(args, "socketHandle", true)))));
 
         spec.toolCall(tool("socket_listen_open", "Open a local listening socket and return a listener handle.",
                 """
                 {"type":"object","required":["bindPort"],"properties":{"bindAddress":{"type":"string","default":"127.0.0.1"},"bindPort":{"type":"integer"},"backlog":{"type":"integer","default":50},"options":{"type":"object","properties":{"reuseAddress":{"type":"boolean"},"receiveBufferSize":{"type":"integer"},"soTimeoutMs":{"type":"integer"}}}}}
                 """),
-                (exchange, request) -> runGated(toolGate, request, args -> socketListenOpen(args, registry)));
+                (exchange, request) -> runGated(toolGate, registry, request, args -> socketListenOpen(args, registry)));
 
         spec.toolCall(tool("socket_listen_accept", "Accept a connection from a listener handle and return a socket handle.",
                 """
                 {"type":"object","required":["socketListenerHandle"],"properties":{"socketListenerHandle":{"type":"string"},"timeoutMs":{"type":"integer","default":30000},"options":{"type":"object","properties":{"tcpNoDelay":{"type":"boolean"},"keepAlive":{"type":"boolean"},"reuseAddress":{"type":"boolean"},"oobInline":{"type":"boolean"},"sendBufferSize":{"type":"integer"},"receiveBufferSize":{"type":"integer"},"soTimeoutMs":{"type":"integer"},"lingerSeconds":{"type":"integer"},"trafficClass":{"type":"integer"}}}}}
                 """),
-                (exchange, request) -> runGated(toolGate, request, args -> socketListenAccept(args, registry)));
+                (exchange, request) -> runGated(toolGate, registry, request, args -> socketListenAccept(args, registry)));
 
         spec.toolCall(tool("socket_listen_close", "Close a listener socket handle.",
                 """
                 {"type":"object","required":["socketListenerHandle"],"properties":{"socketListenerHandle":{"type":"string"}}}
                 """),
-                (exchange, request) -> runGated(toolGate, request,
+                (exchange, request) -> runGated(toolGate, registry, request,
                         args -> closeResult("socketlistener", registry.closeSocketListener(stringArg(args, "socketListenerHandle", true)))));
 
         spec.toolCall(tool("shell_open", "Open an interactive shell or legacy exec channel on an SSH connection. Use ssh_exec for a single stateless command.",
                 """
                 {"type":"object","required":["sshHandle"],"properties":{"sshHandle":{"type":"string"},"pty":{"type":"boolean","default":true},"term":{"type":"string","default":"xterm"},"cols":{"type":"integer","default":120},"rows":{"type":"integer","default":40},"command":{"type":"string"},"timeoutMs":{"type":"integer","default":30000}}}
                 """),
-                (exchange, request) -> runGated(toolGate, request, args -> shellOpen(args, registry)));
+                (exchange, request) -> runGated(toolGate, registry, request, args -> shellOpen(args, registry)));
 
         spec.toolCall(tool("shell_write", "Write data to an open shell handle.",
                 """
                 {"type":"object","required":["shellHandle","data"],"properties":{"shellHandle":{"type":"string"},"data":{"type":"string"},"appendNewline":{"type":"boolean","default":true}}}
                 """),
-                (exchange, request) -> runGated(toolGate, request, args -> shellWrite(args, registry)));
+                (exchange, request) -> runGated(toolGate, registry, request, args -> shellWrite(args, registry)));
 
         spec.toolCall(tool("shell_read", "Read available stdout/stderr bytes from a shell handle.",
                 """
                 {"type":"object","required":["shellHandle"],"properties":{"shellHandle":{"type":"string"},"maxBytes":{"type":"integer","default":8192},"base64":{"type":"boolean","default":false}}}
                 """),
-                (exchange, request) -> runGated(toolGate, request, args -> shellRead(args, registry)));
+                (exchange, request) -> runGated(toolGate, registry, request, args -> shellRead(args, registry)));
 
         spec.toolCall(tool("shell_close", "Close a shell handle.",
                 "{" +
                         "\"type\":\"object\",\"required\":[\"shellHandle\"],\"properties\":{\"shellHandle\":{\"type\":\"string\"}}" +
                         "}"),
-                (exchange, request) -> runGated(toolGate, request,
+                (exchange, request) -> runGated(toolGate, registry, request,
                         args -> closeResult("shell", registry.closeShell(stringArg(args, "shellHandle", true)))));
 
         spec.toolCall(tool("expect_open", "Create an ExpectShell from an existing shell handle and return an expectShellHandle.",
                 """
                 {"type":"object","required":["shellHandle"],"properties":{"shellHandle":{"type":"string"},"os":{"type":"string"},"startupTimeoutSeconds":{"type":"integer","default":30},"detectSettings":{"type":"boolean","default":true},"encoding":{"type":"string"},"passwordPrompt":{"type":"string"},"passwordErrorText":{"type":"string"}}}
                 """),
-                (exchange, request) -> runGated(toolGate, request, args -> expectShellOpen(args, registry)));
+                (exchange, request) -> runGated(toolGate, registry, request, args -> expectShellOpen(args, registry)));
 
         spec.toolCall(tool("expect_close", "Close an expectShellHandle.",
                 """
                 {"type":"object","required":["expectShellHandle"],"properties":{"expectShellHandle":{"type":"string"}}}
                 """),
-                (exchange, request) -> runGated(toolGate, request,
+                (exchange, request) -> runGated(toolGate, registry, request,
                         args -> closeResult("expectshell", registry.closeExpectShell(stringArg(args, "expectShellHandle", true)))));
 
         spec.toolCall(tool("expect_get_character_encoding", "Get the configured character encoding for an expect shell.",
                 """
                 {"type":"object","required":["expectShellHandle"],"properties":{"expectShellHandle":{"type":"string"}}}
                 """),
-                (exchange, request) -> runGated(toolGate, request, args -> expectShellGetCharacterEncoding(args, registry)));
+                (exchange, request) -> runGated(toolGate, registry, request, args -> expectShellGetCharacterEncoding(args, registry)));
 
         spec.toolCall(tool("expect_set_character_encoding", "Set the character encoding for an expect shell.",
                 """
                 {"type":"object","required":["expectShellHandle","characterEncoding"],"properties":{"expectShellHandle":{"type":"string"},"characterEncoding":{"type":"string"}}}
                 """),
-                (exchange, request) -> runGated(toolGate, request, args -> expectShellSetCharacterEncoding(args, registry)));
+                (exchange, request) -> runGated(toolGate, registry, request, args -> expectShellSetCharacterEncoding(args, registry)));
 
         spec.toolCall(tool("expect_set_shell_init_timeout", "Set the global ExpectShell shell-init timeout (legacy static setting).",
                 """
                 {"type":"object","required":["timeoutMs"],"properties":{"timeoutMs":{"type":"integer"}}}
                 """),
-                (exchange, request) -> runGated(toolGate, request, McpToolset::expectShellSetShellInitTimeout));
+                (exchange, request) -> runGated(toolGate, registry, request, McpToolset::expectShellSetShellInitTimeout));
 
         spec.toolCall(tool("expect_in_startup", "Check whether the expect shell is still in startup detection mode.",
                 """
                 {"type":"object","required":["expectShellHandle"],"properties":{"expectShellHandle":{"type":"string"}}}
                 """),
-                (exchange, request) -> runGated(toolGate, request, args -> expectShellInStartup(args, registry)));
+                (exchange, request) -> runGated(toolGate, registry, request, args -> expectShellInStartup(args, registry)));
 
         spec.toolCall(tool("expect_su", "Run su and return a child expectShellHandle when successful.",
                 """
                 {"type":"object","required":["expectShellHandle","cmd"],"properties":{"expectShellHandle":{"type":"string"},"cmd":{"type":"string"},"password":{"type":"string"},"passwordPrompt":{"type":"string"}}}
                 """),
-                (exchange, request) -> runGated(toolGate, request, args -> expectShellSu(args, registry)));
+                (exchange, request) -> runGated(toolGate, registry, request, args -> expectShellSu(args, registry)));
 
         spec.toolCall(tool("expect_sudo", "Run sudo and return process status, output, and exit code.",
                 """
                 {"type":"object","required":["expectShellHandle","cmd"],"properties":{"expectShellHandle":{"type":"string"},"cmd":{"type":"string"},"password":{"type":"string"},"promptExpression":{"type":"string"},"waitFor":{"type":"boolean","default":true}}}
                 """),
-                (exchange, request) -> runGated(toolGate, request, args -> expectShellSudo(args, registry)));
+                (exchange, request) -> runGated(toolGate, registry, request, args -> expectShellSudo(args, registry)));
 
         spec.toolCall(tool("expect_is_closed", "Check whether an expect shell has been closed.",
                 """
                 {"type":"object","required":["expectShellHandle"],"properties":{"expectShellHandle":{"type":"string"}}}
                 """),
-                (exchange, request) -> runGated(toolGate, request, args -> expectShellIsClosed(args, registry)));
+                (exchange, request) -> runGated(toolGate, registry, request, args -> expectShellIsClosed(args, registry)));
 
         spec.toolCall(tool("expect_exit", "Exit the current shell and close the expect shell handle.",
                 """
                 {"type":"object","required":["expectShellHandle"],"properties":{"expectShellHandle":{"type":"string"}}}
                 """),
-                (exchange, request) -> runGated(toolGate, request, args -> expectShellExit(args, registry)));
+                (exchange, request) -> runGated(toolGate, registry, request, args -> expectShellExit(args, registry)));
 
         spec.toolCall(tool("expect_get_newline", "Get the newline sequence used by the remote shell OS profile.",
                 """
                 {"type":"object","required":["expectShellHandle"],"properties":{"expectShellHandle":{"type":"string"}}}
                 """),
-                (exchange, request) -> runGated(toolGate, request, args -> expectShellGetNewline(args, registry)));
+                (exchange, request) -> runGated(toolGate, registry, request, args -> expectShellGetNewline(args, registry)));
 
         spec.toolCall(tool("expect_execute_with_output", "Execute a command and return command output.",
                 """
                 {"type":"object","required":["expectShellHandle","cmd"],"properties":{"expectShellHandle":{"type":"string"},"cmd":{"type":"string"}}}
                 """),
-                (exchange, request) -> runGated(toolGate, request, args -> expectShellExecuteWithOutput(args, registry)));
+                (exchange, request) -> runGated(toolGate, registry, request, args -> expectShellExecuteWithOutput(args, registry)));
 
         spec.toolCall(tool("expect_execute_with_exit_code", "Execute a command and return its exit code.",
                 """
                 {"type":"object","required":["expectShellHandle","cmd"],"properties":{"expectShellHandle":{"type":"string"},"cmd":{"type":"string"}}}
                 """),
-                (exchange, request) -> runGated(toolGate, request, args -> expectShellExecuteWithExitCode(args, registry)));
+                (exchange, request) -> runGated(toolGate, registry, request, args -> expectShellExecuteWithExitCode(args, registry)));
 
         spec.toolCall(tool("expect_execute", "Execute a command without returning output.",
                 """
                 {"type":"object","required":["expectShellHandle","cmd"],"properties":{"expectShellHandle":{"type":"string"},"cmd":{"type":"string"}}}
                 """),
-                (exchange, request) -> runGated(toolGate, request, args -> expectShellExecute(args, registry)));
+                (exchange, request) -> runGated(toolGate, registry, request, args -> expectShellExecute(args, registry)));
 
         spec.toolCall(tool("expect_execute_command", "Execute a command with advanced options and return process status.",
                 """
                 {"type":"object","required":["expectShellHandle","cmd"],"properties":{"expectShellHandle":{"type":"string"},"cmd":{"type":"string"},"matchPromptMarker":{"type":"boolean","default":false},"consume":{"type":"boolean","default":true},"charset":{"type":"string"}}}
                 """),
-                (exchange, request) -> runGated(toolGate, request, args -> expectShellExecuteCommand(args, registry)));
+                (exchange, request) -> runGated(toolGate, registry, request, args -> expectShellExecuteCommand(args, registry)));
 
         spec.toolCall(tool("expect_get_num_commands_executed", "Get the number of commands executed through this expect shell.",
                 """
                 {"type":"object","required":["expectShellHandle"],"properties":{"expectShellHandle":{"type":"string"}}}
                 """),
-                (exchange, request) -> runGated(toolGate, request, args -> expectShellGetNumCommandsExecuted(args, registry)));
+                (exchange, request) -> runGated(toolGate, registry, request, args -> expectShellGetNumCommandsExecuted(args, registry)));
 
         spec.toolCall(tool("expect_get_os_type", "Get the legacy OS type code detected by expect shell.",
                 """
                 {"type":"object","required":["expectShellHandle"],"properties":{"expectShellHandle":{"type":"string"}}}
                 """),
-                (exchange, request) -> runGated(toolGate, request, args -> expectShellGetOsType(args, registry)));
+                (exchange, request) -> runGated(toolGate, registry, request, args -> expectShellGetOsType(args, registry)));
 
         spec.toolCall(tool("expect_get_os_description", "Get the detected OS description for this expect shell.",
                 """
                 {"type":"object","required":["expectShellHandle"],"properties":{"expectShellHandle":{"type":"string"}}}
                 """),
-                (exchange, request) -> runGated(toolGate, request, args -> expectShellGetOsDescription(args, registry)));
+                (exchange, request) -> runGated(toolGate, registry, request, args -> expectShellGetOsDescription(args, registry)));
 
         spec.toolCall(tool("sftp_open", "Open an SFTP client from an SSH handle.",
                 """
                 {"type":"object","required":["sshHandle"],"properties":{"sshHandle":{"type":"string"},"remotePath":{"type":"string","default":"/"}}}
                 """),
-                (exchange, request) -> runGated(toolGate, request, args -> sftpOpen(args, registry)));
+                (exchange, request) -> runGated(toolGate, registry, request, args -> sftpOpen(args, registry)));
 
         spec.toolCall(tool("sftp_close", "Close an SFTP handle.",
                 "{" +
                         "\"type\":\"object\",\"required\":[\"sftpHandle\"],\"properties\":{\"sftpHandle\":{\"type\":\"string\"}}" +
                         "}"),
-                (exchange, request) -> runGated(toolGate, request,
+                (exchange, request) -> runGated(toolGate, registry, request,
                         args -> closeResult("sftp", registry.closeSftp(stringArg(args, "sftpHandle", true)))));
 
         spec.toolCall(tool("sftp_pwd", "Get the current remote working directory of an SFTP client.",
                 """
                 {"type":"object","required":["sftpHandle"],"properties":{"sftpHandle":{"type":"string"}}}
                 """),
-                (exchange, request) -> runGated(toolGate, request, args -> sftpPwd(args, registry)));
+                (exchange, request) -> runGated(toolGate, registry, request, args -> sftpPwd(args, registry)));
 
         spec.toolCall(tool("sftp_cd", "Change the current remote working directory of an SFTP client.",
                 """
                 {"type":"object","required":["sftpHandle","path"],"properties":{"sftpHandle":{"type":"string"},"path":{"type":"string"}}}
                 """),
-                (exchange, request) -> runGated(toolGate, request, args -> sftpCd(args, registry)));
+                (exchange, request) -> runGated(toolGate, registry, request, args -> sftpCd(args, registry)));
 
         spec.toolCall(tool("sftp_ls", "List files in a remote directory.",
                 """
                 {"type":"object","required":["sftpHandle"],"properties":{"sftpHandle":{"type":"string"},"path":{"type":"string"},"filter":{"type":"string"},"regexFilter":{"type":"boolean","default":false},"maximumFiles":{"type":"integer","default":0}}}
                 """),
-                (exchange, request) -> runGated(toolGate, request, args -> sftpLs(args, registry)));
+                (exchange, request) -> runGated(toolGate, registry, request, args -> sftpLs(args, registry)));
 
         spec.toolCall(tool("sftp_stat", "Get attributes of a remote file or directory.",
                 """
                 {"type":"object","required":["sftpHandle","path"],"properties":{"sftpHandle":{"type":"string"},"path":{"type":"string"},"followLink":{"type":"boolean","default":true}}}
                 """),
-                (exchange, request) -> runGated(toolGate, request, args -> sftpStat(args, registry)));
+                (exchange, request) -> runGated(toolGate, registry, request, args -> sftpStat(args, registry)));
 
         spec.toolCall(tool("sftp_mkdir", "Create a remote directory.",
                 """
                 {"type":"object","required":["sftpHandle","path"],"properties":{"sftpHandle":{"type":"string"},"path":{"type":"string"},"parents":{"type":"boolean","default":false}}}
                 """),
-                (exchange, request) -> runGated(toolGate, request, args -> sftpMkdir(args, registry)));
+                (exchange, request) -> runGated(toolGate, registry, request, args -> sftpMkdir(args, registry)));
 
         spec.toolCall(tool("sftp_rmdir", "Remove a remote directory.",
                 """
                 {"type":"object","required":["sftpHandle","path"],"properties":{"sftpHandle":{"type":"string"},"path":{"type":"string"}}}
                 """),
-                (exchange, request) -> runGated(toolGate, request, args -> sftpRmdir(args, registry)));
+                (exchange, request) -> runGated(toolGate, registry, request, args -> sftpRmdir(args, registry)));
 
         spec.toolCall(tool("sftp_rm", "Remove a remote file or directory tree.",
                 """
                 {"type":"object","required":["sftpHandle","path"],"properties":{"sftpHandle":{"type":"string"},"path":{"type":"string"},"recursive":{"type":"boolean","default":false},"force":{"type":"boolean","default":false}}}
                 """),
-                (exchange, request) -> runGated(toolGate, request, args -> sftpRm(args, registry)));
+                (exchange, request) -> runGated(toolGate, registry, request, args -> sftpRm(args, registry)));
 
         spec.toolCall(tool("sftp_rename", "Rename a remote file or directory.",
                 """
                 {"type":"object","required":["sftpHandle","oldPath","newPath"],"properties":{"sftpHandle":{"type":"string"},"oldPath":{"type":"string"},"newPath":{"type":"string"},"posix":{"type":"boolean","default":false}}}
                 """),
-                (exchange, request) -> runGated(toolGate, request, args -> sftpRename(args, registry)));
+                (exchange, request) -> runGated(toolGate, registry, request, args -> sftpRename(args, registry)));
 
         spec.toolCall(tool("sftp_symlink", "Create a symbolic link on the remote server.",
                 """
                 {"type":"object","required":["sftpHandle","target","linkPath"],"properties":{"sftpHandle":{"type":"string"},"target":{"type":"string"},"linkPath":{"type":"string"}}}
                 """),
-                (exchange, request) -> runGated(toolGate, request, args -> sftpSymlink(args, registry)));
+                (exchange, request) -> runGated(toolGate, registry, request, args -> sftpSymlink(args, registry)));
 
         spec.toolCall(tool("sftp_chmod", "Change permissions of a remote file or directory.",
                 """
                 {"type":"object","required":["sftpHandle","path","permissions"],"properties":{"sftpHandle":{"type":"string"},"path":{"type":"string"},"permissions":{"type":"string"}}}
                 """),
-                (exchange, request) -> runGated(toolGate, request, args -> sftpChmod(args, registry)));
+                (exchange, request) -> runGated(toolGate, registry, request, args -> sftpChmod(args, registry)));
 
         spec.toolCall(tool("sftp_chown", "Change owner/group of a remote file or directory.",
                 """
                 {"type":"object","required":["sftpHandle","path"],"properties":{"sftpHandle":{"type":"string"},"path":{"type":"string"},"owner":{"type":"string"},"group":{"type":"string"}}}
                 """),
-                (exchange, request) -> runGated(toolGate, request, args -> sftpChown(args, registry)));
+                (exchange, request) -> runGated(toolGate, registry, request, args -> sftpChown(args, registry)));
 
         spec.toolCall(tool("sftp_file_open", "Open a remote file for random access and return an SFTP file handle.",
                 """
                 {"type":"object","required":["sftpHandle","path"],"properties":{"sftpHandle":{"type":"string"},"path":{"type":"string"},"read":{"type":"boolean","default":true},"write":{"type":"boolean","default":false},"create":{"type":"boolean","default":false},"truncate":{"type":"boolean","default":false},"append":{"type":"boolean","default":false}}}
                 """),
-                (exchange, request) -> runGated(toolGate, request, args -> sftpFileOpen(args, registry)));
+                (exchange, request) -> runGated(toolGate, registry, request, args -> sftpFileOpen(args, registry)));
 
         spec.toolCall(tool("sftp_file_read", "Read bytes from an open SFTP file handle at a given offset.",
                 """
                 {"type":"object","required":["sftpFileHandle","offset","length"],"properties":{"sftpFileHandle":{"type":"string"},"offset":{"type":"integer"},"length":{"type":"integer"},"base64":{"type":"boolean","default":false}}}
                 """),
-                (exchange, request) -> runGated(toolGate, request, args -> sftpFileRead(args, registry)));
+                (exchange, request) -> runGated(toolGate, registry, request, args -> sftpFileRead(args, registry)));
 
         spec.toolCall(tool("sftp_file_write", "Write bytes to an open SFTP file handle at a given offset.",
                 """
                 {"type":"object","required":["sftpFileHandle","offset","data"],"properties":{"sftpFileHandle":{"type":"string"},"offset":{"type":"integer"},"data":{"type":"string"},"base64":{"type":"boolean","default":true}}}
                 """),
-                (exchange, request) -> runGated(toolGate, request, args -> sftpFileWrite(args, registry)));
+                (exchange, request) -> runGated(toolGate, registry, request, args -> sftpFileWrite(args, registry)));
 
         spec.toolCall(tool("sftp_file_close", "Close an SFTP file handle.",
                 """
                 {"type":"object","required":["sftpFileHandle"],"properties":{"sftpFileHandle":{"type":"string"}}}
                 """),
-                (exchange, request) -> runGated(toolGate, request,
+                (exchange, request) -> runGated(toolGate, registry, request,
                         args -> closeResult("sftpfile", registry.closeSftpFile(stringArg(args, "sftpFileHandle", true)))));
 
         spec.toolCall(tool("tunnel_open_local", "Open a local tunnel and return a handle.",
                 """
                 {"type":"object","required":["sshHandle","bindAddress","bindPort","destinationAddress","destinationPort"],"properties":{"sshHandle":{"type":"string"},"protocol":{"type":"string","enum":["tcp","unix"],"default":"tcp"},"bindAddress":{"type":"string"},"bindPort":{"type":"integer"},"destinationAddress":{"type":"string"},"destinationPort":{"type":"integer"},"bindPath":{"type":"string"},"destinationPath":{"type":"string"}}}
                 """),
-                (exchange, request) -> runGated(toolGate, request, args -> tunnelOpenLocal(args, registry)));
+                (exchange, request) -> runGated(toolGate, registry, request, args -> tunnelOpenLocal(args, registry)));
 
         spec.toolCall(tool("tunnel_open_remote", "Open a remote tunnel and return a handle.",
                 """
                 {"type":"object","required":["sshHandle","bindAddress","bindPort","destinationAddress","destinationPort"],"properties":{"sshHandle":{"type":"string"},"protocol":{"type":"string","enum":["tcp","unix"],"default":"tcp"},"bindAddress":{"type":"string"},"bindPort":{"type":"integer"},"destinationAddress":{"type":"string"},"destinationPort":{"type":"integer"},"bindPath":{"type":"string"},"destinationPath":{"type":"string"}}}
                 """),
-                (exchange, request) -> runGated(toolGate, request, args -> tunnelOpenRemote(args, registry)));
+                (exchange, request) -> runGated(toolGate, registry, request, args -> tunnelOpenRemote(args, registry)));
 
         spec.toolCall(tool("tunnel_close", "Close a tunnel handle.",
                 "{" +
                         "\"type\":\"object\",\"required\":[\"tunnelHandle\"],\"properties\":{\"tunnelHandle\":{\"type\":\"string\"}}" +
                         "}"),
-                (exchange, request) -> runGated(toolGate, request,
+                (exchange, request) -> runGated(toolGate, registry, request,
                         args -> closeResult("tunnel", registry.closeTunnel(stringArg(args, "tunnelHandle", true)))));
 
         spec.toolCall(tool("scp_copy_to", "Upload files to a remote host using legacy SCP via an SSH handle.",
                 """
                 {"type":"object","required":["sshHandle","localPath","remotePath"],"properties":{"sshHandle":{"type":"string"},"localPath":{"type":"string"},"remotePath":{"type":"string"},"recursive":{"type":"boolean","default":false}}}
                 """),
-                (exchange, request) -> runGated(toolGate, request, args -> scpCopyTo(args, registry)));
+                (exchange, request) -> runGated(toolGate, registry, request, args -> scpCopyTo(args, registry)));
 
         spec.toolCall(tool("scp_copy_from", "Download files from a remote host using legacy SCP via an SSH handle.",
                 """
                 {"type":"object","required":["sshHandle","remotePath","localPath"],"properties":{"sshHandle":{"type":"string"},"remotePath":{"type":"string"},"localPath":{"type":"string"},"recursive":{"type":"boolean","default":false}}}
                 """),
-                (exchange, request) -> runGated(toolGate, request, args -> scpCopyFrom(args, registry)));
+                (exchange, request) -> runGated(toolGate, registry, request, args -> scpCopyFrom(args, registry)));
 
         spec.resources(
                 new SyncResourceSpecification(
@@ -1031,7 +1031,7 @@ final class McpToolset {
                 return error("Shell/exec start request failed.");
             }
 
-            String shellHandle = registry.registerShell(channel, sshHandle);
+            String shellHandle = registry.registerShell(channel, sshHandle, command == null || command.isBlank());
             Map<String, Object> payload = Map.of(
                     "shellHandle", shellHandle,
                     "sshHandle", sshHandle,
@@ -1301,7 +1301,7 @@ final class McpToolset {
             ExpectShell child = password == null
                     ? expectShell.get().su(cmd)
                     : (passwordPrompt == null ? expectShell.get().su(cmd, password) : expectShell.get().su(cmd, password, passwordPrompt));
-            String childHandle = registry.registerChildExpectShell(child, expectShellHandle);
+            String childHandle = registry.registerChildExpectShell(child, expectShellHandle, cmd);
             return ok(Map.of(
                     "expectShellHandle", expectShellHandle,
                     "childExpectShellHandle", childHandle,
@@ -1997,8 +1997,10 @@ final class McpToolset {
         }
     }
 
-    private static McpSchema.CallToolResult runGated(ToolGate toolGate, McpSchema.CallToolRequest request, ToolExecutor executor) {
-        Map<String, Object> args = toolArgs(request);
+    private static McpSchema.CallToolResult runGated(ToolGate toolGate, HandleRegistry registry,
+            McpSchema.CallToolRequest request, ToolExecutor executor) {
+        // Immutable snapshot: the gate assesses exactly what the executor receives.
+        Map<String, Object> args = java.util.Collections.unmodifiableMap(new LinkedHashMap<>(toolArgs(request)));
         String toolName = request.name();
         Optional<StandardGatedTool> gatedTool = StandardGatedTool.fromToolName(toolName);
         if (gatedTool.isEmpty()) {
@@ -2006,7 +2008,14 @@ final class McpToolset {
         }
 
         try {
-            Optional<String> verificationMessage = toolGate.verify(gatedTool.get(), args);
+            if (toolGate.enforcesCommandBoundary()) {
+                Optional<String> violation = CommandBoundary.check(toolName, args, registry);
+                if (violation.isPresent()) {
+                    return error(violation.get());
+                }
+            }
+            Optional<String> verificationMessage = toolGate.verify(gatedTool.get(), args,
+                    registry.executionContext(args));
             if (verificationMessage.isPresent()) {
                 return confirmationRequired(verificationMessage.get(), gatedTool.get(), args);
             }
