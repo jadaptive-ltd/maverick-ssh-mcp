@@ -27,8 +27,8 @@ public final class UpdateService implements AutoCloseable {
             "https://athene.jadaptive.com/t/files/jadaptive/maverick-ssh-mcp/current");
 
     private static final String CACHE_FILE = "maverick-ssh-mcp-available-version.json";
-    private static final Duration CHECK_INTERVAL = Duration.ofDays(7);
-    private static final Duration MAX_JITTER = Duration.ofHours(12);
+    private static final Duration CHECK_INTERVAL = Duration.ofDays(1);
+    private static final Duration MAX_JITTER = Duration.ofHours(2);
     private static final ObjectMapper JSON = new ObjectMapper();
 
     private final URI updateUrl;
