@@ -65,8 +65,8 @@ class UpdateServiceTest {
             assertEquals(1, requests.get());
             assertEquals("application/json", accept.get());
             assertEquals("application/json", contentType.get());
-            assertEquals("Maverick SSH MCP 0.9.0-84 [" + System.getProperty("os.name") + "; "
-                    + System.getProperty("os.arch") + "; " + System.getProperty("os.version") + "]",
+            assertEquals("Maverick SSH MCP 0.9.0-84 (" + System.getProperty("os.name") + "; "
+                    + System.getProperty("os.arch") + "; " + System.getProperty("os.version") + ")",
                     userAgent.get());
 
             Path cache = dataDirectory.resolve("maverick-ssh-mcp-available-version.json");
