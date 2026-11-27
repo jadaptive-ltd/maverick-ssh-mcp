@@ -3247,6 +3247,9 @@
   ],
   "resources": [
     {
+      "glob": "META-INF/maven/com.jadaptive/maverick-ssh-mcp/pom.properties"
+    },
+    {
       "glob": "META-INF/maven/com.sshtools/maverick-synergy-common/pom.properties"
     },
     {
